@@ -5,31 +5,91 @@
 <style type="text/css">
 body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
 
-header { text-align: center; }
+header { position: absolute; z-index: 2; text-align: center; width: 100%; }
 header .header_btn { display: inline-block; padding: 10px 20px; font-weight: bold; font-size: 14px; cursor: pointer; color: #cccccc; }
 header .header_btn:hover { border-bottom: #616161 solid 2px; color: #616161; }
-header .header_btn.select { color: #009688; border-bottom: #009688 solid 2px; }
+header .header_btn.select { color: #009688 !important; border-bottom: #009688 solid 2px !important; }
 iframe { position: absolute; top: 40px; width: 100%; height: calc( 100% - 80px ); border: none; }
+iframe.hide { top: 0px; opacity: 0; }
 footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; background-color: #ECEFF1; color: #616161; text-align: center; font-size: 10px; padding: 13px; }
+.background { position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; z-index:  }
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
 <header>
-	<div class="header_btn select">소속</div>
-	<div class="header_btn">직원</div>
-	<div class="header_btn">품목</div>
-	<div class="header_btn">정산</div>
-	<div class="header_btn">추이</div>
+	<div class="header_btn select" data-target-src="/group/main">소속</div>
+	<div class="header_btn" data-target-src="/employee/main">직원</div>
+	<div class="header_btn" data-target-src="/product/main">품목</div>
+	<div class="header_btn" data-target-src="/calculation/main">정산</div>
+	<div class="header_btn" data-target-src="/stats/main">통계</div>
 </header>
-<iframe src="/group/main"></iframe>
+<iframe id="sub_view" class="hide" src="/group/main"></iframe>
 <footer>
 	신나라유통
 </footer>
 
 <script type="text/javascript">
+
+/**
+ * jQuery 변수
+ */
+
+// 헤더 버튼들
+var $headerBtns = $(".header_btn");
+
+// 하위 화면 ( iframe )
+var $subView = $("#sub_view");
+
+var $header = $("header");
+var $footer = $("footer");
+
+/**
+ * 이벤트
+ */
+
+// 헤더 버튼 클릭 이벤트
+$headerBtns.on( "click", function(){
 	
+	var $this = $(this);
+	$headerBtns.not( $this ).stop().removeClass( "select", 100 );
+	$this.stop().addClass( "select", 100 );
+	
+	var src = $this.attr( "data-target-src" );
+	$subView.stop().addClass( "hide", 500, function(){
+		$subView.attr( "src", src );
+	} );
+	
+} );
+
+
+// 하위 화면 로드 이벤트
+$subView.on( "load", function(){
+	
+	$subView.stop().removeClass( "hide", 500 );
+	
+} );
+
+window.hideNav = function( duration, callback ){
+	
+	var $subBody = $($subView.contents()[0].body);
+	$header.animate({"top": "-40px"}, duration);
+	$subView.animate({"top": "0px", "height": "100%"}, duration);
+	$subBody.animate({"margin-top": "40px"}, duration);
+	$footer.animate({"bottom": "-40px"}, duration);
+	
+};
+
+window.showNav = function( duration, callback ){
+	
+	var $subBody = $($subView.contents()[0].body);
+	$header.animate({"top": "0px"}, duration);
+	$subView.animate({"top": "40px", "height": "calc( 100% - 40px )"}, duration);
+	$subBody.animate({"margin-top": "0px"}, duration);
+	$footer.animate({"bottom": "0px"}, duration);
+	
+};
 </script>
 </body>
 </html>
