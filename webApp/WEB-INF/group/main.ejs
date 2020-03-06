@@ -14,15 +14,44 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .smc-inp { border: none; border-bottom: #ccc solid 1px; padding: 4px 10px; font-size: 10px; width: 100%; }
 .smc-inp::placeholder { color: #cccccc; }
 .smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
-.group_wrap { border-radius: 4px; box-shadow: 0px 0px 0px 1px #ccc; }
-
 .smc-count { font-size: 10px; border-bottom: #ccc solid 2px; margin-bottom: 10px; height: 32px; }
-
 .small-title { font-weight: bold; margin-bottom: 40px; }
+
+/* 그룹 */
+.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); }
+	.group-item { display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-name { padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+			.group-content-item { padding: 4px 0px; height: 25px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.group-property { float: left; width: 69px; text-align: center; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.group-value { float: left; width: 110px; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-use { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; background-color: #E8F5E9; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+/**
+ 	Polyfill
+ **/
+ 
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength,padString) {
+        targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0,targetLength) + String(this);
+        }
+    };
+}
+</script>
 </head>
 <body>
 <div class="container" style="position: relative;">
@@ -35,7 +64,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 			
 				<!-- 상단 -->
 				<div class="smc-count">
-					<div class="col-md-6" style="padding-top: 8px;">총 4건</div>
+					<div class="col-md-6" style="padding-top: 8px;">총 <span id="group-cnt-span">0</span>건</div>
 					<div class="col-md-6">
 						<div class="smc-btn-wrap">
 							<div class="smc-btn blue">저장</div>
@@ -47,18 +76,8 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 				</div>
 				
 				<!-- 본문 -->
-				<div class="col-md-12" style="position: relative; text-align: center; background-color: ; height: calc( 100% - 40px );">
-					<div style="display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px;">
-						<div style="padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px;">
-							북부
-						</div>
-						<div style="text-align: center; padding: 4px 0px; font-size: 12px;">
-							36명
-						</div>
-						<div style="padding: 4px 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; background-color: #E8F5E9;">
-							사용중
-						</div>
-					</div>
+				<div id="group-list" class="col-md-12 group-list">
+					
 				</div>
 				
 				<!-- 하단 -->
@@ -73,7 +92,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 
 <div id="add-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
 
-	<div style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 410px ); top: 50%; width: 400px; padding: 20px;">
+	<div id="add_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
 		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
 			소속 추가
 		</div>
@@ -81,12 +100,12 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 			<span style="color: #ff0000;">*</span>소속명
 		</div>
 		<div class="col-md-9">
-			<input class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
+			<input id="group-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
 		</div>
 		<div class="col-md-12" style="margin-top: 20px;">
 			<div class="smc-btn-wrap">
-				<div class="smc-btn blue">완료</div>
-				<div class="smc-btn">취소</div>
+				<div id="complete-btn" class="smc-btn blue">완료</div>
+				<div id="cancel-btn" class="smc-btn">취소</div>
 			</div>
 		</div>
 	</div>
@@ -95,10 +114,144 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 
 <script type="text/javascript">
 
-$("#add-btn").on("click", function(){
+/**
+	jQuery 변수
+ **/
+
+var $addBtn = $("#add-btn"); // 추가 버튼
+var $addPopup = $("#add-popup"); // 팝업 ( 배경포함 )
+var $addPopupContent = $("#add_popup_content"); // 팝업 ( 내용 )
+var $cancelBtn = $("#cancel-btn"); // 취소 버튼
+var $completeBtn = $("#complete-btn"); // 완료 버튼
+var $groupNameInp = $("#group-name-inp"); // 소속명 입력창
+var $groupList = $("#group-list"); // 그룹 목록
+var $groupCntSpan = $("#group-cnt-span"); // 그룹수
+ 
+/**
+	모듈
+ **/
+ var $TemplateModule = (function(){
+	 
+	 var template = {
+			 
+		 "group-item": [
+			 '<div class="group-item">',
+				'<div class="group-name">',
+					'북부',
+				'</div>',
+				'<div class="group-content-list">',
+					'<div class="group-content-item">',
+						'<div class="group-property">직원수</div>',
+						'<div class="group-emp-cnt group-value">0명</div>',
+					'</div>',
+					'<div class="group-content-item">',
+						'<div class="group-property">등록일</div>',
+						'<div class="group-reg-dt group-value">2020-03-06</div>',
+					'</div>',
+					'<div class="group-content-item">',
+						'<div class="group-property">수정일</div>',
+						'<div class="group-up-dt group-value">2020-03-06</div>',
+					'</div>',
+				'</div>',
+				'<div class="group-use">',
+					'사용중',
+				'</div>',
+			'</div>'
+		 ].join("")
+			 
+	 };
+	 
+	 return {
+		
+		 // jQuery 신규 객체 생성
+		 create: function( templateName ){
+			 return $( template[ templateName ] );
+		 }
+		 
+	 };
+	 
+ })();
+ 
+ /**
+ 	이벤트
+ **/
+ 
+// 추가 버튼 클릭 이벤트
+$addBtn.on("click", function(){
 	
-	$("#add-popup").fadeIn( 500 );
+	// 팝업 표시
+	$addPopup.fadeIn( 500 );
 	parent.hideNav( 500 );
+	$groupNameInp.focus();
+	$addPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+});
+
+// 취소 버튼 클릭 이벤트
+$cancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addPopup.fadeOut( 500 );
+	$addPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 완료 버튼 클릭 이벤트
+$completeBtn.on("click", function(){
+	
+	var newGroupName = $groupNameInp.val().trim();
+	if( newGroupName == "" ){
+		alert( "그룹명이 비어있습니다." );
+		return;
+	}
+	
+	var $groupNames = $groupList.find( ".group-name" );
+	for( var i=0; i<$groupNames.length; ++i ){
+		var groupName =  $groupNames.eq( i ).text();
+		if( newGroupName == groupName ){
+			alert( "이미 존재하는 그룹명 입니다." );
+			return;
+		}
+	}
+	
+	var $groupItem = $TemplateModule.create( "group-item" );
+	var now = new Date();
+	var yyyyMMdd = now.getFullYear() + "-" + ( now.getMonth() + 1 ).toString().padStart( 2, 0 ) + "-" + now.getDate().toString().padStart( 2, 0 );
+	$groupItem.find( ".group-reg-dt" ).text( yyyyMMdd );
+	$groupItem.find( ".group-up-dt" ).text( yyyyMMdd );
+	$groupItem.find( ".group-name" ).text( newGroupName );
+	
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addPopup.fadeOut( 500 );
+	$addPopupContent.css( { "margin-top": "0px" } );
+	$addPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		// 넓어지는 애니메이션으로 표시
+		$groupItem.css( { "width": "0px" } );
+		$groupItem.prependTo( $groupList );
+		$groupItem.animate( { "width": "200px" }, 500 );
+		
+		// 수량 표시 갱신
+		var cnt = $groupList.find(".group-item").length;
+		$groupCntSpan.text( cnt );
+		
+		// 팝업 그룹명 제거
+		$groupNameInp.val("");
+		
+	} );
+	
+});
+
+$groupNameInp.on("keypress", function( e ){
+	
+	if( e.keyCode == 13 ){
+		
+		$completeBtn.trigger("click");
+		
+	}
 	
 });
 

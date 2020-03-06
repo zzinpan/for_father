@@ -74,8 +74,8 @@ $subView.on( "load", function(){
 window.hideNav = function( duration, callback ){
 	
 	var $subBody = $($subView.contents()[0].body);
+	$subView.animate({"top": "0px", "height": window.innerHeight + "px"}, duration);
 	$header.animate({"top": "-40px"}, duration);
-	$subView.animate({"top": "0px", "height": "100%"}, duration);
 	$subBody.animate({"margin-top": "40px"}, duration);
 	$footer.animate({"bottom": "-40px"}, duration);
 	
@@ -84,8 +84,8 @@ window.hideNav = function( duration, callback ){
 window.showNav = function( duration, callback ){
 	
 	var $subBody = $($subView.contents()[0].body);
+	$subView.animate({"top": "40px", "height": ( window.innerHeight - 80 ) + "px"}, duration);
 	$header.animate({"top": "0px"}, duration);
-	$subView.animate({"top": "40px", "height": "calc( 100% - 40px )"}, duration);
 	$subBody.animate({"margin-top": "0px"}, duration);
 	$footer.animate({"bottom": "0px"}, duration);
 	
