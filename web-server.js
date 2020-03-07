@@ -26,6 +26,38 @@
 	global.path = require('path');
 	global.APP_ROOT_PATH = global.path.resolve( __dirname );
 	
+	/**
+	 * 프로젝트 변수
+	 */
+	
+	// 데이터 경로
+	global.dataDir = "./data";
+	
+	// 유니크 아이디
+	global.getUniqueId = function(){
+		return ( Date.now() + Math.random() ).toString().replace(".", "");
+	};
+	
+	// 시간
+	global.now = function(){
+		var now = new Date();
+		var yyyy = now.getFullYear().toString();
+		var MM = ( now.getMonth() + 1 ).toString().padStart( 2, 0 );
+		var dd = now.getDate().toString().padStart( 2, 0 );
+		var hh = now.getHours().toString().padStart( 2, 0 );
+		var mm = now.getMinutes().toString().padStart( 2, 0 );
+		var ss = now.getSeconds().toString().padStart( 2, 0 );
+		return {
+			object: now,
+			yyyy: yyyy,
+			MM: MM,
+			dd: dd,
+			hh: hh,
+			mm: mm,
+			ss: ss
+		}
+	};
+	
 })();
 
 // 프로퍼티 셋팅
@@ -174,6 +206,48 @@
 	
 })();
 
+/**
+ * 데이터 파일 생성
+ */
+(function creataDataFile(){
+	
+	if (fs.existsSync(global.dataDir)){
+		console.log("has data.");
+		return;
+	}
+	console.log("no data.");
+	
+	// 폴더 생성
+	fs.mkdirSync(global.dataDir);
+	console.log("create " + global.dataDir + " - complete");
+	
+	// 소속 파일 생성
+	var now = global.now();
+	var nowStr = now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss;
+	var group = [
+		{ 
+			id: "GRP|ETC",
+			name: "기타",
+			use: true,
+			createDate: nowStr,
+			updateDate: nowStr
+			
+		}
+	];
+	fs.writeFile( 
+		global.dataDir + "/group.json", 
+		JSON.stringify( group ),
+		"utf8",
+		function(err){ 
+			if (err == null) { 
+				console.log("create group.json - complete");
+			} else { 
+				console.log("create group.json - fail");
+				console.log( err );
+			} 
+	});
+	
+})();
 
 // 서버 실행
 http.createServer(app).listen(app.get('port'), function(){
