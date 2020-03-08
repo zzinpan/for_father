@@ -29,6 +29,19 @@ module.exports = [
 		url: "/group/save",
 		type: "post",
 		method: function( req, res, next ){
+
+			var groups = req.body;
+			fs.writeFile( 
+				global.dataDir + "/group.json", 
+				JSON.stringify( groups ),
+				"utf8",
+				function(err){ 
+					if (err == null) { 
+						res.send( { result: "SUCCESS", data: null } );
+					} else { 
+						res.send( { result: "FAIL", data: err } );
+					} 
+			});
 			
 		}
 	},

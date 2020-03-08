@@ -80,7 +80,7 @@ if (!String.prototype.padStart) {
 					<div class="col-md-6" style="padding-top: 8px;">총 <span id="group-cnt-span">0</span>건</div>
 					<div class="col-md-6">
 						<div class="smc-btn-wrap">
-							<div class="smc-btn blue">저장</div>
+							<div id="save-btn" class="smc-btn blue">저장</div>
 							<div id="del-btn" class="smc-btn disable">삭제</div>
 							<div id="mod-btn" class="smc-btn disable">수정</div>
 							<div id="add-btn" class="smc-btn">추가</div>
@@ -181,6 +181,7 @@ if (!String.prototype.padStart) {
 var $addBtn = $("#add-btn"); // 추가 버튼
 var $delBtn = $("#del-btn"); // 삭제 버튼
 var $modBtn = $("#mod-btn"); // 수정 버튼
+var $saveBtn = $("#save-btn"); // 저장 버튼
 
 // 추가팝업 부분
 var $addPopup = $("#add-popup"); // 추가 팝업 ( 배경포함 )
@@ -289,7 +290,6 @@ var $TemplateModule = (function(){
 			
 			// 직원수
 			$.fn.setEmployeeCnt = function setEmployeeCnt( cnt ){
-				this.data("employeeCnt", cnt);
 				this.find(".group-emp-cnt").text(cnt);
 			};
 		
@@ -321,7 +321,6 @@ var $TemplateModule = (function(){
 				$clone.data({
 					id: null,
 					name: null,
-					employeeCnt: null,
 					use: null,
 					createDate: null,					
 					updateDate: null
@@ -395,7 +394,7 @@ var $TemplateModule = (function(){
 /****************************************
 	데이터 로드
 ****************************************/
-var groups = JSON.parse('<%-groups%>');
+var groups = <%-groups%>;
 for( var i=0; i<groups.length; ++i ){
 	var group = groups[ i ];
 	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.createDate, group.updateDate );
@@ -652,6 +651,41 @@ $modCompleteBtn.on("click", function(){
 	$modPopup.fadeOut( 500 );
 	$modPopupContent.css( { "margin-top": "0px" } );
 	$modPopupContent.animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 저장 버튼 클릭 이벤트
+$saveBtn.on("click", function(){
+	
+	 var groups = [];
+	 var $groupItems = $groupList.find(".group-item");
+	 for( var i=0; i<$groupItems.length; ++i ){
+		 var $groupItem = $groupItems.eq( i );
+		 groups.push( $groupItem.data() );
+	 }
+	 
+	 $.ajax({
+		
+		 url: "/group/save",
+		 type: "post",
+		 headers: {
+	     	"Content-Type": "application/json"
+	     },
+		 data: JSON.stringify( groups ),
+		 dataType: "json",
+		 success: function( res ){
+			 
+			 console.log( res );
+			 
+			 if( res.result == "SUCCESS" ){
+				 alert( "저장되었습니다." );
+			 }else{
+				 alert( "실패하였습니다.\n관리자에게 문의바랍니다." );
+			 }
+			 
+		 }
+		 
+	 });
 	
 });
 
