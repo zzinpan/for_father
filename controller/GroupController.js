@@ -1,10 +1,10 @@
 module.exports = [
 	
 	/**
-	 * 메인 화면
+	 * 소속관리 화면
 	 */
 	{
-		url: "/group/main",
+		url: "/group/mgmt/view",
 		type: "get",
 		method: function( req, res, next ){
 			
@@ -13,7 +13,7 @@ module.exports = [
 				global.dataDir + "/group.json",
 				"utf8",
 				function( err, data ){ 
-					res.render( "WEB-INF/group/main.ejs", {
+					res.render( "WEB-INF/group/mgmt.ejs", {
 						groups: data
 					} );
 				}
@@ -26,7 +26,7 @@ module.exports = [
 	 * 소속 저장
 	 */
 	{
-		url: "/group/save",
+		url: "/group/mgmt/save",
 		type: "post",
 		method: function( req, res, next ){
 

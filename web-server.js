@@ -226,9 +226,10 @@
 	var nowStr = now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss;
 	var group = [
 		{ 
-			id: "GRP|ETC",
+			id: "GRP::ETC",
 			name: "기타",
 			use: true,
+			enableDelete: false,
 			createDate: nowStr,
 			updateDate: nowStr
 			

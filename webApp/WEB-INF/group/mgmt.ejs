@@ -298,6 +298,14 @@ var $TemplateModule = (function(){
 				return this.data("use"); 
 			};
 		
+			// 삭제가능 여부
+			$.fn.setEnableDelete = function( enableDelete ){
+				this.data("enableDelete", enableDelete);
+				if( enableDelete == false ){
+					this.addClass("disable");
+				}
+			};
+		
 			// 사용여부 설정
 			$.fn.setUse = function( bool ){
 				this.data("use", bool);
@@ -315,13 +323,14 @@ var $TemplateModule = (function(){
 				this.find( ".group-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
 			};
 		
-			return function( id, name, employeeCnt, use, createDate, updateDate ){
+			return function( id, name, employeeCnt, use, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "group-item" ] );
 				$clone.data({
 					id: null,
 					name: null,
 					use: null,
+					enableDelete: null,
 					createDate: null,					
 					updateDate: null
 				});
@@ -349,6 +358,11 @@ var $TemplateModule = (function(){
 					use = true;
 				}
 				$clone.setUse( use );
+				
+				if( enableDelete == null ){
+					enableDelete = true;
+				}
+				$clone.setEnableDelete( enableDelete );
 				
 				// 등록일
 				if( createDate == null ){
@@ -397,10 +411,7 @@ var $TemplateModule = (function(){
 var groups = <%-groups%>;
 for( var i=0; i<groups.length; ++i ){
 	var group = groups[ i ];
-	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.createDate, group.updateDate );
-	if( group.id == "GRP::ETC" ){
-		$group.addClass("disable");
-	}
+	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.enableDelete, group.createDate, group.updateDate );
 	$group.appendTo( $groupList );
 }
 
@@ -666,7 +677,7 @@ $saveBtn.on("click", function(){
 	 
 	 $.ajax({
 		
-		 url: "/group/save",
+		 url: "/group/mgmt/save",
 		 type: "post",
 		 headers: {
 	     	"Content-Type": "application/json"
@@ -674,8 +685,6 @@ $saveBtn.on("click", function(){
 		 data: JSON.stringify( groups ),
 		 dataType: "json",
 		 success: function( res ){
-			 
-			 console.log( res );
 			 
 			 if( res.result == "SUCCESS" ){
 				 alert( "저장되었습니다." );
