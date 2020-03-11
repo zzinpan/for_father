@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=UTF-8">
+<title>신나라유통 ERP > group > management</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+<style type="text/css">
+body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
+.smc-btn { float: right; display: inline-block; padding: 4px 10px; vertical-align: bottom; font-weight: bold; font-size: 10px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px; }
+.smc-btn:not(.disable):hover { box-shadow: 0px 0px 1px 1px #aaa; !important; }
+.smc-btn.select { box-shadow: 0px 0px 1px 1px #2196F3 !important; }
+.smc-btn.blue { background-color: #2196F3; color: white; box-shadow: 0px 0px 0px 1px #2196F3; }
+.smc-btn.disable { background-color: #eee; color: #aaa; cursor: not-allowed; }
+.smc-header { font-size: 20px; padding: 10px; color: #222; font-weight: bold; margin-bottom: 20px; }
+.smc-desc { background-color: #eee; color: #616161; padding: 10px; font-size: 12px; }
+.smc-inp { border: none; border-bottom: #ccc solid 1px; padding: 4px 10px; font-size: 10px; width: 100%; }
+.smc-inp::placeholder { color: #cccccc; }
+.smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
+.smc-count { font-size: 10px; border-bottom: #ccc solid 2px; margin-bottom: 10px; height: 32px; }
+.small-title { font-weight: bold; margin-bottom: 40px; }
+
+.popup-row { float: left; width: 100%; }
+.mt6 { margin-top: 6px; }
+.mt10 { margin-top: 10px; }
+.mt20 { margin-top: 20px; }
+
+/* 그룹 */
+.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); }
+	.group-item { cursor: pointer; display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
+	.group-item.disable { cursor: not-allowed; }
+	.group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
+	.group-item:not(.disable):hover { box-shadow: 0px 0px 2px 1px #aaa; }
+		.group-name { padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-item.disable .group-name { background-color: #607D8B; }
+		.group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+			.group-content-item { padding: 4px 0px; height: 25px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.group-property { float: left; width: 69px; text-align: center; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.group-value { float: left; width: 110px; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-content-use-status.use { background-color: #E8F5E9; }
+		.group-content-use-status.unuse { background-color: #eee; }
+</style>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+/**
+ 	Polyfill
+ **/
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength,padString) {
+        targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0,targetLength) + String(this);
+        }
+    };
+}
+</script>
+</head>
+<body>
+<div class="container" style="position: relative;">
+	<div class="row" style="position: relative; margin-top: 50px;">
+		<div class="col-md-offset-2 col-md-8" style="position: relative;">
+			<div class="smc-header">
+				소속 관리
+			</div>
+			<div class="col-md-12" style="position: relative;">
+			
+				<!-- 상단 -->
+				<div class="smc-count">
+					<div class="col-md-6" style="padding-top: 8px;">총 <span id="group-cnt-span">0</span>건</div>
+					<div class="col-md-6">
+						<div class="smc-btn-wrap">
+							<div id="save-btn" class="smc-btn blue">저장</div>
+							<div id="del-btn" class="smc-btn disable">삭제</div>
+							<div id="mod-btn" class="smc-btn disable">수정</div>
+							<div id="add-btn" class="smc-btn">추가</div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- 본문 -->
+				<div id="group-list" class="col-md-12 group-list">
+					
+				</div>
+				
+				<!-- 하단 -->
+				<div></div>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
+
+<!-- 추가 팝업 -->
+<div id="add-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
+
+	<div id="add_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
+		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
+			소속 추가
+		</div>
+		<div class="popup-row">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>소속명
+			</div>
+			<div class="col-md-9">
+				<input id="add-group-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt20">
+			<div class="col-md-12">
+				<div class="smc-btn-wrap">
+					<div id="add-complete-btn" class="smc-btn blue">완료</div>
+					<div id="add-cancel-btn" class="smc-btn">취소</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<!-- 수정 팝업 -->
+<div id="mod-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
+
+	<div id="mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
+		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
+			소속 수정
+		</div>
+		<div class="popup-row">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>소속명
+			</div>
+			<div class="col-md-9">
+				<input id="mod-group-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt10">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>사용여부
+			</div>
+			<div class="col-md-9">
+				<div id="mod-use-btn" class="smc-btn" style="float: left;">사용</div>
+				<div id="mod-unuse-btn" class="smc-btn"  style="float: left;">미사용</div>
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-offset-3 col-md-9" style="font-size: 10px; color: #616161;">
+				&nbsp; ※미사용 소속은 정산을 수행할 수 없습니다.
+			</div>
+		</div>
+		<div class="popup-row mt20">
+			<div class="col-md-12">
+				<div class="smc-btn-wrap">
+					<div id="mod-complete-btn" class="smc-btn blue">완료</div>
+					<div id="mod-cancel-btn" class="smc-btn">취소</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+
+/**
+	jQuery 변수
+ **/
+
+// 상단 버튼 부분
+var $addBtn = $("#add-btn"); // 추가 버튼
+var $delBtn = $("#del-btn"); // 삭제 버튼
+var $modBtn = $("#mod-btn"); // 수정 버튼
+var $saveBtn = $("#save-btn"); // 저장 버튼
+
+// 추가팝업 부분
+var $addPopup = $("#add-popup"); // 추가 팝업 ( 배경포함 )
+var $addPopupContent = $("#add_popup_content"); // 추가 팝업 ( 내용 )
+var $addCancelBtn = $("#add-cancel-btn"); // 취소 버튼
+var $addCompleteBtn = $("#add-complete-btn"); // 완료 버튼
+var $addGroupNameInp = $("#add-group-name-inp"); // 추가 팝업 - 소속명 입력창
+
+// 수정 팝업 부분
+var $modPopup = $("#mod-popup"); // 수정 팝업 ( 배경 포함 )
+var $modPopupContent = $("#mod_popup_content"); // 수정 팝업 ( 내용 )
+var $modCancelBtn = $("#mod-cancel-btn"); // 취소 버튼
+var $modCompleteBtn = $("#mod-complete-btn"); // 완료 버튼
+var $modGroupNameInp = $("#mod-group-name-inp"); // 수정 팝업 - 소속명 입력창
+var $modUseBtn = $("#mod-use-btn"); // 사용 버튼
+var $modUnuseBtn = $("#mod-unuse-btn"); // 사용 버튼
+
+// 그룹 목록 부분
+var $groupList = $("#group-list"); // 그룹 목록
+var $groupCntSpan = (function(){
+	
+	var $this = $("#group-cnt-span"); // 그룹수
+	$this.update = function(){
+		var cnt = $groupList.find(".group-item").length;
+		$this.text( cnt );
+		return $this;
+	};
+	return $this;
+	
+})();
+ 
+/**
+	모듈
+ **/
+ 
+ var TimeModule = {
+		
+		now: function(){
+			var now = new Date();
+			var yyyy = now.getFullYear().toString();
+			var MM = ( now.getMonth() + 1 ).toString().padStart( 2, 0 );
+			var dd = now.getDate().toString().padStart( 2, 0 );
+			var hh = now.getHours().toString().padStart( 2, 0 );
+			var mm = now.getMinutes().toString().padStart( 2, 0 );
+			var ss = now.getSeconds().toString().padStart( 2, 0 );
+			return {
+				object: now,
+				yyyy: yyyy,
+				MM: MM,
+				dd: dd,
+				hh: hh,
+				mm: mm,
+				ss: ss
+			}
+		}
+		
+};
+ 
+ // jQuery 템플릿 모듈
+var $TemplateModule = (function(){
+ 
+	var template = {
+	
+		"group-item": [
+			'<div class="group-item">',
+				'<div class="group-name">',
+					'',
+				'</div>',
+				'<div class="group-content-list">',
+					'<div class="group-content-item">',
+						'<div class="group-property">직원수</div>',
+						'<div class="group-value"><span class="group-emp-cnt">0</span>명</div>',
+					'</div>',
+					'<div class="group-content-item">',
+						'<div class="group-property">등록일</div>',
+						'<div class="group-reg-dt group-value">0000-00-00</div>',
+					'</div>',
+					'<div class="group-content-item">',
+						'<div class="group-property">수정일</div>',
+						'<div class="group-up-dt group-value">0000-00-00</div>',
+					'</div>',
+				'</div>',
+				'<div class="group-content-use-status">',
+					'사용',
+				'</div>',
+			'</div>'
+		].join("")
+	 
+	};
+
+	return {
+	
+		// jQuery 신규 객체 생성
+		createGroup: (function(){
+		
+			// 이름 조회
+			$.fn.getName = function getName(){
+				return this.data("name");
+			};
+			
+			// 이름 설정
+			$.fn.setName = function setName( name ){
+				this.data("name", name);
+				this.find(".group-name").text(name);
+			};
+			
+			// 직원수
+			$.fn.setEmployeeCnt = function setEmployeeCnt( cnt ){
+				this.find(".group-emp-cnt").text(cnt);
+			};
+		
+			// 사용여부 조회
+			$.fn.getUse = function(){
+				return this.data("use"); 
+			};
+		
+			// 삭제가능 여부
+			$.fn.setEnableDelete = function( enableDelete ){
+				this.data("enableDelete", enableDelete);
+				if( enableDelete == false ){
+					this.addClass("disable");
+				}
+			};
+		
+			// 사용여부 설정
+			$.fn.setUse = function( bool ){
+				this.data("use", bool);
+				if( bool == true ){
+					this.find(".group-content-use-status").removeClass("unuse").addClass("use").text("사용");
+				}else{
+					this.find(".group-content-use-status").removeClass("use").addClass("unuse").text("미사용");
+				}
+			};
+		
+			// 수정일 갱신
+			$.fn.updateDate = function updateDate(){
+				var now = TimeModule.now();
+				this.data( "updateDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
+				this.find( ".group-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
+			};
+		
+			return function( id, name, employeeCnt, use, enableDelete, createDate, updateDate ){
+		 
+				var $clone = $( template[ "group-item" ] );
+				$clone.data({
+					id: null,
+					name: null,
+					use: null,
+					enableDelete: null,
+					createDate: null,					
+					updateDate: null
+				});
+				
+				// 아이디
+				if( id == null ){
+					id = "GRP::" + ( Date.now() + Math.random() ).toString().replace(".", "");
+				}
+				$clone.data( "id", id );
+				
+				// 소속명
+				if( name == null ){
+					name = "";
+				}
+				$clone.setName( name );
+				
+				// 직원수
+				if( employeeCnt == null ){
+					employeeCnt = 0;
+				}
+				$clone.setEmployeeCnt( employeeCnt );
+				
+				// 사용여부
+				if( use == null ){
+					use = true;
+				}
+				$clone.setUse( use );
+				
+				if( enableDelete == null ){
+					enableDelete = true;
+				}
+				$clone.setEnableDelete( enableDelete );
+				
+				// 등록일
+				if( createDate == null ){
+					var now = TimeModule.now();
+					$clone.data( "createDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
+					$clone.find( ".group-reg-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
+				}else{
+					var yyyy = createDate.slice( 0, 4 );
+					var MM = createDate.slice( 4, 6 );
+					var dd = createDate.slice( 6, 8 );
+					var hh = createDate.slice( 8, 10 );
+					var mm = createDate.slice( 10, 12 );
+					var ss = createDate.slice( 12, 14 );
+					$clone.data( "createDate", yyyy + MM + dd + hh + mm + ss );
+					$clone.find( ".group-reg-dt" ).text( yyyy + "-" + MM  + "-" + dd );
+				}
+				
+				// 수정일
+				if( updateDate == null ){
+					$clone.updateDate();
+				}else{
+					var yyyy = updateDate.slice( 0, 4 );
+					var MM = updateDate.slice( 4, 6 );
+					var dd = updateDate.slice( 6, 8 );
+					var hh = updateDate.slice( 8, 10 );
+					var mm = updateDate.slice( 10, 12 );
+					var ss = updateDate.slice( 12, 14 );
+					$clone.data( "updateDate", yyyy + MM + dd + hh + mm + ss );
+					$clone.find( ".group-up-dt" ).text( yyyy + "-" + MM  + "-" + dd );
+				}
+				
+				return $clone;
+				 
+			}
+		 
+		})()
+	
+	};
+
+})();
+ 
+ 
+/****************************************
+	데이터 로드
+****************************************/
+var groups = <%-groups%>;
+for( var i=0; i<groups.length; ++i ){
+	var group = groups[ i ];
+	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.enableDelete, group.createDate, group.updateDate );
+	$group.appendTo( $groupList );
+}
+
+//수량 표시 갱신
+$groupCntSpan.update();
+
+ 
+/****************************************
+	이벤트
+****************************************/
+ 
+// 추가 버튼 클릭 이벤트
+$addBtn.on("click", function(){
+	
+	// 팝업 표시
+	$addPopup.fadeIn( 500 );
+	parent.hideNav( 500 );
+	$addGroupNameInp.focus();
+	$addPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+});
+
+// 추가팝업 - 취소 버튼 클릭 이벤트
+$addCancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addPopup.fadeOut( 500 );
+	$addPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 추가팝업 - 완료 버튼 클릭 이벤트
+$addCompleteBtn.on("click", function(){
+	
+	var newGroupName = $addGroupNameInp.val().trim();
+	if( newGroupName == "" ){
+		alert( "그룹명이 비어있습니다." );
+		return;
+	}
+	
+	var $groupItems = $groupList.find( ".group-item" );
+	for( var i=0; i<$groupItems.length; ++i ){
+		var groupName =  $groupItems.eq( i ).getName();
+		if( newGroupName == groupName ){
+			alert( "이미 존재하는 그룹명 입니다." );
+			return;
+		}
+	}
+	
+	var $groupItem = $TemplateModule.createGroup( null, newGroupName );
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addPopup.fadeOut( 500 );
+	$addPopupContent.css( { "margin-top": "0px" } );
+	$addPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		// 넓어지는 애니메이션으로 표시
+		$groupItem.css( { "width": "0px" } );
+		$groupItem.prependTo( $groupList );
+		$groupItem.animate( { "width": "200px" }, 500 );
+		
+		// 수량 표시 갱신
+		$groupCntSpan.update();
+		
+		// 팝업 그룹명 제거
+		$addGroupNameInp.val("");
+		
+	} );
+	
+});
+
+// 그룹명 입력 이벤트
+$addGroupNameInp.on("keypress", function( e ){
+	
+	// 엔터키 == 완료버튼 클릭
+	if( e.keyCode == 13 ){
+		
+		$addCompleteBtn.trigger("click");
+		
+	}
+	
+});
+
+// 그룹순서 변경
+(function(){
+	
+	var $select = null;
+	var isMousedown = false;
+	
+	// 그룹아이템 마우스다운 이벤트
+	$groupList.on("mousedown", ".group-item", function(){
+		
+		isMousedown = true;
+		
+		// 기존 선택 제거
+		var $this = $(this);
+		
+		$groupList.find(".group-item").not( $this ).removeClass( "select" );
+		$this.addClass("select");
+		
+		if( $this.hasClass("disable") ){
+			$delBtn.addClass( "disable" );
+			$modBtn.addClass( "disable" );
+		}else{
+			$delBtn.removeClass( "disable" );
+			$modBtn.removeClass( "disable" );
+		}
+		$select = $this;
+		
+	});
+	
+	$groupList.on("mousemove", ".group-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		$select.css( { cursor: "move" } );
+		
+	});
+	
+	$groupList.on("mouseenter", ".group-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		var $this = $(this);
+		if( $select.get(0) == $this.get(0) ){
+			return;
+		}
+
+		var mouseenterIdx = $groupList.find( ".group-item" ).index( $this );
+		var moveIdx = $groupList.find( ".group-item" ).index( $select );
+		
+		if( moveIdx > mouseenterIdx ){
+			$this.before( $select );
+		}else{
+			$this.after( $select );
+		}
+		
+		
+	});
+	
+	$groupList.on("mouseup", ".group-item", function( e ){
+		
+		// 기존 선택 제거
+		var $select = $groupList.find(".group-item.select");
+		$select.css( { cursor: "pointer" } );
+		isMousedown = false;
+		
+	});
+	
+})();
+
+// 삭제 버튼 클릭 이벤트
+$delBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $delBtn.hasClass("disable") ){
+		return;
+	}
+	
+	var $selectedGroupItem = $groupList.find(".group-item.select");
+	var groupName = $selectedGroupItem.getName();
+	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다.\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
+		
+		// 삭제모션
+		$selectedGroupItem.animate( { "width": "0px" }, 500, function(){
+			
+			// 삭제
+			$selectedGroupItem.remove();
+			
+			// 수량 표시 갱신
+			$groupCntSpan.update();
+			
+			// 버튼 비활성화
+			$delBtn.addClass( "disable" );
+			$modBtn.addClass( "disable" );
+			
+		} );
+		
+		
+	}
+	
+});
+
+// 수정 버튼 클릭 이벤트
+$modBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $delBtn.hasClass("disable") ){
+		return;
+	}
+	
+	// 선택된 소속
+	var $selectedGroupItem = $groupList.find(".group-item.select");
+	var groupName = $selectedGroupItem.getName();
+	
+	// 이름 설정
+	$modGroupNameInp.val( groupName );
+	
+	// 사용여부 설정
+	var use = $selectedGroupItem.getUse();
+	if( use ){
+		$modUseBtn.addClass("select");
+		$modUnuseBtn.removeClass("select");
+	}else{
+		$modUnuseBtn.addClass("select");
+		$modUseBtn.removeClass("select");
+	}
+	
+	// 팝업 표시
+	$modPopup.fadeIn( 500 );
+	parent.hideNav( 500 );
+	$modPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+	// 입력창 포커스 ( show 이후에 처리 필요 )
+	$modGroupNameInp.focus();
+	
+});
+
+// 수정팝업 - 사용 버튼 클릭 이벤트
+$modUseBtn.on("click", function(){
+	
+	$modUseBtn.addClass("select");
+	$modUnuseBtn.removeClass("select");
+	
+	
+});
+
+// 수정팝업 - 미사용 버튼 클릭 이벤트
+$modUnuseBtn.on("click", function(){
+	
+	$modUnuseBtn.addClass("select");
+	$modUseBtn.removeClass("select");
+	
+	
+});
+
+// 수정팝업 - 취소 버튼 클릭 이벤트
+$modCancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$modPopup.fadeOut( 500 );
+	$modPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 수정팝업 - 완료 버튼 클릭 이벤트
+$modCompleteBtn.on("click", function(){
+	
+	var newGroupName = $modGroupNameInp.val().trim();
+	if( newGroupName == "" ){
+		alert( "그룹명이 비어있습니다." );
+		return;
+	}
+	
+	// 선택된 소속
+	var $selectedGroupItem = $groupList.find(".group-item.select");
+	
+	// 그룹명이 달라진 경우만 그룹명 검증
+	var beforeGroupName = $selectedGroupItem.getName();
+	if( beforeGroupName != newGroupName ){
+		var $groupItems = $groupList.find( ".group-item" );
+		for( var i=0; i<$groupItems.length; ++i ){
+			var groupName =  $groupItems.eq( i ).getName();
+			if( newGroupName == groupName ){
+				alert( "이미 존재하는 그룹명 입니다." );
+				return;
+			}
+		}
+	}
+	
+	// 소속명 설정
+	$selectedGroupItem.setName( newGroupName );
+	
+	// 사용여부 설정
+	var use = $modUseBtn.hasClass("select");
+	$selectedGroupItem.setUse( use );
+	
+	// 수정일 갱신
+	$selectedGroupItem.updateDate();
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$modPopup.fadeOut( 500 );
+	$modPopupContent.css( { "margin-top": "0px" } );
+	$modPopupContent.animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 저장 버튼 클릭 이벤트
+$saveBtn.on("click", function(){
+	
+	 var groups = [];
+	 var $groupItems = $groupList.find(".group-item");
+	 for( var i=0; i<$groupItems.length; ++i ){
+		 var $groupItem = $groupItems.eq( i );
+		 groups.push( $groupItem.data() );
+	 }
+	 
+	 $.ajax({
+		
+		 url: "/group/management/save",
+		 type: "post",
+		 headers: {
+	     	"Content-Type": "application/json"
+	     },
+		 data: JSON.stringify( groups ),
+		 dataType: "json",
+		 success: function( res ){
+			 
+			 if( res.result == "SUCCESS" ){
+				 alert( "저장되었습니다." );
+			 }else{
+				 alert( "실패하였습니다.\n관리자에게 문의바랍니다." );
+			 }
+			 
+		 }
+		 
+	 });
+	
+});
+
+
+</script>
+</body>
+</html>

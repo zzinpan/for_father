@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset=UTF-8">
-<title>신나라유통 ERP > group</title>
+<title>신나라유통 ERP > employee > management</title>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 <style type="text/css">
@@ -71,9 +71,19 @@ if (!String.prototype.padStart) {
 	<div class="row" style="position: relative; margin-top: 50px;">
 		<div class="col-md-offset-2 col-md-8" style="position: relative;">
 			<div class="smc-header">
-				소속 관리
+				직원 관리
 			</div>
 			<div class="col-md-12" style="position: relative;">
+			
+				<div>
+					<div>소속</div>
+					<div>
+						<select>
+							<option value="전체">
+							
+						</select>
+					</div>
+				</div>
 			
 				<!-- 상단 -->
 				<div class="smc-count">
@@ -108,7 +118,7 @@ if (!String.prototype.padStart) {
 
 	<div id="add_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
 		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			소속 추가
+			직원 추가
 		</div>
 		<div class="popup-row">
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
@@ -135,7 +145,7 @@ if (!String.prototype.padStart) {
 
 	<div id="mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
 		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			소속 수정
+			직원 수정
 		</div>
 		<div class="popup-row">
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
@@ -408,11 +418,11 @@ var $TemplateModule = (function(){
 /****************************************
 	데이터 로드
 ****************************************/
-var groups = <%-groups%>;
-for( var i=0; i<groups.length; ++i ){
-	var group = groups[ i ];
-	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.enableDelete, group.createDate, group.updateDate );
-	$group.appendTo( $groupList );
+var employees = <%-employees%>;
+for( var i=0; i<employees.length; ++i ){
+	var employee = employees[ i ];
+// 	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.enableDelete, group.createDate, group.updateDate );
+// 	$group.appendTo( $groupList );
 }
 
 //수량 표시 갱신

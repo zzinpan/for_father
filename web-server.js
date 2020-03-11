@@ -248,6 +248,37 @@
 			} 
 	});
 	
+	// 직원 파일 생성
+	var employee = [ 
+		{
+			groupId: "GRP::ETC",
+			id: "EMP::FACTORY",
+			name: "공장",
+			age: null,
+			mail: null,
+			birthday: null,
+			weddingAnniversary: null,
+			image: null,
+			memo: null,
+			createDate: nowStr,
+			updateDate: nowStr,
+			use: true,
+			enableDelete: false
+		}
+	];
+	fs.writeFile( 
+			global.dataDir + "/employee.json", 
+			JSON.stringify( group ),
+			"utf8",
+			function(err){ 
+				if (err == null) { 
+					console.log("create employee.json - complete");
+				} else { 
+					console.log("create employee.json - fail");
+					console.log( err );
+				} 
+		});
+	
 })();
 
 // 서버 실행
