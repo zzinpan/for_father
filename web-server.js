@@ -103,6 +103,7 @@
 	app.set('view engine', 'ejs');
 	
 	// static file 프로젝트 root 경로를 기본값으로 사용
+	app.use('/data', express.static("./data"));
 	app.use('/dist', express.static("./dist"));
 	app.use('/src', express.static("./src"));
 	app.use('/', express.static("./webApp"));

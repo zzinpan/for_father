@@ -10,7 +10,8 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .smc-btn { float: right; display: inline-block; padding: 4px 10px; vertical-align: bottom; font-weight: bold; font-size: 10px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px; }
 .smc-btn:not(.disable):hover { box-shadow: 0px 0px 1px 1px #aaa; !important; }
 .smc-btn.select { box-shadow: 0px 0px 1px 1px #2196F3 !important; }
-.smc-btn.blue { background-color: #2196F3; color: white; box-shadow: 0px 0px 0px 1px #2196F3; }
+.smc-btn.blue { background-color: #2196F3; color: white; box-shadow: 0px 0px 0px 1px #64B5F6; }
+.smc-btn.bluegray { background-color: #607D8B; color: white; box-shadow: 0px 0px 0px 1px #90A4AE; }
 .smc-btn.disable { background-color: #eee; color: #aaa; cursor: not-allowed; }
 .smc-header { font-size: 20px; padding: 10px; color: #222; font-weight: bold; margin-bottom: 20px; }
 .smc-desc { background-color: #eee; color: #616161; padding: 10px; font-size: 12px; }
@@ -33,10 +34,10 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 	.group-item:not(.disable):hover { box-shadow: 0px 0px 2px 1px #aaa; }
 		.group-name { padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.group-item.disable .group-name { background-color: #607D8B; }
-		.group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #f9f9f9; }
 			.group-content-item { padding: 4px 0px; height: 25px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-				.group-property { float: left; width: 69px; text-align: center; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-				.group-value { float: left; width: 110px; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.group-property { float: left; width: 89px; padding-right: 10px; text-align: right; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.group-value { float: left; width: 120px; padding-left: 10px; text-align: left; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.group-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.group-content-use-status.use { background-color: #E8F5E9; }
 		.group-content-use-status.unuse { background-color: #eee; }
@@ -75,14 +76,29 @@ if (!String.prototype.padStart) {
 			</div>
 			<div class="col-md-12" style="position: relative;">
 			
-				<div>
-					<div>소속</div>
-					<div>
-						<select>
-							<option value="전체">
-							
+				<div style="padding: 20px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
+					<div style="float: left; display: inline-block; margin: 1px 10px 0px 0px;">소속</div>
+					<div style="float: left; display: inline-block;">
+						<select style="width: 100px; border: #ccc solid 1px; padding-left: 4px; border-radius: 4px;">
+							<option value="ALL" selected="selected">전체</option>
+							<%
+								groups = JSON.parse( groups );
+								for( var i=0; i<groups.length; ++i ){
+									%><option value="<%= groups[i].id %>"><%= groups[i].name %></option><%
+								}
+							%>
 						</select>
 					</div>
+					<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">이름</div>
+					<div style="float: left; display: inline-block;">
+						<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+					</div>
+					<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">특이사항</div>
+					<div style="float: left; display: inline-block;">
+						<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+					</div>
+					
+					<div id="save-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
 				</div>
 			
 				<!-- 상단 -->
@@ -100,7 +116,47 @@ if (!String.prototype.padStart) {
 				
 				<!-- 본문 -->
 				<div id="group-list" class="col-md-12 group-list">
-					
+					<div style="cursor: pointer; display: inline-block; width: 240px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none;">
+						<div style="padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #00BCD4; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">신명철</div>
+						<div style="margin-top: 20px; margin-bottom: 20px; margin-left: calc( 50% - 25px ); width: 50px; height: 50px; box-shadow: 0px 0px 0px 2px #CFD8DC; border-radius: 50px; background-image: url(/data/image/user/default.png); background-size: 100% 100%;"></div>
+						<div class="group-content-list">
+							 <div class="group-content-item"> 
+								 <div class="group-property">소속</div> 
+								 <div class="group-value">북부</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">나이</div> 
+								 <div class="group-reg-dt group-value">31</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">이메일</div> 
+								 <div class="group-up-dt group-value">12y8e@naver.com</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">생년월일</div> 
+								 <div class="group-up-dt group-value">1990-12-08</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">결혼기념일</div> 
+								 <div class="group-up-dt group-value">2018-08-10</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">메모</div> 
+								 <div class="group-up-dt group-value">보라아빠</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">등록일</div> 
+								 <div class="group-up-dt group-value">2020-03-12</div> 
+							 </div> 
+							 <div class="group-content-item"> 
+								 <div class="group-property">수정일</div> 
+								 <div class="group-up-dt group-value">2020-03-12</div> 
+							 </div> 
+						 </div> 
+						 <div class="group-content-use-status use"> 
+							 사용 
+						 </div> 
+					</div>
 				</div>
 				
 				<!-- 하단 -->

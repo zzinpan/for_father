@@ -17,7 +17,7 @@ module.exports = [
 						global.dataDir + "/group.json",
 						"utf8",
 						function( err, groups ){ 
-							res.render( "WEB-INF/group/management.ejs", {
+							res.render( "WEB-INF/employee/management.ejs", {
 								groups: groups,
 								employees: emplyoees
 							} );
