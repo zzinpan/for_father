@@ -22,6 +22,12 @@
 	// 암호화
 	global.sha256 = require('sha256');
 	
+	// 쿠키 파서
+	global.cookieParser = require('cookie-parser');
+
+	// 세션
+	global.session = require('express-session');
+	
 	// 프로젝트 경로
 	global.path = require('path');
 	global.APP_ROOT_PATH = global.path.resolve( __dirname );
@@ -111,8 +117,8 @@
 	/**
 	 * 세션 관련 설정
 	 */
-	app.use(express.cookieParser());
-	app.use(express.session({
+	app.use(cookieParser());
+	app.use(session({
 	  key: "SGK2D_SESSION_ID", // 세션키
 	  secret: "SmartGeoKit2D", // 비밀키
 //	  cookie: {
