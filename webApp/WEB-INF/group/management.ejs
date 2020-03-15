@@ -26,7 +26,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .mt20 { margin-top: 20px; }
 
 /* 그룹 */
-.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); }
+.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); overflow: auto; }
 	.group-item { cursor: pointer; display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
 	.group-item.disable { cursor: not-allowed; }
 	.group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
@@ -94,7 +94,7 @@ if (!String.prototype.padStart) {
 				</div>
 				
 				<!-- 하단 -->
-				<div></div>
+				<div class="col-md-12" style="height: 60px;"></div>
 				
 			</div>
 			
@@ -341,10 +341,7 @@ var $TemplateModule = (function(){
 				}
 				$clone.data( "id", id );
 				
-				// 소속명
-				if( name == null ){
-					name = "";
-				}
+				// 소속명 ( 필수값 )
 				$clone.setName( name );
 				
 				// 직원수

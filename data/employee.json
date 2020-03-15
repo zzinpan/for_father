@@ -1,1 +1,1 @@
-[{"id":"GRP::ETC","name":"기타","use":true,"enableDelete":false,"createDate":"20200311232254","updateDate":"20200311232254"}]
+[{"groupId":"GRP::ETC","id":"EMP::FACTORY","name":"공장","age":null,"phone":null,"mail":null,"birthday":null,"image":null,"memo":"기본 데이터\r\n삭제 불가능","createDate":"20200315161618","updateDate":"20200315161618","use":true,"enableDelete":false}]

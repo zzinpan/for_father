@@ -30,20 +30,21 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .mt20 { margin-top: 20px; }
 
 /* 그룹 */
-.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); }
-	.group-item { cursor: pointer; display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-	.group-item.disable { cursor: not-allowed; }
-	.group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
-	.group-item:not(.disable):hover { box-shadow: 0px 0px 2px 1px #aaa; }
-		.group-name { padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-		.group-item.disable .group-name { background-color: #607D8B; }
-		.group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #f9f9f9; }
-			.group-content-item { padding: 4px 0px; height: 25px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-				.group-property { float: left; width: 89px; padding-right: 10px; text-align: right; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-				.group-value { float: left; width: 120px; padding-left: 10px; text-align: left; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-		.group-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-		.group-content-use-status.use { background-color: #E8F5E9; }
-		.group-content-use-status.unuse { background-color: #eee; }
+.employee-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 140px ); overflow: auto; }
+	.employee-item { cursor: pointer; display: inline-block; width: 240px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
+	.employee-item.disable { cursor: not-allowed; }
+	.employee-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
+	.employee-item:not(.disable):hover { box-shadow: 0px 0px 2px 1px #aaa; }
+		.employee-name { padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #00BCD4; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.employee-image { margin-top: 20px; margin-bottom: 20px; margin-left: calc( 50% - 25px ); width: 50px; height: 50px; box-shadow: 0px 0px 0px 2px #CFD8DC; border-radius: 50px; background-image: url(/image/default-user.png); background-size: auto 100%; background-position: center; background-repeat: no-repeat; }
+		.employee-item.disable .employee-name { background-color: #607D8B; }
+		.employee-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; background-color: #f9f9f9; }
+			.employee-content-item { padding: 4px 0px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.employee-property { float: left; width: 89px; padding-right: 10px; text-align: right; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.employee-value { float: left; width: 120px; padding-left: 10px; text-align: left; white-space: pre; text-overflow: ellipsis; overflow: hidden; }
+		.employee-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.employee-content-use-status.use { background-color: #E8F5E9; }
+		.employee-content-use-status.unuse { background-color: #eee; }
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
@@ -70,6 +71,7 @@ if (!String.prototype.padStart) {
         }
     };
 }
+
 </script>
 </head>
 <body>
@@ -84,14 +86,8 @@ if (!String.prototype.padStart) {
 				<div style="padding: 20px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
 					<div style="float: left; display: inline-block; margin: 1px 10px 0px 0px;">소속</div>
 					<div style="float: left; display: inline-block;">
-						<select class="smc-select">
+						<select id="search-group-sel" class="smc-select">
 							<option value="ALL" selected="selected">전체</option>
-							<%
-								groups = JSON.parse( groups );
-								for( var i=0; i<groups.length; ++i ){
-									%><option value="<%= groups[i].id %>"><%= groups[i].name %></option><%
-								}
-							%>
 						</select>
 					</div>
 					<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">이름</div>
@@ -108,7 +104,7 @@ if (!String.prototype.padStart) {
 			
 				<!-- 상단 -->
 				<div class="smc-count">
-					<div class="col-md-6" style="padding-top: 8px;">총 <span id="group-cnt-span">0</span>건</div>
+					<div class="col-md-6" style="padding-top: 8px;">총 <span id="employee-cnt-span">0</span>건</div>
 					<div class="col-md-6">
 						<div class="smc-btn-wrap">
 							<div id="save-btn" class="smc-btn blue">저장</div>
@@ -120,52 +116,11 @@ if (!String.prototype.padStart) {
 				</div>
 				
 				<!-- 본문 -->
-				<div id="group-list" class="col-md-12 group-list">
-					<div style="cursor: pointer; display: inline-block; width: 240px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none;">
-						<div style="padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #00BCD4; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">신명철</div>
-						<div style="margin-top: 20px; margin-bottom: 20px; margin-left: calc( 50% - 25px ); width: 50px; height: 50px; box-shadow: 0px 0px 0px 2px #CFD8DC; border-radius: 50px; background-image: url(/data/image/user/default.png); background-size: 100% 100%;"></div>
-						<div class="group-content-list">
-							 <div class="group-content-item"> 
-								 <div class="group-property">소속</div> 
-								 <div class="group-value">북부</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">나이</div> 
-								 <div class="group-reg-dt group-value">31</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">연락처</div> 
-								 <div class="group-up-dt group-value">010-0000-0000</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">이메일</div> 
-								 <div class="group-up-dt group-value">12y8e@naver.com</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">생년월일</div> 
-								 <div class="group-up-dt group-value">1990-12-08</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">메모</div> 
-								 <div class="group-up-dt group-value">보라아빠</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">등록일</div> 
-								 <div class="group-up-dt group-value">2020-03-12</div> 
-							 </div> 
-							 <div class="group-content-item"> 
-								 <div class="group-property">수정일</div> 
-								 <div class="group-up-dt group-value">2020-03-12</div> 
-							 </div> 
-						 </div> 
-						 <div class="group-content-use-status use"> 
-							 사용 
-						 </div> 
-					</div>
+				<div id="employee-list" class="col-md-12 employee-list">
 				</div>
 				
 				<!-- 하단 -->
-				<div></div>
+				<div class="col-md-12" style="height: 60px;"></div>
 				
 			</div>
 			
@@ -182,16 +137,19 @@ if (!String.prototype.padStart) {
 			직원 추가
 		</div>
 		<div class="popup-row">
+			<div class="col-md-12">
+				<div id="add-employee-img" class="employee-image" style="background-image: url(/image/default-user.png); border-radius: 50px;">
+					<div id="add-employee-image-btn" class="add-employee-image-btn" style="margin-top: 32px; margin-right: -5px; float: right; padding: 4px; background-image: url(/image/camera.png); background-size: 12px 12px; background-position: center; background-repeat: no-repeat; background-color: white; border-radius: 50px; box-shadow: 0px 0px 0px 1px #ccc; width: 20px; height: 20px; cursor: pointer;">
+						<input id="add-employee-image-inp" type="file" style="display: none;" accept="image/*">
+					</div>
+				</div>
+			</div>
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
 				<span style="color: #ff0000;">*</span>소속
 			</div>
 			<div class="col-md-9">
-				<select class="smc-select">
-					<%
-						for( var i=0; i<groups.length; ++i ){
-							%><option value="<%= groups[i].id %>"><%= groups[i].name %></option><%
-						}
-					%>
+				<select id="add-employee-group-sel" class="smc-select">
+					<option value="NO_SELECT" selected="selected">선택</option>
 				</select>
 			</div>
 		</div>
@@ -200,7 +158,7 @@ if (!String.prototype.padStart) {
 				<span style="color: #ff0000;">*</span>이름
 			</div>
 			<div class="col-md-9">
-				<input id="add-group-name-inp" class="smc-inp" type="text" placeholder="이름을 입력해주세요.">
+				<input id="add-employee-name-inp" class="smc-inp" type="text" placeholder="이름을 입력해주세요.">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -208,7 +166,7 @@ if (!String.prototype.padStart) {
 				나이
 			</div>
 			<div class="col-md-9">
-				<input id="add-group-name-inp" class="smc-inp" type="text" placeholder="나이를 입력해주세요.">
+				<input id="add-employee-age-inp" class="smc-inp" type="text" placeholder="나이를 입력해주세요.">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -216,7 +174,7 @@ if (!String.prototype.padStart) {
 				연락처
 			</div>
 			<div class="col-md-9">
-				<input id="add-group-name-inp" class="smc-inp" type="text" placeholder="연락처를 입력해주세요.">
+				<input id="add-employee-phone-inp" class="smc-inp" type="text" placeholder="연락처를 입력해주세요.">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -224,7 +182,7 @@ if (!String.prototype.padStart) {
 				이메일
 			</div>
 			<div class="col-md-9">
-				<input id="add-group-name-inp" class="smc-inp" type="text" placeholder="이메일을 입력해주세요.">
+				<input id="add-employee-mail-inp" class="smc-inp" type="text" placeholder="이메일을 입력해주세요.">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -232,7 +190,7 @@ if (!String.prototype.padStart) {
 				생년월일
 			</div>
 			<div class="col-md-9">
-				<input id="birthday-inp" class="smc-inp cal-inp" type="text" placeholder="생년월일을 입력해주세요.">
+				<input id="add-employee-birthday-inp" class="smc-inp cal-inp" type="text" placeholder="생년월일을 입력해주세요.">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -240,7 +198,7 @@ if (!String.prototype.padStart) {
 				메모
 			</div>
 			<div class="col-md-9">
-				<textarea id="birthday-inp" class="smc-inp" style="height: 52px;" placeholder="특이사항을 입력하주세요."></textarea>
+				<textarea id="add-employee-memo-inp" class="smc-inp" style="height: 52px;" placeholder="특이사항을 입력하주세요."></textarea>
 			</div>
 		</div>
 		<div class="popup-row mt20">
@@ -263,11 +221,14 @@ if (!String.prototype.padStart) {
 			직원 수정
 		</div>
 		<div class="popup-row">
+			<div class="col-md-12">
+				<div class="employee-image"></div>
+			</div>
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
 				<span style="color: #ff0000;">*</span>소속명
 			</div>
 			<div class="col-md-9">
-				<input id="mod-group-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
+				<input id="mod-employee-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
 			</div>
 		</div>
 		<div class="popup-row mt10">
@@ -302,6 +263,9 @@ if (!String.prototype.padStart) {
 	jQuery 변수
  **/
 
+// 상단 검색
+var $searchGroupSel = $("#search-group-sel"); // 소속 선택창
+ 
 // 상단 버튼 부분
 var $addBtn = $("#add-btn"); // 추가 버튼
 var $delBtn = $("#del-btn"); // 삭제 버튼
@@ -313,11 +277,18 @@ var $addPopup = $("#add-popup"); // 추가 팝업 ( 배경포함 )
 var $addPopupContent = $("#add_popup_content"); // 추가 팝업 ( 내용 )
 var $addCancelBtn = $("#add-cancel-btn"); // 취소 버튼
 var $addCompleteBtn = $("#add-complete-btn"); // 완료 버튼
+var $addEmployeeImg = $("#add-employee-img"); // 이미지
+var $addEmployeeImageBtn = $("#add-employee-image-btn"); // 이미지 추가 버튼
+var $addEmployeeImageInp = $("#add-employee-image-inp"); // 이미지 파일 입력창
 var $addEmployeeGroupSel = $("#add-employee-group-sel"); // 추가 팝업 - 소속 선택창
 var $addEmployeeNameInp = $("#add-employee-name-inp"); // 추가 팝업 - 직원명 입력창
 var $addEmployeeAgeInp = $("#add-employee-age-inp"); // 추가 팝업 - 나이 입력창
-var $addEmployeePhoneInp = $("#add-employee-age-inp"); // 추가 팝업 - 나이 입력창
+var $addEmployeePhoneInp = $("#add-employee-phone-inp"); // 추가 팝업 - 연락처 입력창
+var $addEmployeeMailInp = $("#add-employee-mail-inp"); // 추가 팝업 - 메일 입력창
+var $addEmployeeBirthdayInp = $("#add-employee-birthday-inp"); // 추가 팝업 - 생년월일 입력창
+var $addEmployeeMemoInp = $("#add-employee-memo-inp"); // 추가 팝업 - 특이ㅏ항 입력창
 
+// 달력 부분
 var $calInps = $(".cal-inp");
 $calInps.datepicker({
 	language: "ko",
@@ -337,17 +308,17 @@ var $modPopup = $("#mod-popup"); // 수정 팝업 ( 배경 포함 )
 var $modPopupContent = $("#mod_popup_content"); // 수정 팝업 ( 내용 )
 var $modCancelBtn = $("#mod-cancel-btn"); // 취소 버튼
 var $modCompleteBtn = $("#mod-complete-btn"); // 완료 버튼
-var $modGroupNameInp = $("#mod-group-name-inp"); // 수정 팝업 - 소속명 입력창
+var $modemployeeNameInp = $("#mod-employee-name-inp"); // 수정 팝업 - 소속명 입력창
 var $modUseBtn = $("#mod-use-btn"); // 사용 버튼
 var $modUnuseBtn = $("#mod-unuse-btn"); // 사용 버튼
 	
 // 그룹 목록 부분
-var $groupList = $("#group-list"); // 그룹 목록
-var $groupCntSpan = (function(){
+var $employeeList = $("#employee-list"); // 그룹 목록
+var $employeeCntSpan = (function(){
 	
-	var $this = $("#group-cnt-span"); // 그룹수
+	var $this = $("#employee-cnt-span"); // 그룹수
 	$this.update = function(){
-		var cnt = $groupList.find(".group-item").length;
+		var cnt = $employeeList.find(".employee-item").length;
 		$this.text( cnt );
 		return $this;
 	};
@@ -358,8 +329,8 @@ var $groupCntSpan = (function(){
 /**
 	모듈
  **/
- 
- var TimeModule = {
+
+var TimeModule = {
 		
 		now: function(){
 			var now = new Date();
@@ -381,44 +352,103 @@ var $groupCntSpan = (function(){
 		}
 		
 };
- 
+
  // jQuery 템플릿 모듈
 var $TemplateModule = (function(){
  
 	var template = {
-	
-		"group-item": [
-			'<div class="group-item">',
-				'<div class="group-name">',
-					'',
-				'</div>',
-				'<div class="group-content-list">',
-					'<div class="group-content-item">',
-						'<div class="group-property">직원수</div>',
-						'<div class="group-value"><span class="group-emp-cnt">0</span>명</div>',
-					'</div>',
-					'<div class="group-content-item">',
-						'<div class="group-property">등록일</div>',
-						'<div class="group-reg-dt group-value">0000-00-00</div>',
-					'</div>',
-					'<div class="group-content-item">',
-						'<div class="group-property">수정일</div>',
-						'<div class="group-up-dt group-value">0000-00-00</div>',
-					'</div>',
-				'</div>',
-				'<div class="group-content-use-status">',
-					'사용',
-				'</div>',
+		
+		"option": '<option value="id">name</option>',
+			
+		"employee-item": [
+			'<div class="employee-item">',
+				'<div class="employee-name"></div>',
+				'<div class="employee-image"></div>',
+				'<div class="employee-content-list">',
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">소속</div>', 
+						 '<div class="employee-group employee-value"></div>',
+					 '</div>',
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">나이</div>', 
+						 '<div class="employee-age employee-value"></div>', 
+					 '</div>', 
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">연락처</div>', 
+						 '<div class="employee-phone employee-value"></div>', 
+					 '</div>', 
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">이메일</div>', 
+						 '<div class="employee-mail employee-value"></div>', 
+					 '</div>', 
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">생년월일</div>', 
+						 '<div class="employee-birthday employee-value"></div>', 
+					 '</div>', 
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">메모</div>', 
+						 '<div class="employee-memo employee-value"></div>', 
+					 '</div>', 
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">등록일</div>', 
+						 '<div class="employee-reg-dt employee-value"></div>', 
+					 '</div>', 
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">수정일</div>', 
+						 '<div class="employee-up-dt employee-value"></div>', 
+					 '</div>', 
+				 '</div>', 
+				 '<div class="employee-content-use-status use">', 
+					 '사용', 
+				 '</div>', 
 			'</div>'
 		].join("")
 	 
 	};
 
 	return {
-	
-		// jQuery 신규 객체 생성
-		createGroup: (function(){
 		
+		// 옵션
+		createOption: function( id, name ){
+			
+			var $option = $(template["option"]);
+			$option.data( { id: id, name: name } );
+			$option.val( id );
+			$option.text( name );
+			return $option;
+			
+		},
+		
+		// jQuery 신규 객체 생성
+		createEmployee: (function(){
+		
+			// 소속 설정
+			$.fn.setGroup = function setGroup( id, name ){
+				this.data("group", { id: id, name: name });
+				this.find(".employee-group").text(name);
+			};
+			
+			// 이미지 조회
+			$.fn.getImage = function(){
+				return this.data("image");
+			};
+			
+			// 이미지 설정
+			$.fn.setImage = function setImage( imageSrc ){
+				this.data("image", imageSrc);
+				if( imageSrc != null ){
+					this.find(".employee-image").css({
+						"background-image": "url(" + imageSrc + ")",
+						"box-shadow": "none"
+					});
+				}else{
+					this.find(".employee-image").css({
+						"background-image": "url(/image/default-user.png)",
+						"box-shadow": "0px 0px 0px 2px #CFD8DC"
+					});
+				}
+			};
+			
 			// 이름 조회
 			$.fn.getName = function getName(){
 				return this.data("name");
@@ -427,12 +457,62 @@ var $TemplateModule = (function(){
 			// 이름 설정
 			$.fn.setName = function setName( name ){
 				this.data("name", name);
-				this.find(".group-name").text(name);
+				this.find(".employee-name").text(name);
 			};
 			
-			// 직원수
-			$.fn.setEmployeeCnt = function setEmployeeCnt( cnt ){
-				this.find(".group-emp-cnt").text(cnt);
+			// 나이 설정
+			$.fn.setAge = function setAge( age ){
+				this.data("age", age);
+				this.find(".employee-age").text(age);
+			};
+			
+			// 나이 조회
+			$.fn.getAge = function getAge(){
+				return this.data("age");
+			};
+			
+			// 연락처 설정
+			$.fn.setPhone = function setPhone( phone ){
+				this.data("phone", phone);
+				this.find(".employee-phone").text(phone);
+			};
+			
+			// 연락처 조회
+			$.fn.getPhone = function getPhone(){
+				return this.data("phone");
+			};
+			
+			// 이메일 설정
+			$.fn.setMail = function setMail( mail ){
+				this.data("mail", mail);
+				this.find(".employee-mail").text(mail);
+			};
+			
+			// 이메일 조회
+			$.fn.getMail = function getMail(){
+				return this.data("mail");
+			};
+			
+			// 생일 설정
+			$.fn.setBirthday = function setBirthday( birthday ){
+				this.data("birthday", birthday);
+				this.find(".employee-birthDay").text(birthday);
+			};
+			
+			// 생일 조회
+			$.fn.getBirthday = function getBirthday(){
+				return this.data("birthday");
+			};
+			
+			// 메모 설정
+			$.fn.setMemo = function setMemo( memo ){
+				this.data("memo", memo);
+				this.find(".employee-memo").text(memo);
+			};
+			
+			// 메모 조회
+			$.fn.getMemo = function getMemo(){
+				return this.data("memo");
 			};
 		
 			// 사용여부 조회
@@ -452,9 +532,9 @@ var $TemplateModule = (function(){
 			$.fn.setUse = function( bool ){
 				this.data("use", bool);
 				if( bool == true ){
-					this.find(".group-content-use-status").removeClass("unuse").addClass("use").text("사용");
+					this.find(".employee-content-use-status").removeClass("unuse").addClass("use").text("사용");
 				}else{
-					this.find(".group-content-use-status").removeClass("use").addClass("unuse").text("미사용");
+					this.find(".employee-content-use-status").removeClass("use").addClass("unuse").text("미사용");
 				}
 			};
 		
@@ -462,38 +542,58 @@ var $TemplateModule = (function(){
 			$.fn.updateDate = function updateDate(){
 				var now = TimeModule.now();
 				this.data( "updateDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
-				this.find( ".group-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
+				this.find( ".employee-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
 			};
 		
-			return function( id, name, employeeCnt, use, enableDelete, createDate, updateDate ){
+			return function( groupId, groupName, id, name, imageSrc, age, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
 		 
-				var $clone = $( template[ "group-item" ] );
+				var $clone = $( template[ "employee-item" ] );
 				$clone.data({
+					group: { id: null, name: null },
 					id: null,
 					name: null,
+					image: null,
+					age: null,
+					phone: null,
+					mail: null,
+					birthday: null,
+					memo: null,
 					use: null,
 					enableDelete: null,
 					createDate: null,					
 					updateDate: null
 				});
 				
+				// 소속 ( 필수값 )
+				$clone.setGroup( groupId, groupName );
+				
 				// 아이디
 				if( id == null ){
-					id = "GRP::" + ( Date.now() + Math.random() ).toString().replace(".", "");
+					// 신규
+					id = "EMP::" + ( Date.now() + Math.random() ).toString().replace(".", "");
 				}
 				$clone.data( "id", id );
 				
-				// 소속명
-				if( name == null ){
-					name = "";
-				}
+				// 소속명 ( 필수값 )
 				$clone.setName( name );
 				
-				// 직원수
-				if( employeeCnt == null ){
-					employeeCnt = 0;
-				}
-				$clone.setEmployeeCnt( employeeCnt );
+				// 이미지
+				$clone.setImage( imageSrc );
+				
+				// 나이
+				$clone.setAge( age );
+				
+				// 연락처
+				$clone.setPhone( phone );
+				
+				// 이메일
+				$clone.setMail( mail );
+				
+				// 생년월일
+				$clone.setBirthday( birthday );
+				
+				// 메모
+				$clone.setMemo( memo );
 				
 				// 사용여부
 				if( use == null ){
@@ -510,7 +610,7 @@ var $TemplateModule = (function(){
 				if( createDate == null ){
 					var now = TimeModule.now();
 					$clone.data( "createDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
-					$clone.find( ".group-reg-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
+					$clone.find( ".employee-reg-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
 				}else{
 					var yyyy = createDate.slice( 0, 4 );
 					var MM = createDate.slice( 4, 6 );
@@ -519,7 +619,7 @@ var $TemplateModule = (function(){
 					var mm = createDate.slice( 10, 12 );
 					var ss = createDate.slice( 12, 14 );
 					$clone.data( "createDate", yyyy + MM + dd + hh + mm + ss );
-					$clone.find( ".group-reg-dt" ).text( yyyy + "-" + MM  + "-" + dd );
+					$clone.find( ".employee-reg-dt" ).text( yyyy + "-" + MM  + "-" + dd );
 				}
 				
 				// 수정일
@@ -533,7 +633,7 @@ var $TemplateModule = (function(){
 					var mm = updateDate.slice( 10, 12 );
 					var ss = updateDate.slice( 12, 14 );
 					$clone.data( "updateDate", yyyy + MM + dd + hh + mm + ss );
-					$clone.find( ".group-up-dt" ).text( yyyy + "-" + MM  + "-" + dd );
+					$clone.find( ".employee-up-dt" ).text( yyyy + "-" + MM  + "-" + dd );
 				}
 				
 				return $clone;
@@ -550,15 +650,56 @@ var $TemplateModule = (function(){
 /****************************************
 	데이터 로드
 ****************************************/
+
+// 그룹 셋팅
+var GroupModule = (function(){
+	
+	var groups = <%-groups%>;
+	
+	return {
+		
+		count: function(){
+			return groups.length;
+		},
+		getByIndex: function( idx ){
+			return groups[ idx ];
+		},
+		getById: function( id ){
+			for( var i=0; i<groups.length; ++i ){
+				var group = groups[ i ];
+				if( group.id == id ){
+					return group;
+				}
+			}
+		}
+		
+	};
+	
+})();
+for( var i=0; i<GroupModule.count(); ++i ){
+	var group = GroupModule.getByIndex( i );
+	
+	// 검색 선택창 목록 생성
+	var $option = $TemplateModule.createOption( group.id, group.name );
+	$searchGroupSel.append( $option );
+
+	// 추가팝업 선택창 목록 생성
+	var $option = $TemplateModule.createOption( group.id, group.name );
+	$addEmployeeGroupSel.append( $option );
+}
+%>
+
 var employees = <%-employees%>;
 for( var i=0; i<employees.length; ++i ){
 	var employee = employees[ i ];
-// 	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.enableDelete, group.createDate, group.updateDate );
-// 	$group.appendTo( $groupList );
+	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.age, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.enableDelete, employee.createDate, employee.updateDate );
+	$employee.appendTo( $employeeList );
 }
 
+
+
 //수량 표시 갱신
-$groupCntSpan.update();
+$employeeCntSpan.update();
 
  
 /****************************************
@@ -571,8 +712,52 @@ $addBtn.on("click", function(){
 	// 팝업 표시
 	$addPopup.fadeIn( 500 );
 	parent.hideNav( 500 );
-	$addGroupNameInp.focus();
+	$addEmployeeNameInp.focus();
+	
+	// 이미지 초기화
+	$addEmployeeImg.data("image", null);
+	$addEmployeeImg.css({
+		"background-image": "url(/image/default-user.png)",
+		"box-shadow": "0px 0px 0px 2px #CFD8DC"
+	});
 	$addPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+});
+
+// 추가팝업 - 이미지 추가 버튼 클릭 이벤트
+$addEmployeeImageBtn.on("click", function(){
+	$addEmployeeImageInp.trigger("click");
+});
+
+// 추가팝업 - 이미지 파일 입력창 클릭 이벤트
+$addEmployeeImageInp.on("click", function( e ){
+	e.stopPropagation();
+});
+// 추가팝업 - 이미지 파일 입력창 클릭 이벤트
+$addEmployeeImageInp.on("change", function( e ){
+	
+	// 초기화 시, 무시
+	if( $addEmployeeImageInp.val() == "" ){
+		return;
+	}
+	
+    var files = $addEmployeeImageInp.get(0).files;
+	if (FileReader && files && files.length) {
+	    var fileReader = new FileReader();
+	    fileReader.onload = function () {
+	    	$addEmployeeImg.data("image", fileReader.result);
+	    	$addEmployeeImg.css({
+	    		"background-image": "url(" + fileReader.result + ")",	
+	    		"box-shadow": "none"
+	    	});
+	    }
+	    fileReader.readAsDataURL(files[0]);
+	}else{
+		alert( "파일 업로드를 지원하지 않는 브라우저입니다.\n이미지를 변경할 수 없습니다." );
+	}
+	
+	// 초기화
+	$addEmployeeImageInp.val("");
 	
 });
 
@@ -589,22 +774,58 @@ $addCancelBtn.on("click", function(){
 // 추가팝업 - 완료 버튼 클릭 이벤트
 $addCompleteBtn.on("click", function(){
 	
-	var newGroupName = $addGroupNameInp.val().trim();
-	if( newGroupName == "" ){
-		alert( "그룹명이 비어있습니다." );
+	var groupId = $addEmployeeGroupSel.val();
+	if( groupId == "NO_SELECT" ){
+		alert( "소속을 선택하세요." );
+		return;
+	}
+	var groupName = $addEmployeeGroupSel.find("option[value='"+groupId+"']").text();
+	
+	var newemployeeName = $addEmployeeNameInp.val().trim();
+	if( newemployeeName == "" ){
+		alert( "이름이 비어있습니다." );
 		return;
 	}
 	
-	var $groupItems = $groupList.find( ".group-item" );
-	for( var i=0; i<$groupItems.length; ++i ){
-		var groupName =  $groupItems.eq( i ).getName();
-		if( newGroupName == groupName ){
-			alert( "이미 존재하는 그룹명 입니다." );
+	var $employeeItems = $employeeList.find( ".employee-item" );
+	for( var i=0; i<$employeeItems.length; ++i ){
+		var employeeName =  $employeeItems.eq( i ).getName();
+		if( newemployeeName == employeeName ){
+			alert( "이미 존재하는 직원 입니다." );
 			return;
 		}
 	}
 	
-	var $groupItem = $TemplateModule.createGroup( null, newGroupName );
+	var imageSrc = $addEmployeeImg.getImage();
+	
+	var age = $addEmployeeAgeInp.val().trim();
+	if( age == "" ){
+		age = null;
+	}else{
+		age = parseInt( age );
+	}
+	
+	var phone = $addEmployeePhoneInp.val().trim();
+	if( phone == "" ){
+		phone = null;
+	}
+	
+	var mail = $addEmployeeMailInp.val().trim();
+	if( mail == "" ){
+		mail = null;
+	}
+	
+	var birthday = $addEmployeeBirthdayInp.val().trim();
+	if( birthday == "" ){
+		birthday = null;
+	}
+	
+	var memo = $addEmployeeMemoInp.val().trim();
+	if( memo == "" ){
+		memo = null;
+	}
+	
+	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newemployeeName, imageSrc, age, phone, mail, birthday, memo );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -613,22 +834,22 @@ $addCompleteBtn.on("click", function(){
 	$addPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
 		
 		// 넓어지는 애니메이션으로 표시
-		$groupItem.css( { "width": "0px" } );
-		$groupItem.prependTo( $groupList );
-		$groupItem.animate( { "width": "200px" }, 500 );
+		$employeeItem.css( { "width": "0px" } );
+		$employeeItem.prependTo( $employeeList );
+		$employeeItem.animate( { "width": "240px" }, 500 );
 		
 		// 수량 표시 갱신
-		$groupCntSpan.update();
+		$employeeCntSpan.update();
 		
 		// 팝업 그룹명 제거
-		$addGroupNameInp.val("");
+		$addEmployeeNameInp.val("");
 		
 	} );
 	
 });
 
 // 그룹명 입력 이벤트
-$addGroupNameInp.on("keypress", function( e ){
+$addEmployeeNameInp.on("keypress", function( e ){
 	
 	// 엔터키 == 완료버튼 클릭
 	if( e.keyCode == 13 ){
@@ -640,7 +861,7 @@ $addGroupNameInp.on("keypress", function( e ){
 });
 
 // 그룹아이템 클릭 이벤트
-$groupList.on("click", ".group-item", function(){
+$employeeList.on("click", ".employee-item", function(){
 	
 	// 기존 선택 제거
 	var $this = $(this);
@@ -650,7 +871,7 @@ $groupList.on("click", ".group-item", function(){
 		return;
 	}
 	
-	$groupList.find(".group-item").not( $this ).removeClass( "select" );
+	$employeeList.find(".employee-item").not( $this ).removeClass( "select" );
 	$this.toggleClass("select");
 	
 	// 선택 시, 버튼 활성화
@@ -677,18 +898,18 @@ $delBtn.on("click", function(){
 		return;
 	}
 	
-	var $selectedGroupItem = $groupList.find(".group-item.select");
-	var groupName = $selectedGroupItem.getName();
-	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다.\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
+	var $selectedemployeeItem = $employeeList.find(".employee-item.select");
+	var employeeName = $selectedemployeeItem.getName();
+	if( confirm( "'" + employeeName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다.\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
 		
 		// 삭제모션
-		$selectedGroupItem.animate( { "width": "0px" }, 500, function(){
+		$selectedemployeeItem.animate( { "width": "0px" }, 500, function(){
 			
 			// 삭제
-			$selectedGroupItem.remove();
+			$selectedemployeeItem.remove();
 			
 			// 수량 표시 갱신
-			$groupCntSpan.update();
+			$employeeCntSpan.update();
 			
 			// 버튼 비활성화
 			$delBtn.addClass( "disable" );
@@ -710,14 +931,14 @@ $modBtn.on("click", function(){
 	}
 	
 	// 선택된 소속
-	var $selectedGroupItem = $groupList.find(".group-item.select");
-	var groupName = $selectedGroupItem.getName();
+	var $selectedemployeeItem = $employeeList.find(".employee-item.select");
+	var employeeName = $selectedemployeeItem.getName();
 	
 	// 이름 설정
-	$modGroupNameInp.val( groupName );
+	$modemployeeNameInp.val( employeeName );
 	
 	// 사용여부 설정
-	var use = $selectedGroupItem.getUse();
+	var use = $selectedemployeeItem.getUse();
 	if( use ){
 		$modUseBtn.addClass("select");
 		$modUnuseBtn.removeClass("select");
@@ -732,7 +953,7 @@ $modBtn.on("click", function(){
 	$modPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
 	
 	// 입력창 포커스 ( show 이후에 처리 필요 )
-	$modGroupNameInp.focus();
+	$modemployeeNameInp.focus();
 	
 });
 
@@ -767,22 +988,22 @@ $modCancelBtn.on("click", function(){
 // 수정팝업 - 완료 버튼 클릭 이벤트
 $modCompleteBtn.on("click", function(){
 	
-	var newGroupName = $modGroupNameInp.val().trim();
-	if( newGroupName == "" ){
+	var newemployeeName = $modemployeeNameInp.val().trim();
+	if( newemployeeName == "" ){
 		alert( "그룹명이 비어있습니다." );
 		return;
 	}
 	
 	// 선택된 소속
-	var $selectedGroupItem = $groupList.find(".group-item.select");
+	var $selectedemployeeItem = $employeeList.find(".employee-item.select");
 	
 	// 그룹명이 달라진 경우만 그룹명 검증
-	var beforeGroupName = $selectedGroupItem.getName();
-	if( beforeGroupName != newGroupName ){
-		var $groupItems = $groupList.find( ".group-item" );
-		for( var i=0; i<$groupItems.length; ++i ){
-			var groupName =  $groupItems.eq( i ).getName();
-			if( newGroupName == groupName ){
+	var beforeemployeeName = $selectedemployeeItem.getName();
+	if( beforeemployeeName != newemployeeName ){
+		var $employeeItems = $employeeList.find( ".employee-item" );
+		for( var i=0; i<$employeeItems.length; ++i ){
+			var employeeName =  $employeeItems.eq( i ).getName();
+			if( newemployeeName == employeeName ){
 				alert( "이미 존재하는 그룹명 입니다." );
 				return;
 			}
@@ -790,14 +1011,14 @@ $modCompleteBtn.on("click", function(){
 	}
 	
 	// 소속명 설정
-	$selectedGroupItem.setName( newGroupName );
+	$selectedemployeeItem.setName( newemployeeName );
 	
 	// 사용여부 설정
 	var use = $modUseBtn.hasClass("select");
-	$selectedGroupItem.setUse( use );
+	$selectedemployeeItem.setUse( use );
 	
 	// 수정일 갱신
-	$selectedGroupItem.updateDate();
+	$selectedemployeeItem.updateDate();
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -810,21 +1031,21 @@ $modCompleteBtn.on("click", function(){
 // 저장 버튼 클릭 이벤트
 $saveBtn.on("click", function(){
 	
-	 var groups = [];
-	 var $groupItems = $groupList.find(".group-item");
-	 for( var i=0; i<$groupItems.length; ++i ){
-		 var $groupItem = $groupItems.eq( i );
-		 groups.push( $groupItem.data() );
+	 var employees = [];
+	 var $employeeItems = $employeeList.find(".employee-item");
+	 for( var i=0; i<$employeeItems.length; ++i ){
+		 var $employeeItem = $employeeItems.eq( i );
+		 employees.push( $employeeItem.data() );
 	 }
 	 
 	 $.ajax({
 		
-		 url: "/group/mgmt/save",
+		 url: "/employee/mgmt/save",
 		 type: "post",
 		 headers: {
 	     	"Content-Type": "application/json"
 	     },
-		 data: JSON.stringify( groups ),
+		 data: JSON.stringify( employees ),
 		 dataType: "json",
 		 success: function( res ){
 			 

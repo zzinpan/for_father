@@ -262,11 +262,11 @@
 			id: "EMP::FACTORY",
 			name: "공장",
 			age: null,
+			phone: null,
 			mail: null,
 			birthday: null,
-			weddingAnniversary: null,
-			image: null,
-			memo: null,
+			image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAACu1BMVEUAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////9/v77+/35+vr+/v7////////////9/f7q7u/X3+LX3+H////+/v7f5efg5un+/v7////////6+/vR2t3T2t77+/3////////9/f7R2d7+/v7////////////d4+X////////9/f7+/v7////s7/Du8vP////////////h5ujh5+r////d4+bc4+b////////////////////////////////////////////w8/T////////b4eX////////Z3+L////////////a4eTc4+b////v8/Tw8/T////////j6Or////////+/v7////V3uDR2t7////n6+7////////Q2d3P2Nz////////q7vDm6u3////+/v7R2t7S2t7////////z9vfz9vb////e5Obi6Ov////09vf////////////////////n7e7u8vP////////T3N/Y4eP////k6ezu8PP////////6+/zZ3+Pg5uf////////9/f3e5Obg5ej9/f3+/v7P2Nz////////R2d3////y9PTS2t7////////5+vvV3eDi5+n+/v/////////p7vD19/fP2NvP2NzP2NzQ2dzM29vP2NzP2dvP2NzO2NvY2NjP2d3P2NzP2NzO2d3Q19zP2dzP2NzQ2N3S0uHO2N3Q19vP19zP2d3O29vO2NvO2NzP2dzP193P2NzP2NzP2NzP2Nz////P2NwAAACIQXX/AAAA5nRSTlMAFlKEpsnk7vTdy6l9GTSN1/7RizgNctrUDxCG734CZertZAEix8EmXPHyVYwGpacFs/PWzcf0sgcD1cHf347fzczgiFbN8/HOWCfb9NzwIMLRw2bZ12DAv+cOf8vKgtLSDG/VOTGJ0hgT+0+/garWo8zdxuHr1tP6v8Dg98f42NrF5fZ8w3fm+P5J/cHEzej18unPwME10MnOwWkLeArlwsBi9erauMbAvBvK3M0cVNbP0Nfl/YCZ+Pa/8K+byObJ458EdnpP7/JXI75k6mMNf/HwfmbU2ncRNIfVNRVOg6bI3+764Md/w3UAAAABYktHRACIBR1IAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAB3RJTUUH5AMPBwQfsulHxgAAAxlJREFUWMOll/VfFFEUxR+ILKHAGAiyoLi2KEiohAoGdiAKiIEtIipiK3Yididid3d3gYgdICX45t9w2EV25777dsbd8+O953xn5vPmzbtDCEc2trXsattrHKjG0cm5jm1d8l9ycXWjcgn16jdQm27o3oii8nD3VBFv7KWlXGm9lRA+TZpSs/JtpjOXb96CKqplK36+dRvlPKVt2/Fu309NvEquPli+fQe1eUr9A9h8QEfWFxgUHBISHNSJ7XTuAvOh/tATFh4hVqtreBDs2sHF6AYM3SNFmaJ6AENPeb4XaPeOFoH69AWWfqb5/oHy5oCBIqPoQXLP4CHGvG4ooMeIiGKAaZhxMWNBa7iIagSwxdXsHw3oxOOABGAbmVgNGAXXaDQOGAN9Yw15T3gDNAkHjIM+3/F6gDtVCUhijBP0gImWA9yq8pOo5QA6WQL4WQOYIgGmWgPwICRZsAYgTCO2bDUlAgdEpLDe6cSbLaaKHKWy3hlkJluM4QFmsd40MpstpvMA6ax3DnG0DjCXaK0DzCMp1gEciANbnM8DLGC9CwlymC7iARZjj7CELWZE4fmly1jvcuLEFukKtdendCVJQ6rCKiS/WoMB/MkarJyAANZiRroO20yUrt/A5DPDUMBGYpOF1TcxgM1oXkgmZAvW2LoN5LfvQAE7pS+SF9rZBQC7UZf+ZNiDdrL2yvL7BBzgUvVZ3o+25K/jATzvoR8zDloOiNUfLIlaSwHaQ4bD8bClAO/q0zn7CNLMkQGOYnn77H8DwjG2efyEDHASW4U444hzCvYyToP34AxLOGsyr54DO+38BeZVvghHRd9LpmPaZdMLXLmKfg+uXTfNC2DkNu7qGzk3RY4iTXbkLTjr3jbUNfF3RDOqQTCjLglwlsp3790XFWR4kAfIuB76kD56rBSXlPnkKX32HPth0L3IVJGXFP2S99/06rWa/Ju3hKvcPOV8Xi4xI927fPPx/Pdmf/skFXz4yI9/+lxAlFXw5Sse//b9h4q4/kF+FhbBdFHhL6Wbl6u4pLSs/HdFZWXFn/Ky0pJinu8v2dfvERZN52gAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjAtMDMtMTVUMDc6MDQ6MzErMDA6MDAOVVx7AAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIwLTAzLTE1VDA3OjA0OjMxKzAwOjAwfwjkxwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAASUVORK5CYII=",
+			memo: "기본 데이터\n삭제 불가능",
 			createDate: nowStr,
 			updateDate: nowStr,
 			use: true,
@@ -275,7 +275,7 @@
 	];
 	fs.writeFile( 
 			global.dataDir + "/employee.json", 
-			JSON.stringify( group ),
+			JSON.stringify( employee ),
 			"utf8",
 			function(err){ 
 				if (err == null) { 

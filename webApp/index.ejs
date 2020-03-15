@@ -65,13 +65,15 @@ footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; 
  * jQuery 변수
  */
 
+// 윈도우
+var $window = $(window);
+
 // 헤더 버튼들
 var $headerBtns = $(".header_btn");
 var $subHeaderBtns = $(".sub_header_btn");
 
 // 서브 헤더 포인트
 var $dot = $("#dot");
-
 
 // 하위 화면 ( iframe )
 var $subView = $("#sub_view");
@@ -160,6 +162,8 @@ $subView.on( "load", function(){
 	
 } );
 
+
+
 window.hideNav = function( duration, callback ){
 	
 	var $subBody = $($subView.contents()[0].body);
@@ -179,6 +183,17 @@ window.showNav = function( duration, callback ){
 	$footer.animate({"bottom": "0px"}, duration);
 	
 };
+
+$window.on("resize", function(){
+	
+	var isNavHide = $subView.css("top") == "0px";
+	if( isNavHide ){
+		$subView.css("height", window.innerHeight + "px");
+	}else{
+		$subView.css("height", window.innerHeight - 80 + "px");
+	}
+	
+});
 </script>
 </body>
 </html>
