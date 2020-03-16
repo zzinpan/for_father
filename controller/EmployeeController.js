@@ -33,11 +33,22 @@ module.exports = [
 	 * 저장
 	 */
 	{
-		url: "/employee/save",
+		url: "/employee/management/save",
 		type: "post",
 		method: function( req, res, next ){
 			
-			res.render( 'WEB-INF/employee/main.ejs' );
+			var employees = req.body;
+			fs.writeFile( 
+				global.dataDir + "/employee.json", 
+				JSON.stringify( employees ),
+				"utf8",
+				function(err){ 
+					if (err == null) { 
+						res.send( { result: "SUCCESS", data: null } );
+					} else { 
+						res.send( { result: "FAIL", data: err } );
+					} 
+			});
 			
 		}
 	}

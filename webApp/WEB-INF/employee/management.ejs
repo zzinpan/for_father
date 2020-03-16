@@ -3,8 +3,7 @@
 <head>
 <meta charset=UTF-8">
 <title>신나라유통 ERP > employee > management</title>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap-datepicker.min.css">
 <style type="text/css">
 body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
@@ -20,7 +19,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .smc-inp::placeholder { color: #cccccc; }
 .smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
 .smc-select { width: 100px; border: #ccc solid 1px; padding-left: 4px; border-radius: 4px; font-size: 12px; }
-.smc-count { font-size: 10px; border-bottom: #ccc solid 2px; margin-bottom: 10px; height: 32px; }
+.smc-count { font-size: 10px; border-bottom: #ccc solid 2px; height: 32px; }
 .small-title { font-weight: bold; margin-bottom: 40px; }
 
 
@@ -30,11 +29,10 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .mt20 { margin-top: 20px; }
 
 /* 그룹 */
-.employee-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 140px ); overflow: auto; }
+.employee-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 140px ); overflow: auto; padding: 40px 0px; }
 	.employee-item { cursor: pointer; display: inline-block; width: 240px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
-	.employee-item.disable { cursor: not-allowed; }
 	.employee-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
-	.employee-item:not(.disable):hover { box-shadow: 0px 0px 2px 1px #aaa; }
+	.employee-item:hover { box-shadow: 0px 0px 2px 1px #aaa; }
 		.employee-name { padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #00BCD4; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.employee-image { margin-top: 20px; margin-bottom: 20px; margin-left: calc( 50% - 25px ); width: 50px; height: 50px; box-shadow: 0px 0px 0px 2px #CFD8DC; border-radius: 50px; background-image: url(/image/default-user.png); background-size: auto 100%; background-position: center; background-repeat: no-repeat; }
 		.employee-item.disable .employee-name { background-color: #607D8B; }
@@ -48,7 +46,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script src="/lib/bootstrap/bootstrap.min.js"></script>
 <script src="/lib/bootstrap/bootstrap-datepicker.min.js"></script>
 <script src="/lib/bootstrap/bootstrap-datepicker.ko.min.js"></script>
 <script type="text/javascript">
@@ -72,34 +70,48 @@ if (!String.prototype.padStart) {
     };
 }
 
+alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
+
 </script>
 </head>
 <body>
-<div class="container" style="position: relative;">
-	<div class="row" style="position: relative; margin-top: 50px;">
-		<div class="col-md-offset-2 col-md-8" style="position: relative;">
+<div class="container" style="position: relative; height: 100%;">
+	<div class="row" style="position: relative; margin-top: 50px; height: calc( 100% - 50px );">
+		<div class="col-md-offset-2 col-md-8" style="position: relative; height: 100%;">
 			<div class="smc-header">
 				직원 관리
 			</div>
-			<div class="col-md-12" style="position: relative;">
+			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
 			
-				<div style="padding: 20px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
-					<div style="float: left; display: inline-block; margin: 1px 10px 0px 0px;">소속</div>
-					<div style="float: left; display: inline-block;">
-						<select id="search-group-sel" class="smc-select">
-							<option value="ALL" selected="selected">전체</option>
-						</select>
+				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 90px;">
+					<div class="col-md-12">
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 10px;">소속</div>
+						<div style="float: left; display: inline-block;">
+							<select id="search-group-sel" class="smc-select">
+								<option value="ALL" selected="selected">전체</option>
+							</select>
+						</div>
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">사용여부</div>
+						<div style="float: left; display: inline-block;">
+							<select id="search-use-sel" class="smc-select">
+								<option value="ALL" selected="selected">전체</option>
+								<option value="USE">사용</option>
+								<option value="UNUSE">미사용</option>
+							</select>
+						</div>
+						<div id="search-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
 					</div>
-					<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">이름</div>
-					<div style="float: left; display: inline-block;">
-						<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
-					</div>
-					<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">특이사항</div>
-					<div style="float: left; display: inline-block;">
-						<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+					<div class="col-md-12" style="margin-top: 10px;">
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 10px;">이름</div>
+						<div style="float: left; display: inline-block;">
+							<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						</div>
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">특이사항</div>
+						<div style="float: left; display: inline-block;">
+							<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						</div>
 					</div>
 					
-					<div id="save-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
 				</div>
 			
 				<!-- 상단 -->
@@ -116,7 +128,7 @@ if (!String.prototype.padStart) {
 				</div>
 				
 				<!-- 본문 -->
-				<div id="employee-list" class="col-md-12 employee-list">
+				<div id="employee-list" class="col-md-12 employee-list" style="height: calc( 100% - 162px );">
 				</div>
 				
 				<!-- 하단 -->
@@ -132,7 +144,7 @@ if (!String.prototype.padStart) {
 <!-- 추가 팝업 -->
 <div id="add-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
 
-	<div id="add_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 162px ); width: 400px; padding: 20px;">
+	<div id="add_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 238px ); width: 400px; padding: 20px;">
 		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
 			직원 추가
 		</div>
@@ -144,6 +156,8 @@ if (!String.prototype.padStart) {
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="popup-row mt6">
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
 				<span style="color: #ff0000;">*</span>소속
 			</div>
@@ -222,13 +236,69 @@ if (!String.prototype.padStart) {
 		</div>
 		<div class="popup-row">
 			<div class="col-md-12">
-				<div class="employee-image"></div>
+				<div id="mod-employee-img" class="employee-image" style="background-image: url(/image/default-user.png); border-radius: 50px;">
+					<div id="mod-employee-image-btn" class="mod-employee-image-btn" style="margin-top: 32px; margin-right: -5px; float: right; padding: 4px; background-image: url(/image/camera.png); background-size: 12px 12px; background-position: center; background-repeat: no-repeat; background-color: white; border-radius: 50px; box-shadow: 0px 0px 0px 1px #ccc; width: 20px; height: 20px; cursor: pointer;">
+						<input id="mod-employee-image-inp" type="file" style="display: none;" accept="image/*">
+					</div>
+				</div>
 			</div>
+		</div>
+		<div class="popup-row mt6">
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>소속명
+				<span style="color: #ff0000;">*</span>소속
 			</div>
 			<div class="col-md-9">
-				<input id="mod-employee-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
+				<select id="mod-employee-group-sel" class="smc-select">
+					<option value="NO_SELECT" selected="selected">선택</option>
+				</select>
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>이름
+			</div>
+			<div class="col-md-9">
+				<input id="mod-employee-name-inp" class="smc-inp" type="text" placeholder="이름을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				나이
+			</div>
+			<div class="col-md-9">
+				<input id="mod-employee-age-inp" class="smc-inp" type="text" placeholder="나이를 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				연락처
+			</div>
+			<div class="col-md-9">
+				<input id="mod-employee-phone-inp" class="smc-inp" type="text" placeholder="연락처를 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				이메일
+			</div>
+			<div class="col-md-9">
+				<input id="mod-employee-mail-inp" class="smc-inp" type="text" placeholder="이메일을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				생년월일
+			</div>
+			<div class="col-md-9">
+				<input id="mod-employee-birthday-inp" class="smc-inp cal-inp" type="text" placeholder="생년월일을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				메모
+			</div>
+			<div class="col-md-9">
+				<textarea id="mod-employee-memo-inp" class="smc-inp" style="height: 52px;" placeholder="특이사항을 입력하주세요."></textarea>
 			</div>
 		</div>
 		<div class="popup-row mt10">
@@ -242,7 +312,7 @@ if (!String.prototype.padStart) {
 		</div>
 		<div class="popup-row mt6">
 			<div class="col-md-offset-3 col-md-9" style="font-size: 10px; color: #616161;">
-				&nbsp; ※미사용 소속은 정산을 수행할 수 없습니다.
+				&nbsp; ※미사용 직원은 정산을 수행할 수 없습니다.
 			</div>
 		</div>
 		<div class="popup-row mt20">
@@ -263,6 +333,9 @@ if (!String.prototype.padStart) {
 	jQuery 변수
  **/
 
+var $window = $(window); // 윈도우
+var $body = $("body"); // 바디
+ 
 // 상단 검색
 var $searchGroupSel = $("#search-group-sel"); // 소속 선택창
  
@@ -277,6 +350,7 @@ var $addPopup = $("#add-popup"); // 추가 팝업 ( 배경포함 )
 var $addPopupContent = $("#add_popup_content"); // 추가 팝업 ( 내용 )
 var $addCancelBtn = $("#add-cancel-btn"); // 취소 버튼
 var $addCompleteBtn = $("#add-complete-btn"); // 완료 버튼
+
 var $addEmployeeImg = $("#add-employee-img"); // 이미지
 var $addEmployeeImageBtn = $("#add-employee-image-btn"); // 이미지 추가 버튼
 var $addEmployeeImageInp = $("#add-employee-image-inp"); // 이미지 파일 입력창
@@ -308,7 +382,17 @@ var $modPopup = $("#mod-popup"); // 수정 팝업 ( 배경 포함 )
 var $modPopupContent = $("#mod_popup_content"); // 수정 팝업 ( 내용 )
 var $modCancelBtn = $("#mod-cancel-btn"); // 취소 버튼
 var $modCompleteBtn = $("#mod-complete-btn"); // 완료 버튼
-var $modemployeeNameInp = $("#mod-employee-name-inp"); // 수정 팝업 - 소속명 입력창
+
+var $modEmployeeImg = $("#mod-employee-img"); // 이미지
+var $modEmployeeImageBtn = $("#mod-employee-image-btn"); // 이미지 추가 버튼
+var $modEmployeeImageInp = $("#mod-employee-image-inp"); // 이미지 파일 입력창
+var $modEmployeeGroupSel = $("#mod-employee-group-sel"); // 추가 팝업 - 소속 선택창
+var $modEmployeeNameInp = $("#mod-employee-name-inp"); // 추가 팝업 - 직원명 입력창
+var $modEmployeeAgeInp = $("#mod-employee-age-inp"); // 추가 팝업 - 나이 입력창
+var $modEmployeePhoneInp = $("#mod-employee-phone-inp"); // 추가 팝업 - 연락처 입력창
+var $modEmployeeMailInp = $("#mod-employee-mail-inp"); // 추가 팝업 - 메일 입력창
+var $modEmployeeBirthdayInp = $("#mod-employee-birthday-inp"); // 추가 팝업 - 생년월일 입력창
+var $modEmployeeMemoInp = $("#mod-employee-memo-inp"); // 추가 팝업 - 특이ㅏ항 입력창
 var $modUseBtn = $("#mod-use-btn"); // 사용 버튼
 var $modUnuseBtn = $("#mod-unuse-btn"); // 사용 버튼
 	
@@ -423,8 +507,16 @@ var $TemplateModule = (function(){
 		createEmployee: (function(){
 		
 			// 소속 설정
-			$.fn.setGroup = function setGroup( id, name ){
-				this.data("group", { id: id, name: name });
+			$.fn.getGroupId = function getGroupId(){
+				return this.data("groupId");
+			};
+			
+			// 소속 설정
+			$.fn.setGroupId = function setGroupId( id ){
+				this.data("groupId", id);
+			};
+			$.fn.setGroupName = function setGroupName( name ){
+				this.data("groupName", name);
 				this.find(".employee-group").text(name);
 			};
 			
@@ -496,7 +588,7 @@ var $TemplateModule = (function(){
 			// 생일 설정
 			$.fn.setBirthday = function setBirthday( birthday ){
 				this.data("birthday", birthday);
-				this.find(".employee-birthDay").text(birthday);
+				this.find(".employee-birthday").text(birthday);
 			};
 			
 			// 생일 조회
@@ -544,12 +636,20 @@ var $TemplateModule = (function(){
 				this.data( "updateDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
 				this.find( ".employee-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
 			};
-		
+			
+			// 저장용 데이터
+			$.fn.getSaveData = function getSaveData(){
+				var data = this.data();
+				delete data.groupName;
+				return data;
+			};
+			
 			return function( groupId, groupName, id, name, imageSrc, age, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "employee-item" ] );
 				$clone.data({
-					group: { id: null, name: null },
+					groupId: null,
+					groupName: null,
 					id: null,
 					name: null,
 					image: null,
@@ -565,7 +665,8 @@ var $TemplateModule = (function(){
 				});
 				
 				// 소속 ( 필수값 )
-				$clone.setGroup( groupId, groupName );
+				$clone.setGroupId( groupId );
+				$clone.setGroupName( groupName );
 				
 				// 아이디
 				if( id == null ){
@@ -686,6 +787,10 @@ for( var i=0; i<GroupModule.count(); ++i ){
 	// 추가팝업 선택창 목록 생성
 	var $option = $TemplateModule.createOption( group.id, group.name );
 	$addEmployeeGroupSel.append( $option );
+
+	// 수정팝업 선택창 목록 생성
+	var $option = $TemplateModule.createOption( group.id, group.name );
+	$modEmployeeGroupSel.append( $option );
 }
 %>
 
@@ -720,6 +825,28 @@ $addBtn.on("click", function(){
 		"background-image": "url(/image/default-user.png)",
 		"box-shadow": "0px 0px 0px 2px #CFD8DC"
 	});
+	
+	// 그룹 초기화
+	$addEmployeeGroupSel.val("NO_SELECT");
+	
+	// 이름 초기화
+	$addEmployeeNameInp.val("");
+	
+	// 나이 초기화
+	$addEmployeeAgeInp.val("");
+	
+	// 연락처 초기화
+	$addEmployeePhoneInp.val("");
+	
+	// 메일 초기화
+	$addEmployeeMailInp.val("");
+	
+	// 생일 초기화
+	$addEmployeeBirthdayInp.val("");
+
+	// 메모 초기화
+	$addEmployeeMemoInp.val("");
+	
 	$addPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
 	
 });
@@ -781,8 +908,8 @@ $addCompleteBtn.on("click", function(){
 	}
 	var groupName = $addEmployeeGroupSel.find("option[value='"+groupId+"']").text();
 	
-	var newemployeeName = $addEmployeeNameInp.val().trim();
-	if( newemployeeName == "" ){
+	var newEmployeeName = $addEmployeeNameInp.val().trim();
+	if( newEmployeeName == "" ){
 		alert( "이름이 비어있습니다." );
 		return;
 	}
@@ -790,7 +917,7 @@ $addCompleteBtn.on("click", function(){
 	var $employeeItems = $employeeList.find( ".employee-item" );
 	for( var i=0; i<$employeeItems.length; ++i ){
 		var employeeName =  $employeeItems.eq( i ).getName();
-		if( newemployeeName == employeeName ){
+		if( newEmployeeName == employeeName ){
 			alert( "이미 존재하는 직원 입니다." );
 			return;
 		}
@@ -825,7 +952,7 @@ $addCompleteBtn.on("click", function(){
 		memo = null;
 	}
 	
-	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newemployeeName, imageSrc, age, phone, mail, birthday, memo );
+	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newEmployeeName, imageSrc, age, phone, mail, birthday, memo );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -840,9 +967,6 @@ $addCompleteBtn.on("click", function(){
 		
 		// 수량 표시 갱신
 		$employeeCntSpan.update();
-		
-		// 팝업 그룹명 제거
-		$addEmployeeNameInp.val("");
 		
 	} );
 	
@@ -860,35 +984,85 @@ $addEmployeeNameInp.on("keypress", function( e ){
 	
 });
 
-// 그룹아이템 클릭 이벤트
-$employeeList.on("click", ".employee-item", function(){
+//그룹순서 변경
+(function(){
 	
-	// 기존 선택 제거
-	var $this = $(this);
+	var $select = null;
+	var isMousedown = false;
 	
-	// 기타
-	if( $this.hasClass("disable") ){
-		return;
-	}
-	
-	$employeeList.find(".employee-item").not( $this ).removeClass( "select" );
-	$this.toggleClass("select");
-	
-	// 선택 시, 버튼 활성화
-	if( $this.hasClass("select") ){
+	// 그룹아이템 마우스다운 이벤트
+	$employeeList.on("mousedown", ".employee-item", function(){
 		
-		$delBtn.removeClass( "disable" );
-		$modBtn.removeClass( "disable" );
+		isMousedown = true;
 		
-	// 선택 제거 시, 버튼 비활성화
-	}else{
+		// 기존 선택 제거
+		var $this = $(this);
 		
-		$delBtn.addClass( "disable" );
-		$modBtn.addClass( "disable" );
+		$employeeList.find(".employee-item").not( $this ).removeClass( "select" );
+		$this.addClass("select");
 		
-	}
+		if( $this.hasClass("disable") ){
+			$delBtn.addClass( "disable" );
+			$modBtn.addClass( "disable" );
+		}else{
+			$delBtn.removeClass( "disable" );
+			$modBtn.removeClass( "disable" );
+		}
+		$select = $this;
+		
+	});
 	
-});
+	$employeeList.on("mousemove", ".employee-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		$select.css( { cursor: "move" } );
+		
+	});
+	
+	$employeeList.on("mouseenter", ".employee-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		var $this = $(this);
+		if( $select.get(0) == $this.get(0) ){
+			return;
+		}
+
+		var mouseenterIdx = $employeeList.find( ".employee-item" ).index( $this );
+		var moveIdx = $employeeList.find( ".employee-item" ).index( $select );
+		
+		if( moveIdx > mouseenterIdx ){
+			$this.before( $select );
+		}else{
+			$this.after( $select );
+		}
+		
+		
+	});
+	
+	$employeeList.on("mouseup", ".employee-item", function( e ){
+		
+		// 기존 선택 제거
+		var $select = $employeeList.find(".employee-item.select");
+		$select.css( { cursor: "pointer" } );
+		isMousedown = false;
+		
+	});
+	
+})();
 
 // 삭제 버튼 클릭 이벤트
 $delBtn.on("click", function(){
@@ -898,15 +1072,15 @@ $delBtn.on("click", function(){
 		return;
 	}
 	
-	var $selectedemployeeItem = $employeeList.find(".employee-item.select");
-	var employeeName = $selectedemployeeItem.getName();
-	if( confirm( "'" + employeeName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다.\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
+	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
+	var employeeName = $selectedEmployeeItem.getName();
+	if( confirm( "'" + employeeName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다." ) ){
 		
 		// 삭제모션
-		$selectedemployeeItem.animate( { "width": "0px" }, 500, function(){
+		$selectedEmployeeItem.animate( { "width": "0px" }, 500, function(){
 			
 			// 삭제
-			$selectedemployeeItem.remove();
+			$selectedEmployeeItem.remove();
 			
 			// 수량 표시 갱신
 			$employeeCntSpan.update();
@@ -930,15 +1104,47 @@ $modBtn.on("click", function(){
 		return;
 	}
 	
-	// 선택된 소속
-	var $selectedemployeeItem = $employeeList.find(".employee-item.select");
-	var employeeName = $selectedemployeeItem.getName();
+	// 선택된 직원
+	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
+
+	// 이미지 설정
+	var employeeImage = $selectedEmployeeItem.getImage();
+	$modEmployeeImg.data("image", employeeImage);
+	$modEmployeeImg.css({
+		"background-image": "url(" + employeeImage + ")",	
+		"box-shadow": "none"
+	});
+	
+	// 그룹 설정
+	var groupId = $selectedEmployeeItem.getGroupId();
+	$modEmployeeGroupSel.val( groupId );
 	
 	// 이름 설정
-	$modemployeeNameInp.val( employeeName );
+	var employeeName = $selectedEmployeeItem.getName();
+	$modEmployeeNameInp.val( employeeName );
+	
+	// 나이 설정
+	var employeeAge = $selectedEmployeeItem.getAge();
+	$modEmployeeAgeInp.val( employeeAge );
+	
+	// 연락처 설정
+	var employeePhone = $selectedEmployeeItem.getPhone();
+	$modEmployeePhoneInp.val( employeePhone );
+	
+	// 이메일 설정
+	var employeeMail = $selectedEmployeeItem.getMail();
+	$modEmployeeMailInp.val( employeeMail );
+	
+	// 생일 설정
+	var employeeBirthday = $selectedEmployeeItem.getBirthday();
+	$modEmployeeBirthdayInp.val( employeeBirthday );
+	
+	// 생일 설정
+	var employeeMemo = $selectedEmployeeItem.getMemo();
+	$modEmployeeMemoInp.val( employeeMemo );
 	
 	// 사용여부 설정
-	var use = $selectedemployeeItem.getUse();
+	var use = $selectedEmployeeItem.getUse();
 	if( use ){
 		$modUseBtn.addClass("select");
 		$modUnuseBtn.removeClass("select");
@@ -953,7 +1159,7 @@ $modBtn.on("click", function(){
 	$modPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
 	
 	// 입력창 포커스 ( show 이후에 처리 필요 )
-	$modemployeeNameInp.focus();
+	$modEmployeeNameInp.focus();
 	
 });
 
@@ -988,22 +1194,22 @@ $modCancelBtn.on("click", function(){
 // 수정팝업 - 완료 버튼 클릭 이벤트
 $modCompleteBtn.on("click", function(){
 	
-	var newemployeeName = $modemployeeNameInp.val().trim();
-	if( newemployeeName == "" ){
+	var newEmployeeName = $modEmployeeNameInp.val().trim();
+	if( newEmployeeName == "" ){
 		alert( "그룹명이 비어있습니다." );
 		return;
 	}
 	
 	// 선택된 소속
-	var $selectedemployeeItem = $employeeList.find(".employee-item.select");
+	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
 	
 	// 그룹명이 달라진 경우만 그룹명 검증
-	var beforeemployeeName = $selectedemployeeItem.getName();
-	if( beforeemployeeName != newemployeeName ){
+	var beforeemployeeName = $selectedEmployeeItem.getName();
+	if( beforeemployeeName != newEmployeeName ){
 		var $employeeItems = $employeeList.find( ".employee-item" );
 		for( var i=0; i<$employeeItems.length; ++i ){
 			var employeeName =  $employeeItems.eq( i ).getName();
-			if( newemployeeName == employeeName ){
+			if( newEmployeeName == employeeName ){
 				alert( "이미 존재하는 그룹명 입니다." );
 				return;
 			}
@@ -1011,14 +1217,14 @@ $modCompleteBtn.on("click", function(){
 	}
 	
 	// 소속명 설정
-	$selectedemployeeItem.setName( newemployeeName );
+	$selectedEmployeeItem.setName( newEmployeeName );
 	
 	// 사용여부 설정
 	var use = $modUseBtn.hasClass("select");
-	$selectedemployeeItem.setUse( use );
+	$selectedEmployeeItem.setUse( use );
 	
 	// 수정일 갱신
-	$selectedemployeeItem.updateDate();
+	$selectedEmployeeItem.updateDate();
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -1035,12 +1241,12 @@ $saveBtn.on("click", function(){
 	 var $employeeItems = $employeeList.find(".employee-item");
 	 for( var i=0; i<$employeeItems.length; ++i ){
 		 var $employeeItem = $employeeItems.eq( i );
-		 employees.push( $employeeItem.data() );
+		 employees.push( $employeeItem.getSaveData() );
 	 }
 	 
 	 $.ajax({
 		
-		 url: "/employee/mgmt/save",
+		 url: "/employee/management/save",
 		 type: "post",
 		 headers: {
 	     	"Content-Type": "application/json"
@@ -1061,7 +1267,18 @@ $saveBtn.on("click", function(){
 	
 });
 
-
+function updateBodyHeight(){
+		
+	$body.css("height", window.innerHeight + "px");
+	
+}
+updateBodyHeight();
+// 윈도우 크기 변경 이벤트
+$window.on("resize", function(){
+	
+	updateBodyHeight();
+	
+});
 </script>
 </body>
 </html>
