@@ -3,6 +3,7 @@
 <head>
 <meta charset=UTF-8">
 <title>신나라유통 ERP > employee > management</title>
+<link rel="stylesheet" href="/lib/jquery-ui-1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap-datepicker.min.css">
 <style type="text/css">
@@ -43,6 +44,11 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 		.employee-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.employee-content-use-status.use { background-color: #E8F5E9; }
 		.employee-content-use-status.unuse { background-color: #eee; }
+
+/* 라이브러리 커스텀 */		
+.ui-autocomplete.ui-widget {
+  font-size: 10px;
+}
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
@@ -70,7 +76,23 @@ if (!String.prototype.padStart) {
     };
 }
 
-alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
+$(function(){
+	
+	$("input[type='phone']").keydown(function( e ) {
+		
+		this.value = this.value.replace( /[\a-zㄱ-ㅎㅏ-ㅣ가-힣]/g, "" );
+		
+	});
+	
+	$("input").focus(function(){
+		
+		this.select();
+		
+	});
+	
+});
+
+
 
 </script>
 </head>
@@ -83,35 +105,32 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 			</div>
 			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
 			
-				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 90px;">
+				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
 					<div class="col-md-12">
 						<div style="float: left; display: inline-block; margin: 1px 10px 0px 10px;">소속</div>
 						<div style="float: left; display: inline-block;">
-							<select id="search-group-sel" class="smc-select">
+							<select id="search-group-sel" class="smc-select" style="width: 70px;">
 								<option value="ALL" selected="selected">전체</option>
 							</select>
 						</div>
 						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">사용여부</div>
 						<div style="float: left; display: inline-block;">
-							<select id="search-use-sel" class="smc-select">
+							<select id="search-use-sel" class="smc-select" style="width: 70px;">
 								<option value="ALL" selected="selected">전체</option>
 								<option value="USE">사용</option>
 								<option value="UNUSE">미사용</option>
 							</select>
 						</div>
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">이름</div>
+						<div style="float: left; display: inline-block;">
+							<input id="search-employee-name-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						</div>
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">메모</div>
+						<div style="float: left; display: inline-block;">
+							<input id="search-employee-memo-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						</div>
 						<div id="search-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
 					</div>
-					<div class="col-md-12" style="margin-top: 10px;">
-						<div style="float: left; display: inline-block; margin: 1px 10px 0px 10px;">이름</div>
-						<div style="float: left; display: inline-block;">
-							<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
-						</div>
-						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">특이사항</div>
-						<div style="float: left; display: inline-block;">
-							<input type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
-						</div>
-					</div>
-					
 				</div>
 			
 				<!-- 상단 -->
@@ -128,7 +147,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				</div>
 				
 				<!-- 본문 -->
-				<div id="employee-list" class="col-md-12 employee-list" style="height: calc( 100% - 162px );">
+				<div id="employee-list" class="col-md-12 employee-list" style="height: calc( 100% - 132px );">
 				</div>
 				
 				<!-- 하단 -->
@@ -172,15 +191,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				<span style="color: #ff0000;">*</span>이름
 			</div>
 			<div class="col-md-9">
-				<input id="add-employee-name-inp" class="smc-inp" type="text" placeholder="이름을 입력해주세요.">
-			</div>
-		</div>
-		<div class="popup-row mt6">
-			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				나이
-			</div>
-			<div class="col-md-9">
-				<input id="add-employee-age-inp" class="smc-inp" type="text" placeholder="나이를 입력해주세요.">
+				<input id="add-employee-name-inp" class="smc-inp" type="text" placeholder="ex) 홍길동">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -188,7 +199,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				연락처
 			</div>
 			<div class="col-md-9">
-				<input id="add-employee-phone-inp" class="smc-inp" type="text" placeholder="연락처를 입력해주세요.">
+				<input id="add-employee-phone-inp" class="smc-inp" type="phone" placeholder="ex) 010-0000-0000">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -196,7 +207,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				이메일
 			</div>
 			<div class="col-md-9">
-				<input id="add-employee-mail-inp" class="smc-inp" type="text" placeholder="이메일을 입력해주세요.">
+				<input id="add-employee-mail-inp" class="smc-inp" type="text" placeholder="ex) xxxxx@xxxx.xxx">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -204,7 +215,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				생년월일
 			</div>
 			<div class="col-md-9">
-				<input id="add-employee-birthday-inp" class="smc-inp cal-inp" type="text" placeholder="생년월일을 입력해주세요.">
+				<input id="add-employee-birthday-inp" class="smc-inp cal-inp" type="text" placeholder="ex) 2020-01-31">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -258,15 +269,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				<span style="color: #ff0000;">*</span>이름
 			</div>
 			<div class="col-md-9">
-				<input id="mod-employee-name-inp" class="smc-inp" type="text" placeholder="이름을 입력해주세요.">
-			</div>
-		</div>
-		<div class="popup-row mt6">
-			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				나이
-			</div>
-			<div class="col-md-9">
-				<input id="mod-employee-age-inp" class="smc-inp" type="text" placeholder="나이를 입력해주세요.">
+				<input id="mod-employee-name-inp" class="smc-inp" type="text" placeholder="ex) 홍길동">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -274,7 +277,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				연락처
 			</div>
 			<div class="col-md-9">
-				<input id="mod-employee-phone-inp" class="smc-inp" type="text" placeholder="연락처를 입력해주세요.">
+				<input id="mod-employee-phone-inp" class="smc-inp" type="phone" placeholder="ex) 010-0000-0000">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -282,7 +285,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				이메일
 			</div>
 			<div class="col-md-9">
-				<input id="mod-employee-mail-inp" class="smc-inp" type="text" placeholder="이메일을 입력해주세요.">
+				<input id="mod-employee-mail-inp" class="smc-inp" type="text" placeholder="ex) xxxxx@xxxx.xxx">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -290,7 +293,7 @@ alert("수정 완료 버튼 시, 데이터 반영 로직 개발중..");
 				생년월일
 			</div>
 			<div class="col-md-9">
-				<input id="mod-employee-birthday-inp" class="smc-inp cal-inp" type="text" placeholder="생년월일을 입력해주세요.">
+				<input id="mod-employee-birthday-inp" class="smc-inp cal-inp" type="text" placeholder="ex) 2020-01-31">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -338,6 +341,10 @@ var $body = $("body"); // 바디
  
 // 상단 검색
 var $searchGroupSel = $("#search-group-sel"); // 소속 선택창
+var $searchUseSel = $("#search-use-sel"); // 사용여부 선택창
+var $searchBtn = $("#search-btn"); // 검색 버튼
+var $searchEmployeeNameInp = $("#search-employee-name-inp"); // 직원명 검색 입력창
+var $searchEmployeeMemoInp = $("#search-employee-memo-inp"); // 특이사항 검색 입력창
  
 // 상단 버튼 부분
 var $addBtn = $("#add-btn"); // 추가 버튼
@@ -356,7 +363,6 @@ var $addEmployeeImageBtn = $("#add-employee-image-btn"); // 이미지 추가 버
 var $addEmployeeImageInp = $("#add-employee-image-inp"); // 이미지 파일 입력창
 var $addEmployeeGroupSel = $("#add-employee-group-sel"); // 추가 팝업 - 소속 선택창
 var $addEmployeeNameInp = $("#add-employee-name-inp"); // 추가 팝업 - 직원명 입력창
-var $addEmployeeAgeInp = $("#add-employee-age-inp"); // 추가 팝업 - 나이 입력창
 var $addEmployeePhoneInp = $("#add-employee-phone-inp"); // 추가 팝업 - 연락처 입력창
 var $addEmployeeMailInp = $("#add-employee-mail-inp"); // 추가 팝업 - 메일 입력창
 var $addEmployeeBirthdayInp = $("#add-employee-birthday-inp"); // 추가 팝업 - 생년월일 입력창
@@ -388,7 +394,6 @@ var $modEmployeeImageBtn = $("#mod-employee-image-btn"); // 이미지 추가 버
 var $modEmployeeImageInp = $("#mod-employee-image-inp"); // 이미지 파일 입력창
 var $modEmployeeGroupSel = $("#mod-employee-group-sel"); // 추가 팝업 - 소속 선택창
 var $modEmployeeNameInp = $("#mod-employee-name-inp"); // 추가 팝업 - 직원명 입력창
-var $modEmployeeAgeInp = $("#mod-employee-age-inp"); // 추가 팝업 - 나이 입력창
 var $modEmployeePhoneInp = $("#mod-employee-phone-inp"); // 추가 팝업 - 연락처 입력창
 var $modEmployeeMailInp = $("#mod-employee-mail-inp"); // 추가 팝업 - 메일 입력창
 var $modEmployeeBirthdayInp = $("#mod-employee-birthday-inp"); // 추가 팝업 - 생년월일 입력창
@@ -402,7 +407,7 @@ var $employeeCntSpan = (function(){
 	
 	var $this = $("#employee-cnt-span"); // 그룹수
 	$this.update = function(){
-		var cnt = $employeeList.find(".employee-item").length;
+		var cnt = $employeeList.find(".employee-item").filter(":visible").length;
 		$this.text( cnt );
 		return $this;
 	};
@@ -453,10 +458,6 @@ var $TemplateModule = (function(){
 						 '<div class="employee-property">소속</div>', 
 						 '<div class="employee-group employee-value"></div>',
 					 '</div>',
-					 '<div class="employee-content-item">', 
-						 '<div class="employee-property">나이</div>', 
-						 '<div class="employee-age employee-value"></div>', 
-					 '</div>', 
 					 '<div class="employee-content-item">', 
 						 '<div class="employee-property">연락처</div>', 
 						 '<div class="employee-phone employee-value"></div>', 
@@ -528,17 +529,22 @@ var $TemplateModule = (function(){
 			// 이미지 설정
 			$.fn.setImage = function setImage( imageSrc ){
 				this.data("image", imageSrc);
-				if( imageSrc != null ){
-					this.find(".employee-image").css({
-						"background-image": "url(" + imageSrc + ")",
-						"box-shadow": "none"
-					});
-				}else{
+				if( imageSrc == null ){
 					this.find(".employee-image").css({
 						"background-image": "url(/image/default-user.png)",
 						"box-shadow": "0px 0px 0px 2px #CFD8DC"
 					});
+				}else{
+					this.find(".employee-image").css({
+						"background-image": "url(" + imageSrc + ")",
+						"box-shadow": "none"
+					});
 				}
+			};
+			
+			// 아이디 조회
+			$.fn.getId = function getId(){
+				return this.data("id");
 			};
 			
 			// 이름 조회
@@ -550,17 +556,6 @@ var $TemplateModule = (function(){
 			$.fn.setName = function setName( name ){
 				this.data("name", name);
 				this.find(".employee-name").text(name);
-			};
-			
-			// 나이 설정
-			$.fn.setAge = function setAge( age ){
-				this.data("age", age);
-				this.find(".employee-age").text(age);
-			};
-			
-			// 나이 조회
-			$.fn.getAge = function getAge(){
-				return this.data("age");
 			};
 			
 			// 연락처 설정
@@ -644,7 +639,7 @@ var $TemplateModule = (function(){
 				return data;
 			};
 			
-			return function( groupId, groupName, id, name, imageSrc, age, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
+			return function( groupId, groupName, id, name, imageSrc, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "employee-item" ] );
 				$clone.data({
@@ -653,7 +648,6 @@ var $TemplateModule = (function(){
 					id: null,
 					name: null,
 					image: null,
-					age: null,
 					phone: null,
 					mail: null,
 					birthday: null,
@@ -680,9 +674,6 @@ var $TemplateModule = (function(){
 				
 				// 이미지
 				$clone.setImage( imageSrc );
-				
-				// 나이
-				$clone.setAge( age );
 				
 				// 연락처
 				$clone.setPhone( phone );
@@ -797,10 +788,9 @@ for( var i=0; i<GroupModule.count(); ++i ){
 var employees = <%-employees%>;
 for( var i=0; i<employees.length; ++i ){
 	var employee = employees[ i ];
-	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.age, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.enableDelete, employee.createDate, employee.updateDate );
+	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.enableDelete, employee.createDate, employee.updateDate );
 	$employee.appendTo( $employeeList );
 }
-
 
 
 //수량 표시 갱신
@@ -810,7 +800,79 @@ $employeeCntSpan.update();
 /****************************************
 	이벤트
 ****************************************/
- 
+
+// 검색 버튼 클릭 이벤트
+$searchBtn.on("click", function(){
+	
+	// 선택된 직원
+	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
+	$selectedEmployeeItem.removeClass("select");
+	$delBtn.removeClass( "disable" );
+	$modBtn.removeClass( "disable" );
+	
+	var groupIdFilter = $searchGroupSel.val();
+	var useFilter = $searchUseSel.val(); // USE UNUSE ALL
+	var nameFilter = $searchEmployeeNameInp.val().trim().toUpperCase();
+	var memoFilter = $searchEmployeeMemoInp.val().trim().toUpperCase();
+	
+	// 직원목록
+	var $employeeItems = $employeeList.find(".employee-item");
+	for( var i=0; i<$employeeItems.length; ++i ){
+		var $employeeItem = $employeeItems.eq( i );
+		$employeeItem.show();
+	}
+	
+	// 그룹 검색
+	if( groupIdFilter != "ALL" ){
+		for( var i=0; i<$employeeItems.length; ++i ){
+			var $employeeItem = $employeeItems.eq( i );
+			if( $employeeItem.getGroupId() != groupIdFilter ){
+				$employeeItem.hide();
+			}
+		}
+		$employeeItems = $employeeItems.filter(":visible");
+	}
+	
+	// 사용여부 검색
+	if( useFilter != "ALL" ){
+		
+		var filterUseValue = useFilter == "USE";
+		
+		for( var i=0; i<$employeeItems.length; ++i ){
+			var $employeeItem = $employeeItems.eq( i );
+			if( $employeeItem.getUse() != filterUseValue ){
+				$employeeItem.hide();
+			}
+		}
+		$employeeItems = $employeeItems.filter(":visible");
+	}
+	
+	// 이름 검색
+	for( var i=0; i<$employeeItems.length; ++i ){
+		var $employeeItem = $employeeItems.eq( i );
+		if( $employeeItem.getName().toUpperCase().indexOf( nameFilter ) == -1 ){
+			$employeeItem.hide();
+		}
+	}
+	$employeeItems = $employeeItems.filter(":visible");
+	
+	// 메모 검색
+	for( var i=0; i<$employeeItems.length; ++i ){
+		var $employeeItem = $employeeItems.eq( i );
+		var memo = $employeeItem.getMemo();
+		if( memo == null ){
+			memo = "";
+		}
+		if( memo.toUpperCase().indexOf( memoFilter ) == -1 ){
+			$employeeItem.hide();
+		}
+	}
+	
+	// 수량 갱신
+	$employeeCntSpan.update();
+	
+});
+
 // 추가 버튼 클릭 이벤트
 $addBtn.on("click", function(){
 	
@@ -831,9 +893,6 @@ $addBtn.on("click", function(){
 	
 	// 이름 초기화
 	$addEmployeeNameInp.val("");
-	
-	// 나이 초기화
-	$addEmployeeAgeInp.val("");
 	
 	// 연락처 초기화
 	$addEmployeePhoneInp.val("");
@@ -924,14 +983,6 @@ $addCompleteBtn.on("click", function(){
 	}
 	
 	var imageSrc = $addEmployeeImg.getImage();
-	
-	var age = $addEmployeeAgeInp.val().trim();
-	if( age == "" ){
-		age = null;
-	}else{
-		age = parseInt( age );
-	}
-	
 	var phone = $addEmployeePhoneInp.val().trim();
 	if( phone == "" ){
 		phone = null;
@@ -952,7 +1003,7 @@ $addCompleteBtn.on("click", function(){
 		memo = null;
 	}
 	
-	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newEmployeeName, imageSrc, age, phone, mail, birthday, memo );
+	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newEmployeeName, imageSrc, phone, mail, birthday, memo );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -967,6 +1018,7 @@ $addCompleteBtn.on("click", function(){
 		
 		// 수량 표시 갱신
 		$employeeCntSpan.update();
+		updateSearchEmployeeNameAutoComplete();
 		
 	} );
 	
@@ -1109,11 +1161,17 @@ $modBtn.on("click", function(){
 
 	// 이미지 설정
 	var employeeImage = $selectedEmployeeItem.getImage();
-	$modEmployeeImg.data("image", employeeImage);
-	$modEmployeeImg.css({
-		"background-image": "url(" + employeeImage + ")",	
-		"box-shadow": "none"
-	});
+	if( employeeImage == null ){
+		$modEmployeeImg.css({
+			"background-image": "url(/image/default-user.png)",
+			"box-shadow": "0px 0px 0px 2px #CFD8DC"
+		});
+	}else{
+		$modEmployeeImg.css({
+			"background-image": "url(" + employeeImage + ")",
+			"box-shadow": "none"
+		});
+	}
 	
 	// 그룹 설정
 	var groupId = $selectedEmployeeItem.getGroupId();
@@ -1122,10 +1180,6 @@ $modBtn.on("click", function(){
 	// 이름 설정
 	var employeeName = $selectedEmployeeItem.getName();
 	$modEmployeeNameInp.val( employeeName );
-	
-	// 나이 설정
-	var employeeAge = $selectedEmployeeItem.getAge();
-	$modEmployeeAgeInp.val( employeeAge );
 	
 	// 연락처 설정
 	var employeePhone = $selectedEmployeeItem.getPhone();
@@ -1163,6 +1217,43 @@ $modBtn.on("click", function(){
 	
 });
 
+//추가팝업 - 이미지 추가 버튼 클릭 이벤트
+$modEmployeeImageBtn.on("click", function(){
+	$modEmployeeImageInp.trigger("click");
+});
+
+// 추가팝업 - 이미지 파일 입력창 클릭 이벤트
+$modEmployeeImageInp.on("click", function( e ){
+	e.stopPropagation();
+});
+// 추가팝업 - 이미지 파일 입력창 클릭 이벤트
+$modEmployeeImageInp.on("change", function( e ){
+	
+	// 초기화 시, 무시
+	if( $modEmployeeImageInp.val() == "" ){
+		return;
+	}
+	
+    var files = $modEmployeeImageInp.get(0).files;
+	if (FileReader && files && files.length) {
+	    var fileReader = new FileReader();
+	    fileReader.onload = function () {
+	    	$modEmployeeImg.data("image", fileReader.result);
+	    	$modEmployeeImg.css({
+	    		"background-image": "url(" + fileReader.result + ")",	
+	    		"box-shadow": "none"
+	    	});
+	    }
+	    fileReader.readAsDataURL(files[0]);
+	}else{
+		alert( "파일 업로드를 지원하지 않는 브라우저입니다.\n이미지를 변경할 수 없습니다." );
+	}
+	
+	// 초기화
+	$modEmployeeImageInp.val("");
+	
+});
+
 // 수정팝업 - 사용 버튼 클릭 이벤트
 $modUseBtn.on("click", function(){
 	
@@ -1194,43 +1285,82 @@ $modCancelBtn.on("click", function(){
 // 수정팝업 - 완료 버튼 클릭 이벤트
 $modCompleteBtn.on("click", function(){
 	
-	var newEmployeeName = $modEmployeeNameInp.val().trim();
-	if( newEmployeeName == "" ){
-		alert( "그룹명이 비어있습니다." );
+	// 선택된 직원
+	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
+	
+	var groupId = $modEmployeeGroupSel.val();
+	if( groupId == "NO_SELECT" ){
+		alert( "소속을 선택하세요." );
 		return;
 	}
 	
-	// 선택된 소속
-	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
+	var groupName = $modEmployeeGroupSel.find("option[value='"+groupId+"']").text();
 	
-	// 그룹명이 달라진 경우만 그룹명 검증
-	var beforeemployeeName = $selectedEmployeeItem.getName();
-	if( beforeemployeeName != newEmployeeName ){
-		var $employeeItems = $employeeList.find( ".employee-item" );
-		for( var i=0; i<$employeeItems.length; ++i ){
-			var employeeName =  $employeeItems.eq( i ).getName();
-			if( newEmployeeName == employeeName ){
-				alert( "이미 존재하는 그룹명 입니다." );
-				return;
-			}
+	var newEmployeeName = $modEmployeeNameInp.val().trim();
+	if( newEmployeeName == "" ){
+		alert( "이름이 비어있습니다." );
+		return;
+	}
+	
+	var $employeeItems = $employeeList.find( ".employee-item" );
+	for( var i=0; i<$employeeItems.length; ++i ){
+		
+		var $employeeItem = $employeeItems.eq( i );
+		if( $employeeItem[ 0 ] == $selectedEmployeeItem[ 0 ] ){
+			continue;
+		}
+		
+		var employeeName =  $employeeItem.getName();
+		if( newEmployeeName == employeeName ){
+			alert( "이미 존재하는 직원 입니다." );
+			return;
 		}
 	}
 	
-	// 소속명 설정
+	// 검증 이후 적용
+	$selectedEmployeeItem.setGroupId( groupId );
+	$selectedEmployeeItem.setGroupName( groupName );
 	$selectedEmployeeItem.setName( newEmployeeName );
 	
-	// 사용여부 설정
-	var use = $modUseBtn.hasClass("select");
-	$selectedEmployeeItem.setUse( use );
+	var imageSrc = $modEmployeeImg.getImage();
+	$selectedEmployeeItem.setImage( imageSrc );
 	
-	// 수정일 갱신
-	$selectedEmployeeItem.updateDate();
+	var phone = $modEmployeePhoneInp.val().trim();
+	if( phone == "" ){
+		phone = null;
+	}
+	$selectedEmployeeItem.setPhone( phone );
+	
+	var mail = $modEmployeeMailInp.val().trim();
+	if( mail == "" ){
+		mail = null;
+	}
+	$selectedEmployeeItem.setMail( mail );
+	
+	var birthday = $modEmployeeBirthdayInp.val().trim();
+	if( birthday == "" ){
+		birthday = null;
+	}
+	$selectedEmployeeItem.setBirthday( birthday );
+	
+	var memo = $modEmployeeMemoInp.val().trim();
+	if( memo == "" ){
+		memo = null;
+	}
+	$selectedEmployeeItem.setMemo( memo );
+	
+	// 선택여부
+	$selectedEmployeeItem.setUse( $modUseBtn.hasClass("select") );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
 	$modPopup.fadeOut( 500 );
 	$modPopupContent.css( { "margin-top": "0px" } );
-	$modPopupContent.animate( { "margin-top": "-40px" }, 500 );
+	$modPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		updateSearchEmployeeNameAutoComplete();
+		
+	} );
 	
 });
 
@@ -1268,11 +1398,32 @@ $saveBtn.on("click", function(){
 });
 
 function updateBodyHeight(){
-		
 	$body.css("height", window.innerHeight + "px");
-	
 }
 updateBodyHeight();
+
+// 자동 완성 갱신
+function updateSearchEmployeeNameAutoComplete(){
+	
+	var names = [];
+	var $employeeItems = $employeeList.find(".employee-item");
+	for( var i=0; i<$employeeItems.length; ++i ){
+		var $employeeItem = $employeeItems.eq( i );
+		names.push( $employeeItem.getName() );
+	}
+	
+	// 직원명 자동검색 갱신
+	$searchEmployeeNameInp.autocomplete({
+		source: names,
+		focus: function( event, ui ) {
+			event.preventDefault();
+		}
+	});
+	
+}
+updateSearchEmployeeNameAutoComplete();
+
+
 // 윈도우 크기 변경 이벤트
 $window.on("resize", function(){
 	
