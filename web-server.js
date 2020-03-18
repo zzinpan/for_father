@@ -136,7 +136,9 @@
 	
 	// welcome File
 	app.get('/', function( req, res ){
-		res.render( 'index', { userName: req.session.userName } );
+	
+		res.render( "index" );
+		
 	});
 	
 	// 컨트롤러 폴더 목록

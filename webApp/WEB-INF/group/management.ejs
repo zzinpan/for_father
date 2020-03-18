@@ -10,6 +10,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .smc-btn:not(.disable):hover { box-shadow: 0px 0px 1px 1px #aaa; !important; }
 .smc-btn.select { box-shadow: 0px 0px 1px 1px #2196F3 !important; }
 .smc-btn.blue { background-color: #2196F3; color: white; box-shadow: 0px 0px 0px 1px #2196F3; }
+.smc-btn.bluegray { background-color: #607D8B; color: white; box-shadow: 0px 0px 0px 1px #90A4AE; }
 .smc-btn.disable { background-color: #eee; color: #aaa; cursor: not-allowed; }
 .smc-header { font-size: 20px; padding: 10px; color: #222; font-weight: bold; margin-bottom: 20px; }
 .smc-desc { background-color: #eee; color: #616161; padding: 10px; font-size: 12px; }
@@ -72,6 +73,24 @@ if (!String.prototype.padStart) {
 				소속 관리
 			</div>
 			<div class="col-md-12" style="position: relative;">
+			
+				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
+					<div class="col-md-12">
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">사용여부</div>
+						<div style="float: left; display: inline-block;">
+							<select id="search-use-sel" class="smc-select" style="width: 70px;">
+								<option value="ALL" selected="selected">전체</option>
+								<option value="USE">사용</option>
+								<option value="UNUSE">미사용</option>
+							</select>
+						</div>
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">소속명</div>
+						<div style="float: left; display: inline-block;">
+							<input id="search-employee-name-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						</div>
+						<div id="search-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
+					</div>
+				</div>
 			
 				<!-- 상단 -->
 				<div class="smc-count">

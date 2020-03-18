@@ -20,10 +20,11 @@ header .sub_header_btn .dot { position: absolute; left: -0px; top: calc( 50% - 2
 iframe { position: absolute; top: 40px; width: 100%; height: calc( 100% - 80px ); border: none; }
 iframe.hide { top: 0px; opacity: 0; }
 footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; background-color: #ECEFF1; color: #616161; text-align: center; font-size: 10px; padding: 13px; }
-.background { position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; z-index:  }
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
 </head>
 <body>
 <header>
@@ -40,10 +41,15 @@ footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; 
 		</div>
 	</div>
 	<div class="header_btn header_employee_btn" data-target-src="/employee/management/view">
-		<div>직원</div>
+		<div>
+			<span>직원</span>
+			<img id="birthday_icon" src="/image/confetti.png" height="12" style="display: none;">	
+		</div>
 		<div class="sub_header">
 			<div class="sub_header_btn" data-target-src="/employee/management/view">
-				<div>직원 관리</div>
+				<div>
+					직원 관리
+				</div>
 			</div>
 			<div class="sub_header_btn">
 				<div>출고가 관리</div>
@@ -73,6 +79,9 @@ var $window = $(window);
 var $headerBtns = $(".header_btn");
 var $subHeaderBtns = $(".sub_header_btn");
 
+// 생일 아이콘
+var $birthdayIcon = $("#birthday_icon");
+
 // 서브 헤더 포인트
 var $dot = $("#dot");
 
@@ -94,12 +103,13 @@ function selectHeaderBtnAndMovePage( $targetHeaderBtn, src ){
 	
 	$subView.addClass( "hide", 500, function(){
 		$subView.attr( "src", src );
+		updateBirthdayIcon();
 	} );
 	
 }
 
 // 서브헤더버튼 선택
-function selectSubHeaderBtnAndMovePage( $targetSubHeaderBtn ){
+function selectSubHeaderBtn( $targetSubHeaderBtn ){
 	
 	$targetSubHeaderBtn.prepend( $dot );
 	$targetSubHeaderBtn.addClass( "select" );
@@ -116,7 +126,7 @@ $headerBtns.on( "click", function(){
 	
 	var $subHeaderBtns = $targetHeaderBtn.find(".sub_header_btn");
 	if( 0 < $subHeaderBtns.length ){
-		selectSubHeaderBtnAndMovePage( $subHeaderBtns.eq( 0 ) );
+		selectSubHeaderBtn( $subHeaderBtns.eq( 0 ) );
 	}
 	
 	
@@ -131,7 +141,7 @@ $subHeaderBtns.on( "click", function( e ){
 	var $targetHeaderBtn = $this.closest( ".header_btn" );
 	var src = $this.attr( "data-target-src" );
 	selectHeaderBtnAndMovePage( $targetHeaderBtn, src );
-	selectSubHeaderBtnAndMovePage( $this );
+	selectSubHeaderBtn( $this );
 	
 } );
 
@@ -184,6 +194,38 @@ window.showNav = function( duration, callback ){
 	$footer.animate({"bottom": "0px"}, duration);
 	
 };
+
+window.updateBirthdayIcon = function(){
+	
+	$.ajax({
+		url: "/employee/getBirthdayEmployees",
+		type: "get",
+		dataType: "json",
+		success: function( employees ){
+			
+			if( employees.length == 0 ){
+				$birthdayIcon.stop().fadeOut( 500 );
+				return;
+			}
+			
+			var arr = [];
+			employees.forEach(function( employee ){
+				arr.push( "<span style=\"font-size: 12px; color: #FFEB3B;\">[ " + employee.birthday + " ]</span><span style=\"font-size: 12px; color: #ffffff;\"> " + employee.name + "님의 생일</span>"  );
+			});
+				
+			tippy('#birthday_icon', {
+				placement: 'right',
+				allowHTML: true,
+				content: arr.join( "<br>" )
+			});
+			
+			$birthdayIcon.stop().fadeIn( 500 );
+			
+		}
+	})
+	
+};
+updateBirthdayIcon();
 
 $window.on("resize", function(){
 	

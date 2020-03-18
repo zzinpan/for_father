@@ -1387,6 +1387,7 @@ $saveBtn.on("click", function(){
 			 
 			 if( res.result == "SUCCESS" ){
 				 alert( "저장되었습니다." );
+				 parent.updateBirthdayIcon();
 			 }else{
 				 alert( "실패하였습니다.\n관리자에게 문의바랍니다." );
 			 }
