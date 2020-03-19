@@ -287,6 +287,33 @@
 				} 
 		});
 	
+	// 품목 그룹 파일 생성
+	var productGroup = [
+		/*
+		{
+			id: "PRG::",
+			name: "5G/L회수",
+			createDate: 2020-01-01,
+			updateDate: 2020-01-01,
+			use: true
+		}
+		*/
+	];
+	
+	// 품목 파일 생성
+	var product = [
+		/*
+		{
+			productGroupId: "PRG::"
+			id: "PRI::",
+			name: "공병",
+			createDate: 2020-01-01,
+			updateDate: 2020-01-01,
+			use: true
+		}
+		*/
+	];
+	
 })();
 
 // 서버 실행

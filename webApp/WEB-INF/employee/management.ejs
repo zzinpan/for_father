@@ -333,7 +333,7 @@ $(function(){
 <script type="text/javascript">
 
 /**
-	jQuery 변수
+	jquery 변수
  **/
 
 var $window = $(window); // 윈도우
@@ -873,6 +873,24 @@ $searchBtn.on("click", function(){
 	
 });
 
+// 이름 검색창 키 이벤트
+$searchEmployeeNameInp.on("keypress", function( e ){
+	
+	if( e.keyCode == 13 ){
+		$searchBtn.trigger( "click" );
+	}
+	
+});
+
+// 메모 검색창 키 이벤트
+$searchEmployeeMemoInp.on("keypress", function( e ){
+	
+	if( e.keyCode == 13 ){
+		$searchBtn.trigger( "click" );
+	}
+	
+});
+
 // 추가 버튼 클릭 이벤트
 $addBtn.on("click", function(){
 	
@@ -1141,6 +1159,8 @@ $delBtn.on("click", function(){
 			$delBtn.addClass( "disable" );
 			$modBtn.addClass( "disable" );
 			
+			updateSearchEmployeeNameAutoComplete();
+			
 		} );
 		
 		
@@ -1398,11 +1418,6 @@ $saveBtn.on("click", function(){
 	
 });
 
-function updateBodyHeight(){
-	$body.css("height", window.innerHeight + "px");
-}
-updateBodyHeight();
-
 // 자동 완성 갱신
 function updateSearchEmployeeNameAutoComplete(){
 	
@@ -1424,6 +1439,10 @@ function updateSearchEmployeeNameAutoComplete(){
 }
 updateSearchEmployeeNameAutoComplete();
 
+function updateBodyHeight(){
+	$body.css("height", window.innerHeight + "px");
+}
+updateBodyHeight();
 
 // 윈도우 크기 변경 이벤트
 $window.on("resize", function(){

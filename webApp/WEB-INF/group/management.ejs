@@ -3,6 +3,7 @@
 <head>
 <meta charset=UTF-8">
 <title>신나라유통 ERP > group > management</title>
+<link rel="stylesheet" href="/lib/jquery-ui-1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
 <style type="text/css">
 body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
@@ -26,7 +27,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .mt20 { margin-top: 20px; }
 
 /* 그룹 */
-.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); overflow: auto; }
+.group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); overflow: auto; padding: 40px 0px; }
 	.group-item { cursor: pointer; display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
 	.group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
 	.group-item:hover { box-shadow: 0px 0px 2px 1px #aaa; }
@@ -39,6 +40,11 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 		.group-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.group-content-use-status.use { background-color: #E8F5E9; }
 		.group-content-use-status.unuse { background-color: #eee; }
+		
+/* 라이브러리 커스텀 */		
+.ui-autocomplete.ui-widget {
+	font-size: 10px;
+}
 </style>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
@@ -66,13 +72,13 @@ if (!String.prototype.padStart) {
 </script>
 </head>
 <body>
-<div class="container" style="position: relative;">
-	<div class="row" style="position: relative; margin-top: 50px;">
-		<div class="col-md-offset-2 col-md-8" style="position: relative;">
+<div class="container" style="position: relative; height: 100%;">
+	<div class="row" style="position: relative; margin-top: 50px; height: calc( 100% - 50px );">
+		<div class="col-md-offset-2 col-md-8" style="position: relative; height: 100%;">
 			<div class="smc-header">
 				소속 관리
 			</div>
-			<div class="col-md-12" style="position: relative;">
+			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
 			
 				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
 					<div class="col-md-12">
@@ -86,7 +92,7 @@ if (!String.prototype.padStart) {
 						</div>
 						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">소속명</div>
 						<div style="float: left; display: inline-block;">
-							<input id="search-employee-name-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+							<input id="search-group-name-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
 						</div>
 						<div id="search-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
 					</div>
@@ -106,7 +112,7 @@ if (!String.prototype.padStart) {
 				</div>
 				
 				<!-- 본문 -->
-				<div id="group-list" class="col-md-12 group-list">
+				<div id="group-list" class="col-md-12 group-list" style="position: relative; height: calc( 100% - 142px );">
 					
 				</div>
 				
@@ -191,9 +197,17 @@ if (!String.prototype.padStart) {
 <script type="text/javascript">
 
 /**
-	jQuery 변수
- **/
+	jquery 변수
+**/
 
+var $window = $(window); // 윈도우
+var $body = $("body"); // 바디
+
+// 검색
+var $searchUseSel = $("#search-use-sel"); // 사용여부 선택창
+var $searchBtn = $("#search-btn"); // 검색 버튼
+var $searchGroupNameInp = $("#search-group-name-inp"); // 소속명 검색 입력창
+ 
 // 상단 버튼 부분
 var $addBtn = $("#add-btn"); // 추가 버튼
 var $delBtn = $("#del-btn"); // 삭제 버튼
@@ -222,7 +236,7 @@ var $groupCntSpan = (function(){
 	
 	var $this = $("#group-cnt-span"); // 그룹수
 	$this.update = function(){
-		var cnt = $groupList.find(".group-item").length;
+		var cnt = $groupList.find(".group-item").filter(":visible").length;
 		$this.text( cnt );
 		return $this;
 	};
@@ -339,6 +353,14 @@ var $TemplateModule = (function(){
 				this.data( "updateDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
 				this.find( ".group-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
 			};
+			
+			// 저장용 데이터
+			$.fn.getSaveData = function getSaveData(){
+				
+				var data = this.data();
+				delete data.employees;
+				
+			};
 		
 			return function( id, name, employeeCnt, use, enableDelete, createDate, updateDate ){
 		 
@@ -422,10 +444,10 @@ var $TemplateModule = (function(){
 /****************************************
 	데이터 로드
 ****************************************/
-var groups = <%-groups%>;
+var groups = <%- groups %>;
 for( var i=0; i<groups.length; ++i ){
 	var group = groups[ i ];
-	var $group = $TemplateModule.createGroup( group.id, group.name, 0, group.use, group.enableDelete, group.createDate, group.updateDate );
+	var $group = $TemplateModule.createGroup( group.id, group.name, group.employees.length, group.use, group.enableDelete, group.createDate, group.updateDate );
 	$group.appendTo( $groupList );
 }
 
@@ -436,6 +458,56 @@ $groupCntSpan.update();
 /****************************************
 	이벤트
 ****************************************/
+ 
+//검색 버튼 클릭 이벤트
+$searchBtn.on("click", function(){
+	
+	// 직원목록
+	var $groupItems = $groupList.find(".group-item");
+	for( var i=0; i<$groupItems.length; ++i ){
+		var $groupItem = $groupItems.eq( i );
+		$groupItem.show();
+	}
+	
+	var useFilter = $searchUseSel.val(); // USE UNUSE ALL
+	var nameFilter = $searchGroupNameInp.val().trim().toUpperCase();
+	
+	// 사용여부 검색
+	if( useFilter != "ALL" ){
+		
+		var filterUseValue = useFilter == "USE";
+		
+		for( var i=0; i<$groupItems.length; ++i ){
+			var $groupItem = $groupItems.eq( i );
+			if( $groupItem.getUse() != filterUseValue ){
+				$groupItem.hide();
+			}
+		}
+		$groupItems = $groupItems.filter(":visible");
+	}
+	
+	// 이름 검색
+	for( var i=0; i<$groupItems.length; ++i ){
+		var $groupItem = $groupItems.eq( i );
+		if( $groupItem.getName().toUpperCase().indexOf( nameFilter ) == -1 ){
+			$groupItem.hide();
+		}
+	}
+	$groupItems = $groupItems.filter(":visible");
+	
+	// 수량 갱신
+	$groupCntSpan.update();
+	
+});
+
+// 이름 검색창 키 이벤트
+$searchGroupNameInp.on("keypress", function( e ){
+	
+	if( e.keyCode == 13 ){
+		$searchBtn.trigger( "click" );
+	}
+	
+});
  
 // 추가 버튼 클릭 이벤트
 $addBtn.on("click", function(){
@@ -494,6 +566,7 @@ $addCompleteBtn.on("click", function(){
 		
 		// 팝업 그룹명 제거
 		$addGroupNameInp.val("");
+		updateSearchGroupNameAutoComplete();
 		
 	} );
 	
@@ -615,6 +688,7 @@ $delBtn.on("click", function(){
 			// 버튼 비활성화
 			$delBtn.addClass( "disable" );
 			$modBtn.addClass( "disable" );
+			updateSearchGroupNameAutoComplete();
 			
 		} );
 		
@@ -725,7 +799,11 @@ $modCompleteBtn.on("click", function(){
 	parent.showNav( 500 );
 	$modPopup.fadeOut( 500 );
 	$modPopupContent.css( { "margin-top": "0px" } );
-	$modPopupContent.animate( { "margin-top": "-40px" }, 500 );
+	$modPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		updateSearchGroupNameAutoComplete();
+		
+	} );
 	
 });
 
@@ -736,7 +814,7 @@ $saveBtn.on("click", function(){
 	 var $groupItems = $groupList.find(".group-item");
 	 for( var i=0; i<$groupItems.length; ++i ){
 		 var $groupItem = $groupItems.eq( i );
-		 groups.push( $groupItem.data() );
+		 groups.push( $groupItem.getSaveData() );
 	 }
 	 
 	 $.ajax({
@@ -762,6 +840,38 @@ $saveBtn.on("click", function(){
 	
 });
 
+
+//자동 완성 갱신
+function updateSearchGroupNameAutoComplete(){
+	
+	var names = [];
+	var $groupItems = $groupList.find(".group-item");
+	for( var i=0; i<$groupItems.length; ++i ){
+		var $groupItem = $groupItems.eq( i );
+		names.push( $groupItem.getName() );
+	}
+	
+	// 직원명 자동검색 갱신
+	$searchGroupNameInp.autocomplete({
+		source: names,
+		focus: function( event, ui ) {
+			event.preventDefault();
+		}
+	});
+	
+}
+updateSearchGroupNameAutoComplete();
+
+
+function updateBodyHeight(){
+	$body.css("height", window.innerHeight + "px");
+}
+updateBodyHeight();
+
+// 윈도우 크기 변경 이벤트
+$window.on("resize", function(){
+	updateBodyHeight();
+});
 
 </script>
 </body>

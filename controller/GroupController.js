@@ -11,10 +11,35 @@ module.exports = [
 			fs.readFile(
 				global.dataDir + "/group.json",
 				"utf8",
-				function( err, data ){ 
-					res.render( "WEB-INF/group/management.ejs", {
-						groups: data
-					} );
+				function( err, groups ){ 
+					
+					fs.readFile(
+						global.dataDir + "/employee.json",
+						"utf8",
+						function( err, employees ){ 
+							
+							groups = JSON.parse( groups );
+							employees = JSON.parse( employees );
+							
+							for(var i=0; i<groups.length; ++i){
+								var group = groups[ i ];
+								group.employees = [];
+								for(var j=0; j<employees.length; ++j){
+									var employee = employees[ j ];
+									if( group.id == employee.groupId ){
+										group.employees.push( employee );
+									}
+								}
+							}
+							
+//							console.log( JSON.stringify( groups ) );
+							
+							res.render( "WEB-INF/group/management.ejs", {
+								groups: JSON.stringify( groups )
+							} );
+						}
+					);
+					
 				}
 			);
 				
