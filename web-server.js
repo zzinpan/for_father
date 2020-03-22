@@ -299,6 +299,19 @@
 		}
 		*/
 	];
+	fs.writeFile( 
+			global.dataDir + "/productGroup.json", 
+			JSON.stringify( productGroup ),
+			"utf8",
+			function(err){ 
+				if (err == null) { 
+					console.log("create productGroup.json - complete");
+				} else { 
+					console.log("create productGroup.json - fail");
+					console.log( err );
+				} 
+		});
+	
 	
 	// 품목 파일 생성
 	var product = [
@@ -313,6 +326,18 @@
 		}
 		*/
 	];
+	fs.writeFile( 
+			global.dataDir + "/product.json", 
+			JSON.stringify( product ),
+			"utf8",
+			function(err){ 
+				if (err == null) { 
+					console.log("create product.json - complete");
+				} else { 
+					console.log("create product.json - fail");
+					console.log( err );
+				} 
+		});
 	
 })();
 
