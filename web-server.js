@@ -289,15 +289,14 @@
 	
 	// 품목 그룹 파일 생성
 	var productGroup = [
-		/*
 		{
-			id: "PRG::",
-			name: "5G/L회수",
-			createDate: 2020-01-01,
-			updateDate: 2020-01-01,
-			use: true
+			id: "PRG::NO_GROUP",
+			name: "그룹없음",
+			createDate: nowStr,
+			updateDate: nowStr,
+			use: true,
+			enableDelete: false
 		}
-		*/
 	];
 	fs.writeFile( 
 			global.dataDir + "/productGroup.json", 

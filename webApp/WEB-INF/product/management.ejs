@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=UTF-8">
+<title>신나라유통 ERP > product > management</title>
+<link rel="stylesheet" href="/lib/jquery-ui-1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
+<style type="text/css">
+body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
+.smc-btn { float: right; display: inline-block; padding: 4px 10px; vertical-align: bottom; font-weight: bold; font-size: 10px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px; }
+.smc-btn:not(.disable):hover { box-shadow: 0px 0px 1px 1px #aaa; !important; }
+.smc-btn.select { box-shadow: 0px 0px 1px 1px #2196F3 !important; }
+.smc-btn.blue { background-color: #2196F3; color: white; box-shadow: 0px 0px 0px 1px #2196F3; }
+.smc-btn.bluegray { background-color: #607D8B; color: white; box-shadow: 0px 0px 0px 1px #90A4AE; }
+.smc-btn.disable { background-color: #eee; color: #aaa; cursor: not-allowed; }
+.smc-header { font-size: 20px; padding: 10px; color: #222; font-weight: bold; margin-bottom: 20px; }
+.smc-desc { background-color: #eee; color: #616161; padding: 10px; font-size: 12px; }
+.smc-inp { border: none; border-bottom: #ccc solid 1px; padding: 4px 10px; font-size: 10px; width: 100%; }
+.smc-inp::placeholder { color: #cccccc; }
+.smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
+.smc-count { font-size: 10px; border-bottom: #ccc solid 2px; margin-bottom: 10px; height: 32px; }
+.small-title { font-weight: bold; margin-bottom: 40px; }
+
+.popup-row { float: left; width: 100%; }
+.mt6 { margin-top: 6px; }
+.mt10 { margin-top: 10px; }
+.mt20 { margin-top: 20px; }
+
+/* 그룹 */
+.product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); overflow: auto; padding: 40px 0px; }
+	.product-group-item { cursor: pointer; display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
+	.product-group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
+	.product-group-item:hover { box-shadow: 0px 0px 2px 1px #aaa; }
+		.product-group-name { display: inline-block; padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.product-group-item.disable .product-group-name { background-color: #607D8B; }
+		.product-group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+			.product-group-content-item { padding: 4px 0px; height: 25px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.product-group-property { float: left; width: 69px; text-align: center; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+				.product-group-value { float: left; width: 110px; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.product-group-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+		.product-group-content-use-status.use { background-color: #E8F5E9; }
+		.product-group-content-use-status.unuse { background-color: #eee; }
+		
+/* 라이브러리 커스텀 */		
+.ui-autocomplete.ui-widget {
+	font-size: 10px;
+}
+</style>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="/lib/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript">
+/**
+ 	Polyfill
+ **/
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength,padString) {
+        targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0,targetLength) + String(this);
+        }
+    };
+}
+</script>
+</head>
+<body>
+<div class="container" style="position: relative; height: 100%;">
+	<div class="row" style="position: relative; margin-top: 50px; height: calc( 100% - 50px );">
+		<div class="col-md-offset-2 col-md-8" style="position: relative; height: 100%;">
+			<div class="smc-header">
+				품목 관리
+			</div>
+			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
+			
+				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
+					<div class="col-md-12">
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">사용여부</div>
+						<div style="float: left; display: inline-block;">
+							<select id="search-use-sel" class="smc-select" style="width: 70px;">
+								<option value="ALL" selected="selected">전체</option>
+								<option value="USE">사용</option>
+								<option value="UNUSE">미사용</option>
+							</select>
+						</div>
+						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">소속명</div>
+						<div style="float: left; display: inline-block;">
+							<input id="search-product-group-name-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						</div>
+						<div id="search-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
+					</div>
+				</div>
+				
+				<!-- 품목그룹 -->
+				<div class="col-md-6" style="position: relative; height: calc( 100% - 60px );">
+					<!-- 상단 -->
+					<div class="smc-count">
+						<div class="col-md-4" style="padding-top: 8px;">총 <span id="product-group-cnt-span">0</span>건</div>
+						<div class="col-md-8">
+							<div class="smc-btn-wrap">
+								<div id="save-btn" class="smc-btn blue">저장</div>
+								<div id="del-btn" class="smc-btn disable">삭제</div>
+								<div id="mod-btn" class="smc-btn disable">수정</div>
+								<div id="add-product-group-btn" class="smc-btn">추가</div>
+							</div>
+						</div>
+					</div>
+					
+					<div style="text-align: center;">
+						<div style="display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 50px; background-color: #03A9F4; color: white; font-weight: bold;margin: 0px;">순서</div>
+						<div style="display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: calc( 100% - 120px ); background-color: #03A9F4; color: white; font-weight: bold; margin: 0px;">품목그룹명</div>
+						<div style="display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 70px; background-color: #03A9F4; color: white; font-weight: bold;">사용여부</div>
+					</div>
+					<!-- 본문 -->
+					<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
+						
+					</div>
+					
+					<!-- 하단 -->
+					<div class="col-md-12" style="height: 60px;"></div>
+				</div>
+				
+				
+				<!-- 품목 -->
+				<div class="col-md-6" style="position: relative; height: calc( 100% - 60px );">
+					<!-- 상단 -->
+					<div class="smc-count">
+						<div class="col-md-4" style="padding-top: 8px;">총 <span id="product-group-cnt-span">0</span>건</div>
+						<div class="col-md-8">
+							<div class="smc-btn-wrap">
+								<div id="save-btn" class="smc-btn blue">저장</div>
+								<div id="del-btn" class="smc-btn disable">삭제</div>
+								<div id="mod-btn" class="smc-btn disable">수정</div>
+								<div id="add-btn" class="smc-btn">추가</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- 본문 -->
+					<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
+						
+					</div>
+					
+					<!-- 하단 -->
+					<div class="col-md-12" style="height: 60px;"></div>
+				</div>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
+
+<!-- 추가 팝업 -->
+<div id="add-product-group-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
+
+	<div id="add_product_group_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
+		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
+			품목그룹 추가
+		</div>
+		<div class="popup-row">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>소속명
+			</div>
+			<div class="col-md-9">
+				<input id="add-product-group-name-inp" class="smc-inp" type="text" placeholder="품목그룹명을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt20">
+			<div class="col-md-12">
+				<div class="smc-btn-wrap">
+					<div id="add-product-group-complete-btn" class="smc-btn blue">완료</div>
+					<div id="add-product-group-cancel-btn" class="smc-btn">취소</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<!-- 수정 팝업 -->
+<div id="mod-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
+
+	<div id="mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
+		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
+			소속 수정
+		</div>
+		<div class="popup-row">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>소속명
+			</div>
+			<div class="col-md-9">
+				<input id="mod-product-group-name-inp" class="smc-inp" type="text" placeholder="소속명을 입력해주세요.">
+			</div>
+		</div>
+		<div class="popup-row mt10">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>사용여부
+			</div>
+			<div class="col-md-9">
+				<div id="mod-use-btn" class="smc-btn" style="float: left;">사용</div>
+				<div id="mod-unuse-btn" class="smc-btn"  style="float: left;">미사용</div>
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-offset-3 col-md-9" style="font-size: 10px; color: #616161;">
+				&nbsp; ※미사용 소속은 정산을 수행할 수 없습니다.
+			</div>
+		</div>
+		<div class="popup-row mt20">
+			<div class="col-md-12">
+				<div class="smc-btn-wrap">
+					<div id="mod-complete-btn" class="smc-btn blue">완료</div>
+					<div id="mod-cancel-btn" class="smc-btn">취소</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript">
+
+/**
+	jquery 변수
+**/
+
+var $window = $(window); // 윈도우
+var $body = $("body"); // 바디
+
+// 검색
+var $searchUseSel = $("#search-use-sel"); // 사용여부 선택창
+var $searchBtn = $("#search-btn"); // 검색 버튼
+var $searchGroupNameInp = $("#search-group-name-inp"); // 소속명 검색 입력창
+ 
+// 상단 버튼 부분
+var $addProductGroupBtn = $("#add-product-group-btn"); // 품목그룹 추가 버튼
+var $delBtn = $("#del-btn"); // 삭제 버튼
+var $modBtn = $("#mod-btn"); // 수정 버튼
+var $saveBtn = $("#save-btn"); // 저장 버튼
+
+// 품목그룹 추가 팝업 부분
+var $addProductGroupPopup = $("#add-product-group-popup"); // 품목그룹 추가 팝업 ( 배경포함 )
+var $addProductGroupPopupContent = $("#add_product_group_popup_content"); // 품목그룹 추가 팝업 ( 내용 )
+var $addProductGroupCancelBtn = $("#add-product-group-cancel-btn"); // 품목그룹 추가 팝업 - 취소 버튼
+var $addProductGroupCompleteBtn = $("#add-product-group-complete-btn"); // 품목그룹 추가 팝업 - 완료 버튼
+var $addProductGroupNameInp = $("#add-product-group-name-inp"); // 품목그룹 추가 팝업 - 품목그룹명 입력창
+
+// 수정 팝업 부분
+var $modPopup = $("#mod-popup"); // 수정 팝업 ( 배경 포함 )
+var $modPopupContent = $("#mod_popup_content"); // 수정 팝업 ( 내용 )
+var $modCancelBtn = $("#mod-cancel-btn"); // 취소 버튼
+var $modCompleteBtn = $("#mod-complete-btn"); // 완료 버튼
+var $modGroupNameInp = $("#mod-product-group-name-inp"); // 수정 팝업 - 소속명 입력창
+var $modUseBtn = $("#mod-use-btn"); // 사용 버튼
+var $modUnuseBtn = $("#mod-unuse-btn"); // 사용 버튼
+
+// 그룹 목록 부분
+var $productGroupList = $("#product-group-list"); // 그룹 목록
+var $groupCntSpan = (function(){
+	
+	var $this = $("#product-group-cnt-span"); // 그룹수
+	$this.update = function(){
+		var cnt = $productGroupList.find(".product-group-item").filter(":visible").length;
+		$this.text( cnt );
+		return $this;
+	};
+	return $this;
+	
+})();
+ 
+/**
+	모듈
+ **/
+ 
+ var TimeModule = {
+		
+		now: function(){
+			var now = new Date();
+			var yyyy = now.getFullYear().toString();
+			var MM = ( now.getMonth() + 1 ).toString().padStart( 2, 0 );
+			var dd = now.getDate().toString().padStart( 2, 0 );
+			var hh = now.getHours().toString().padStart( 2, 0 );
+			var mm = now.getMinutes().toString().padStart( 2, 0 );
+			var ss = now.getSeconds().toString().padStart( 2, 0 );
+			return {
+				object: now,
+				yyyy: yyyy,
+				MM: MM,
+				dd: dd,
+				hh: hh,
+				mm: mm,
+				ss: ss
+			}
+		}
+		
+};
+ 
+ // jQuery 템플릿 모듈
+var $TemplateModule = (function(){
+ 
+	var template = {
+	
+		"product-group-item": [
+			'<div class="product-group-item">',
+				'<div class="product-group-name">',
+					'',
+				'</div>',
+				'<div class="product-group-content-list">',
+					'<div class="product-group-content-item">',
+						'<div class="product-group-property">직원수</div>',
+						'<div class="product-group-value"><span class="product-group-emp-cnt">0</span>명</div>',
+					'</div>',
+					'<div class="product-group-content-item">',
+						'<div class="product-group-property">등록일</div>',
+						'<div class="product-group-reg-dt product-group-value">0000-00-00</div>',
+					'</div>',
+					'<div class="product-group-content-item">',
+						'<div class="product-group-property">수정일</div>',
+						'<div class="product-group-up-dt product-group-value">0000-00-00</div>',
+					'</div>',
+				'</div>',
+				'<div class="product-group-content-use-status">',
+					'사용',
+				'</div>',
+			'</div>'
+		].join("")
+	 
+	};
+
+	return {
+	
+		// jQuery 신규 제품그룹 객체 생성
+		createProductGroup: (function(){
+		
+			// 이름 조회
+			$.fn.getName = function getName(){
+				return this.data("name");
+			};
+			
+			// 이름 설정
+			$.fn.setName = function setName( name ){
+				this.data("name", name);
+				this.find(".product-group-name").text(name);
+			};
+			
+			// 사용여부 조회
+			$.fn.getUse = function(){
+				return this.data("use"); 
+			};
+		
+			// 삭제가능 여부
+			$.fn.setEnableDelete = function( enableDelete ){
+				this.data("enableDelete", enableDelete);
+				if( enableDelete == false ){
+					this.addClass("disable");
+				}
+			};
+		
+			// 사용여부 설정
+			$.fn.setUse = function( bool ){
+				this.data("use", bool);
+				if( bool == true ){
+					this.find(".product-group-content-use-status").removeClass("unuse").addClass("use").text("사용");
+				}else{
+					this.find(".product-group-content-use-status").removeClass("use").addClass("unuse").text("미사용");
+				}
+			};
+		
+			// 수정일 갱신
+			$.fn.updateDate = function updateDate(){
+				var now = TimeModule.now();
+				this.data( "updateDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
+				this.find( ".product-group-up-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
+			};
+			
+			// 저장용 데이터
+			$.fn.getSaveData = function getSaveData(){
+				
+				var data = this.data();
+				delete data.employees;
+				
+			};
+		
+			return function( id, name, use, enableDelete, createDate, updateDate ){
+		 
+				var $clone = $( template[ "product-group-item" ] );
+				$clone.data({
+					id: null,
+					name: null,
+					use: null,
+					enableDelete: null,
+					createDate: null,					
+					updateDate: null
+				});
+				
+				// 아이디
+				if( id == null ){
+					id = "PRG::" + ( Date.now() + Math.random() ).toString().replace(".", "");
+				}
+				$clone.data( "id", id );
+				
+				// 소속명 ( 필수값 )
+				$clone.setName( name );
+				
+				// 사용여부
+				if( use == null ){
+					use = true;
+				}
+				$clone.setUse( use );
+				
+				if( enableDelete == null ){
+					enableDelete = true;
+				}
+				$clone.setEnableDelete( enableDelete );
+				
+				// 등록일
+				if( createDate == null ){
+					var now = TimeModule.now();
+					$clone.data( "createDate", now.yyyy + now.MM + now.dd + now.hh + now.mm + now.ss );
+					$clone.find( ".product-group-reg-dt" ).text( now.yyyy + "-" + now.MM  + "-" + now.dd );
+				}else{
+					var yyyy = createDate.slice( 0, 4 );
+					var MM = createDate.slice( 4, 6 );
+					var dd = createDate.slice( 6, 8 );
+					var hh = createDate.slice( 8, 10 );
+					var mm = createDate.slice( 10, 12 );
+					var ss = createDate.slice( 12, 14 );
+					$clone.data( "createDate", yyyy + MM + dd + hh + mm + ss );
+					$clone.find( ".product-group-reg-dt" ).text( yyyy + "-" + MM  + "-" + dd );
+				}
+				
+				// 수정일
+				if( updateDate == null ){
+					$clone.updateDate();
+				}else{
+					var yyyy = updateDate.slice( 0, 4 );
+					var MM = updateDate.slice( 4, 6 );
+					var dd = updateDate.slice( 6, 8 );
+					var hh = updateDate.slice( 8, 10 );
+					var mm = updateDate.slice( 10, 12 );
+					var ss = updateDate.slice( 12, 14 );
+					$clone.data( "updateDate", yyyy + MM + dd + hh + mm + ss );
+					$clone.find( ".product-group-up-dt" ).text( yyyy + "-" + MM  + "-" + dd );
+				}
+				
+				return $clone;
+				 
+			}
+		 
+		})()
+	
+	};
+
+})();
+ 
+ 
+/****************************************
+	데이터 로드
+****************************************/
+var productGroups = <%- productGroups %>;
+for( var i=0; i<productGroups.length; ++i ){
+	var productGroup = productGroups[ i ];
+	var $productGroup = $TemplateModule.createProductGroup( productGroup.id, productGroup.name, productGroup.use, productGroup.enableDelete, productGroup.createDate, productGroup.updateDate );
+	$productGroup.appendTo( $productGroupList );
+}
+
+//수량 표시 갱신
+$groupCntSpan.update();
+
+ 
+/****************************************
+	이벤트
+****************************************/
+ 
+//검색 버튼 클릭 이벤트
+$searchBtn.on("click", function(){
+	
+	// 직원목록
+	var $groupItems = $productGroupList.find(".product-group-item");
+	for( var i=0; i<$groupItems.length; ++i ){
+		var $groupItem = $groupItems.eq( i );
+		$groupItem.show();
+	}
+	
+	var useFilter = $searchUseSel.val(); // USE UNUSE ALL
+	var nameFilter = $searchGroupNameInp.val().trim().toUpperCase();
+	
+	// 사용여부 검색
+	if( useFilter != "ALL" ){
+		
+		var filterUseValue = useFilter == "USE";
+		
+		for( var i=0; i<$groupItems.length; ++i ){
+			var $groupItem = $groupItems.eq( i );
+			if( $groupItem.getUse() != filterUseValue ){
+				$groupItem.hide();
+			}
+		}
+		$groupItems = $groupItems.filter(":visible");
+	}
+	
+	// 이름 검색
+	for( var i=0; i<$groupItems.length; ++i ){
+		var $groupItem = $groupItems.eq( i );
+		if( $groupItem.getName().toUpperCase().indexOf( nameFilter ) == -1 ){
+			$groupItem.hide();
+		}
+	}
+	$groupItems = $groupItems.filter(":visible");
+	
+	// 수량 갱신
+	$groupCntSpan.update();
+	
+});
+
+// 이름 검색창 키 이벤트
+$searchGroupNameInp.on("keypress", function( e ){
+	
+	if( e.keyCode == 13 ){
+		$searchBtn.trigger( "click" );
+	}
+	
+});
+ 
+// 추가 버튼 클릭 이벤트
+$addProductGroupBtn.on("click", function(){
+	
+	// 팝업 표시
+	$addProductGroupPopup.fadeIn( 500 );
+	parent.hideNav( 500 );
+	$addProductGroupNameInp.focus();
+	$addProductGroupPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+});
+
+// 추가팝업 - 취소 버튼 클릭 이벤트
+$addProductGroupCancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addPopup.fadeOut( 500 );
+	$addProductGroupPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 추가팝업 - 완료 버튼 클릭 이벤트
+$addProductGroupCompleteBtn.on("click", function(){
+	
+	var newGroupName = $addProductGroupNameInp.val().trim();
+	if( newGroupName == "" ){
+		alert( "품목그룹명이 비어있습니다." );
+		return;
+	}
+	
+	var $groupItems = $productGroupList.find( ".group-item" );
+	for( var i=0; i<$groupItems.length; ++i ){
+		var groupName =  $groupItems.eq( i ).getName();
+		if( newGroupName == groupName ){
+			alert( "이미 존재하는 품목그룹명 입니다." );
+			return;
+		}
+	}
+	
+	var $groupItem = $TemplateModule.createProductGroup( null, newGroupName );
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addPopup.fadeOut( 500 );
+	$addProductGroupPopupContent.css( { "margin-top": "0px" } );
+	$addProductGroupPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		// 넓어지는 애니메이션으로 표시
+		$groupItem.css( { "width": "0px" } );
+		$groupItem.prependTo( $productGroupList );
+		$groupItem.animate( { "width": "200px" }, 500 );
+		
+		// 수량 표시 갱신
+		$groupCntSpan.update();
+		
+		// 팝업 그룹명 제거
+		$addProductGroupNameInp.val("");
+		updateSearchGroupNameAutoComplete();
+		
+	} );
+	
+});
+
+// 그룹명 입력 이벤트
+$addProductGroupNameInp.on("keypress", function( e ){
+	
+	// 엔터키 == 완료버튼 클릭
+	if( e.keyCode == 13 ){
+		
+		$addProductGroupCompleteBtn.trigger("click");
+		
+	}
+	
+});
+
+// 그룹순서 변경
+(function(){
+	
+	var $select = null;
+	var isMousedown = false;
+	
+	// 그룹아이템 마우스다운 이벤트
+	$productGroupList.on("mousedown", ".product-group-item", function(){
+		
+		isMousedown = true;
+		
+		// 기존 선택 제거
+		var $this = $(this);
+		
+		$productGroupList.find(".product-group-item").not( $this ).removeClass( "select" );
+		$this.addClass("select");
+		
+		if( $this.hasClass("disable") ){
+			$delBtn.addClass( "disable" );
+			$modBtn.addClass( "disable" );
+		}else{
+			$delBtn.removeClass( "disable" );
+			$modBtn.removeClass( "disable" );
+		}
+		$select = $this;
+		
+	});
+	
+	$productGroupList.on("mousemove", ".product-group-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		$select.css( { cursor: "move" } );
+		
+	});
+	
+	$productGroupList.on("mouseenter", ".product-group-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		var $this = $(this);
+		if( $select.get(0) == $this.get(0) ){
+			return;
+		}
+
+		var mouseenterIdx = $productGroupList.find( ".product-group-item" ).index( $this );
+		var moveIdx = $productGroupList.find( ".product-group-item" ).index( $select );
+		
+		if( moveIdx > mouseenterIdx ){
+			$this.before( $select );
+		}else{
+			$this.after( $select );
+		}
+		
+		
+	});
+	
+	$productGroupList.on("mouseup", ".product-group-item", function( e ){
+		
+		// 기존 선택 제거
+		var $select = $productGroupList.find(".product-group-item.select");
+		$select.css( { cursor: "pointer" } );
+		isMousedown = false;
+		
+	});
+	
+})();
+
+// 삭제 버튼 클릭 이벤트
+$delBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $delBtn.hasClass("disable") ){
+		return;
+	}
+	
+	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
+	var groupName = $selectedGroupItem.getName();
+	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다.\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
+		
+		// 삭제모션
+		$selectedGroupItem.animate( { "width": "0px" }, 500, function(){
+			
+			// 삭제
+			$selectedGroupItem.remove();
+			
+			// 수량 표시 갱신
+			$groupCntSpan.update();
+			
+			// 버튼 비활성화
+			$delBtn.addClass( "disable" );
+			$modBtn.addClass( "disable" );
+			updateSearchGroupNameAutoComplete();
+			
+		} );
+		
+		
+	}
+	
+});
+
+// 수정 버튼 클릭 이벤트
+$modBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $delBtn.hasClass("disable") ){
+		return;
+	}
+	
+	// 선택된 소속
+	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
+	var groupName = $selectedGroupItem.getName();
+	
+	// 이름 설정
+	$modGroupNameInp.val( groupName );
+	
+	// 사용여부 설정
+	var use = $selectedGroupItem.getUse();
+	if( use ){
+		$modUseBtn.addClass("select");
+		$modUnuseBtn.removeClass("select");
+	}else{
+		$modUnuseBtn.addClass("select");
+		$modUseBtn.removeClass("select");
+	}
+	
+	// 팝업 표시
+	$modPopup.fadeIn( 500 );
+	parent.hideNav( 500 );
+	$modPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+	// 입력창 포커스 ( show 이후에 처리 필요 )
+	$modGroupNameInp.focus();
+	
+});
+
+// 수정팝업 - 사용 버튼 클릭 이벤트
+$modUseBtn.on("click", function(){
+	
+	$modUseBtn.addClass("select");
+	$modUnuseBtn.removeClass("select");
+	
+	
+});
+
+// 수정팝업 - 미사용 버튼 클릭 이벤트
+$modUnuseBtn.on("click", function(){
+	
+	$modUnuseBtn.addClass("select");
+	$modUseBtn.removeClass("select");
+	
+	
+});
+
+// 수정팝업 - 취소 버튼 클릭 이벤트
+$modCancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$modPopup.fadeOut( 500 );
+	$modPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 수정팝업 - 완료 버튼 클릭 이벤트
+$modCompleteBtn.on("click", function(){
+	
+	var newGroupName = $modGroupNameInp.val().trim();
+	if( newGroupName == "" ){
+		alert( "그룹명이 비어있습니다." );
+		return;
+	}
+	
+	// 선택된 소속
+	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
+	
+	// 그룹명이 달라진 경우만 그룹명 검증
+	var beforeGroupName = $selectedGroupItem.getName();
+	if( beforeGroupName != newGroupName ){
+		var $groupItems = $productGroupList.find( ".product-group-item" );
+		for( var i=0; i<$groupItems.length; ++i ){
+			var groupName =  $groupItems.eq( i ).getName();
+			if( newGroupName == groupName ){
+				alert( "이미 존재하는 그룹명 입니다." );
+				return;
+			}
+		}
+	}
+	
+	// 소속명 설정
+	$selectedGroupItem.setName( newGroupName );
+	
+	// 사용여부 설정
+	var use = $modUseBtn.hasClass("select");
+	$selectedGroupItem.setUse( use );
+	
+	// 수정일 갱신
+	$selectedGroupItem.updateDate();
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$modPopup.fadeOut( 500 );
+	$modPopupContent.css( { "margin-top": "0px" } );
+	$modPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		updateSearchGroupNameAutoComplete();
+		
+	} );
+	
+});
+
+// 저장 버튼 클릭 이벤트
+$saveBtn.on("click", function(){
+	
+	 var groups = [];
+	 var $groupItems = $productGroupList.find(".product-group-item");
+	 for( var i=0; i<$groupItems.length; ++i ){
+		 var $groupItem = $groupItems.eq( i );
+		 groups.push( $groupItem.getSaveData() );
+	 }
+	 
+	 $.ajax({
+		
+		 url: "/product/management/save",
+		 type: "post",
+		 headers: {
+	     	"Content-Type": "application/json"
+	     },
+		 data: JSON.stringify( groups ),
+		 dataType: "json",
+		 success: function( res ){
+			 
+			 if( res.result == "SUCCESS" ){
+				 alert( "저장되었습니다." );
+			 }else{
+				 alert( "실패하였습니다.\n관리자에게 문의바랍니다." );
+			 }
+			 
+		 }
+		 
+	 });
+	
+});
+
+
+//자동 완성 갱신
+function updateSearchGroupNameAutoComplete(){
+	
+	var names = [];
+	var $groupItems = $productGroupList.find(".product-group-item");
+	for( var i=0; i<$groupItems.length; ++i ){
+		var $groupItem = $groupItems.eq( i );
+		names.push( $groupItem.getName() );
+	}
+	
+	// 직원명 자동검색 갱신
+	$searchGroupNameInp.autocomplete({
+		source: names,
+		focus: function( event, ui ) {
+			event.preventDefault();
+		}
+	});
+	
+}
+updateSearchGroupNameAutoComplete();
+
+
+function updateBodyHeight(){
+	$body.css("height", window.innerHeight + "px");
+}
+updateBodyHeight();
+
+// 윈도우 크기 변경 이벤트
+$window.on("resize", function(){
+	updateBodyHeight();
+});
+
+</script>
+</body>
+</html>
