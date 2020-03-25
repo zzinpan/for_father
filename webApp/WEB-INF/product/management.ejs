@@ -18,7 +18,8 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .smc-inp { border: none; border-bottom: #ccc solid 1px; padding: 4px 10px; font-size: 10px; width: 100%; }
 .smc-inp::placeholder { color: #cccccc; }
 .smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
-.smc-count { font-size: 10px; border-bottom: #ccc solid 2px; margin-bottom: 10px; height: 32px; }
+.smc-count { font-size: 10px; height: 28px; }
+.smc-grid { position: relative; box-shadow: 0px 0px 0px 1px #ccc; height: calc( 100% - 67px ); border-radius: 4px; }
 .small-title { font-weight: bold; margin-bottom: 40px; }
 
 .popup-row { float: left; width: 100%; }
@@ -27,12 +28,17 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .mt20 { margin-top: 20px; }
 
 /* 그룹 */
-.product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 40px ); overflow: auto; padding: 40px 0px; }
-	.product-group-item { cursor: pointer; display: inline-block; width: 200px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; margin: 5px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; }
-	.product-group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; }
-	.product-group-item:hover { box-shadow: 0px 0px 2px 1px #aaa; }
-		.product-group-name { display: inline-block; padding: 4px 0px; border-bottom: #ccc solid 1px; text-align: center; background-color: #009688; color: white; font-weight: bold; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
-		.product-group-item.disable .product-group-name { background-color: #607D8B; }
+.product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 218px ); overflow: auto; padding: 0px 0px 40px 0px; }
+	.product-group-header { background-color: #4FC3F7; color: white; font-weight: bold; height: 37px; text-align: center; }
+	.product-group-item { position: relative; cursor: pointer; width: 100%; box-shadow: 1px 0px 0px 1px #ccc; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; z-index: 0; }
+	.product-group-item.odd { background-color: #E1F5FE; }
+	.product-group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; z-index: 2; }
+	.product-group-item:hover { box-shadow: 0px 0px 2px 1px #aaa; z-index: 1; }
+		
+		.product-group-order { display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 50px; margin: 0px; }
+		.product-group-name { display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: calc( 100% - 120px ); margin: 0px; }
+		.product-group-use { display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 70px; }
+		.product-group-item.disable { background-color: #eee; }
 		.product-group-content-list { padding: 10px 0px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 			.product-group-content-item { padding: 4px 0px; height: 25px; font-size: 12px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 				.product-group-property { float: left; width: 69px; text-align: center; border-right: #ccc solid 1px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
@@ -98,14 +104,17 @@ if (!String.prototype.padStart) {
 					</div>
 				</div>
 				
+				<div class="col-md-12" style="height: 32px; border-bottom: #ccc solid 2px; margin-bottom: 40px;">
+					<div id="save-btn" class="smc-btn blue">저장</div>
+				</div>
+				
 				<!-- 품목그룹 -->
-				<div class="col-md-6" style="position: relative; height: calc( 100% - 60px );">
+				<div class="col-md-6" style="position: relative; height: calc( 100% - 172px );">
 					<!-- 상단 -->
 					<div class="smc-count">
 						<div class="col-md-4" style="padding-top: 8px;">총 <span id="product-group-cnt-span">0</span>건</div>
 						<div class="col-md-8">
 							<div class="smc-btn-wrap">
-								<div id="save-btn" class="smc-btn blue">저장</div>
 								<div id="del-btn" class="smc-btn disable">삭제</div>
 								<div id="mod-btn" class="smc-btn disable">수정</div>
 								<div id="add-product-group-btn" class="smc-btn">추가</div>
@@ -113,43 +122,49 @@ if (!String.prototype.padStart) {
 						</div>
 					</div>
 					
-					<div style="text-align: center;">
-						<div style="display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 50px; background-color: #03A9F4; color: white; font-weight: bold;margin: 0px;">순서</div>
-						<div style="display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: calc( 100% - 120px ); background-color: #03A9F4; color: white; font-weight: bold; margin: 0px;">품목그룹명</div>
-						<div style="display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 70px; background-color: #03A9F4; color: white; font-weight: bold;">사용여부</div>
-					</div>
-					<!-- 본문 -->
-					<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
-						
+					<div class="smc-grid">
+					
+						<div class="product-group-header">
+							<div class="product-group-order">순서</div>
+							<div class="product-group-name">품목그룹명</div>
+							<div class="product-group-use">사용여부</div>
+						</div>
+						<!-- 본문 -->
+						<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
+							
+						</div>
 					</div>
 					
-					<!-- 하단 -->
-					<div class="col-md-12" style="height: 60px;"></div>
 				</div>
 				
 				
 				<!-- 품목 -->
-				<div class="col-md-6" style="position: relative; height: calc( 100% - 60px );">
+				<div class="col-md-6" style="position: relative; height: calc( 100% - 172px );">
 					<!-- 상단 -->
 					<div class="smc-count">
 						<div class="col-md-4" style="padding-top: 8px;">총 <span id="product-group-cnt-span">0</span>건</div>
 						<div class="col-md-8">
 							<div class="smc-btn-wrap">
-								<div id="save-btn" class="smc-btn blue">저장</div>
 								<div id="del-btn" class="smc-btn disable">삭제</div>
 								<div id="mod-btn" class="smc-btn disable">수정</div>
-								<div id="add-btn" class="smc-btn">추가</div>
+								<div id="add-product-group-btn" class="smc-btn">추가</div>
 							</div>
 						</div>
 					</div>
 					
-					<!-- 본문 -->
-					<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
-						
+					<div class="smc-grid">
+					
+						<div class="product-group-header">
+							<div class="product-group-order">순서</div>
+							<div class="product-group-name">품목그룹명</div>
+							<div class="product-group-use">사용여부</div>
+						</div>
+						<!-- 본문 -->
+						<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
+							
+						</div>
 					</div>
 					
-					<!-- 하단 -->
-					<div class="col-md-12" style="height: 60px;"></div>
 				</div>
 				
 			</div>
@@ -160,17 +175,17 @@ if (!String.prototype.padStart) {
 </div>
 
 <!-- 추가 팝업 -->
-<div id="add-product-group-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
+<div id="add-product-group-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 4;">
 
 	<div id="add_product_group_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
 		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
 			품목그룹 추가
 		</div>
 		<div class="popup-row">
-			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>소속명
+			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>품목그룹명
 			</div>
-			<div class="col-md-9">
+			<div class="col-md-8">
 				<input id="add-product-group-name-inp" class="smc-inp" type="text" placeholder="품목그룹명을 입력해주세요.">
 			</div>
 		</div>
@@ -276,6 +291,16 @@ var $groupCntSpan = (function(){
 	return $this;
 	
 })();
+
+function updateProductGroupItemsOrder(){
+	
+	var $items = $productGroupList.find(".product-group-item");
+	for( var i=0; i<$items.length; ++i ){
+		var $item = $items.eq( i );
+		$item.updateOrder();
+	}
+	
+}
  
 /**
 	모듈
@@ -311,24 +336,12 @@ var $TemplateModule = (function(){
 	
 		"product-group-item": [
 			'<div class="product-group-item">',
-				'<div class="product-group-name">',
+				'<div class="product-group-order">',
 					'',
 				'</div>',
-				'<div class="product-group-content-list">',
-					'<div class="product-group-content-item">',
-						'<div class="product-group-property">직원수</div>',
-						'<div class="product-group-value"><span class="product-group-emp-cnt">0</span>명</div>',
-					'</div>',
-					'<div class="product-group-content-item">',
-						'<div class="product-group-property">등록일</div>',
-						'<div class="product-group-reg-dt product-group-value">0000-00-00</div>',
-					'</div>',
-					'<div class="product-group-content-item">',
-						'<div class="product-group-property">수정일</div>',
-						'<div class="product-group-up-dt product-group-value">0000-00-00</div>',
-					'</div>',
+				'<div class="product-group-name">',
 				'</div>',
-				'<div class="product-group-content-use-status">',
+				'<div class="product-group-use">',
 					'사용',
 				'</div>',
 			'</div>'
@@ -340,6 +353,15 @@ var $TemplateModule = (function(){
 	
 		// jQuery 신규 제품그룹 객체 생성
 		createProductGroup: (function(){
+		
+			// 현재 UI 순서로 갱신
+			$.fn.updateOrder = function updateOrder(){
+				
+				var $items = this.parent().find(".product-group-item");
+				var idx = $items.index( this );
+				this.find(".product-group-order").text( idx + 1 );
+				
+			};
 		
 			// 이름 조회
 			$.fn.getName = function getName(){
@@ -467,11 +489,17 @@ var $TemplateModule = (function(){
 	데이터 로드
 ****************************************/
 var productGroups = <%- productGroups %>;
-for( var i=0; i<productGroups.length; ++i ){
-	var productGroup = productGroups[ i ];
+// for( var i=0; i<productGroups.length; ++i ){
+// 	var productGroup = productGroups[ i ];
+// 	var $productGroup = $TemplateModule.createProductGroup( i+1, productGroup.id, productGroup.name, productGroup.use, productGroup.enableDelete, productGroup.createDate, productGroup.updateDate );
+// 	$productGroup.appendTo( $productGroupList );
+// }
+for( var i=0; i<6; ++i ){
+	var productGroup = productGroups[ 0 ];
 	var $productGroup = $TemplateModule.createProductGroup( productGroup.id, productGroup.name, productGroup.use, productGroup.enableDelete, productGroup.createDate, productGroup.updateDate );
 	$productGroup.appendTo( $productGroupList );
 }
+updateProductGroupItemsOrder();
 
 //수량 표시 갱신
 $groupCntSpan.update();
@@ -547,7 +575,7 @@ $addProductGroupCancelBtn.on("click", function(){
 	
 	// 팝업 제거
 	parent.showNav( 500 );
-	$addPopup.fadeOut( 500 );
+	$addProductGroupPopup.fadeOut( 500 );
 	$addProductGroupPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
 	
 });
@@ -561,7 +589,7 @@ $addProductGroupCompleteBtn.on("click", function(){
 		return;
 	}
 	
-	var $groupItems = $productGroupList.find( ".group-item" );
+	var $groupItems = $productGroupList.find( ".product-group-item" );
 	for( var i=0; i<$groupItems.length; ++i ){
 		var groupName =  $groupItems.eq( i ).getName();
 		if( newGroupName == groupName ){
@@ -574,14 +602,16 @@ $addProductGroupCompleteBtn.on("click", function(){
 	
 	// 팝업 제거
 	parent.showNav( 500 );
-	$addPopup.fadeOut( 500 );
+	$addProductGroupPopup.fadeOut( 500 );
 	$addProductGroupPopupContent.css( { "margin-top": "0px" } );
 	$addProductGroupPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
 		
 		// 넓어지는 애니메이션으로 표시
-		$groupItem.css( { "width": "0px" } );
+		$groupItem.css( { "height": "0px" } );
 		$groupItem.prependTo( $productGroupList );
-		$groupItem.animate( { "width": "200px" }, 500 );
+		updateProductGroupItemsOrder();
+		
+		$groupItem.animate( { "height": "37px" }, 500 );
 		
 		// 수량 표시 갱신
 		$groupCntSpan.update();

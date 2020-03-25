@@ -196,6 +196,14 @@ $(function(){
 		</div>
 		<div class="popup-row mt6">
 			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				차번호
+			</div>
+			<div class="col-md-9">
+				<input id="add-employee-car-inp" class="smc-inp" type="text"  placeholder="ex) 00가0000">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
 				연락처
 			</div>
 			<div class="col-md-9">
@@ -241,7 +249,7 @@ $(function(){
 <!-- 수정 팝업 -->
 <div id="mod-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none;">
 
-	<div id="mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
+	<div id="mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 267px ); width: 400px; padding: 20px;">
 		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
 			직원 수정
 		</div>
@@ -270,6 +278,14 @@ $(function(){
 			</div>
 			<div class="col-md-9">
 				<input id="mod-employee-name-inp" class="smc-inp" type="text" placeholder="ex) 홍길동">
+			</div>
+		</div>
+		<div class="popup-row mt6">
+			<div class="col-md-3" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				차번호
+			</div>
+			<div class="col-md-9">
+				<input id="mod-employee-car-inp" class="smc-inp" type="text" placeholder="ex) 00가0000">
 			</div>
 		</div>
 		<div class="popup-row mt6">
@@ -363,6 +379,7 @@ var $addEmployeeImageBtn = $("#add-employee-image-btn"); // 이미지 추가 버
 var $addEmployeeImageInp = $("#add-employee-image-inp"); // 이미지 파일 입력창
 var $addEmployeeGroupSel = $("#add-employee-group-sel"); // 추가 팝업 - 소속 선택창
 var $addEmployeeNameInp = $("#add-employee-name-inp"); // 추가 팝업 - 직원명 입력창
+var $addEmployeeCarInp = $("#add-employee-car-inp"); // 추가 팝업 - 차번호 입력창
 var $addEmployeePhoneInp = $("#add-employee-phone-inp"); // 추가 팝업 - 연락처 입력창
 var $addEmployeeMailInp = $("#add-employee-mail-inp"); // 추가 팝업 - 메일 입력창
 var $addEmployeeBirthdayInp = $("#add-employee-birthday-inp"); // 추가 팝업 - 생년월일 입력창
@@ -394,6 +411,7 @@ var $modEmployeeImageBtn = $("#mod-employee-image-btn"); // 이미지 추가 버
 var $modEmployeeImageInp = $("#mod-employee-image-inp"); // 이미지 파일 입력창
 var $modEmployeeGroupSel = $("#mod-employee-group-sel"); // 추가 팝업 - 소속 선택창
 var $modEmployeeNameInp = $("#mod-employee-name-inp"); // 추가 팝업 - 직원명 입력창
+var $modEmployeeCarInp = $("#mod-employee-car-inp"); // 추가 팝업 - 차번호 입력창
 var $modEmployeePhoneInp = $("#mod-employee-phone-inp"); // 추가 팝업 - 연락처 입력창
 var $modEmployeeMailInp = $("#mod-employee-mail-inp"); // 추가 팝업 - 메일 입력창
 var $modEmployeeBirthdayInp = $("#mod-employee-birthday-inp"); // 추가 팝업 - 생년월일 입력창
@@ -458,6 +476,10 @@ var $TemplateModule = (function(){
 						 '<div class="employee-property">소속</div>', 
 						 '<div class="employee-group employee-value"></div>',
 					 '</div>',
+					 '<div class="employee-content-item">', 
+						 '<div class="employee-property">차번호</div>', 
+						 '<div class="employee-car employee-value"></div>', 
+					 '</div>', 
 					 '<div class="employee-content-item">', 
 						 '<div class="employee-property">연락처</div>', 
 						 '<div class="employee-phone employee-value"></div>', 
@@ -569,6 +591,17 @@ var $TemplateModule = (function(){
 				return this.data("phone");
 			};
 			
+			// 차번호 설정
+			$.fn.setCar = function setCar( car ){
+				this.data("car", car);
+				this.find(".employee-car").text(car);
+			};
+			
+			// 차번호 조회
+			$.fn.getCar = function getCar(){
+				return this.data("car");
+			};
+			
 			// 이메일 설정
 			$.fn.setMail = function setMail( mail ){
 				this.data("mail", mail);
@@ -639,7 +672,7 @@ var $TemplateModule = (function(){
 				return data;
 			};
 			
-			return function( groupId, groupName, id, name, imageSrc, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
+			return function( groupId, groupName, id, name, imageSrc, car, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "employee-item" ] );
 				$clone.data({
@@ -648,6 +681,7 @@ var $TemplateModule = (function(){
 					id: null,
 					name: null,
 					image: null,
+					car: null,
 					phone: null,
 					mail: null,
 					birthday: null,
@@ -674,6 +708,9 @@ var $TemplateModule = (function(){
 				
 				// 이미지
 				$clone.setImage( imageSrc );
+				
+				// 차번호
+				$clone.setCar( car );
 				
 				// 연락처
 				$clone.setPhone( phone );
@@ -788,7 +825,7 @@ for( var i=0; i<GroupModule.count(); ++i ){
 var employees = <%-employees%>;
 for( var i=0; i<employees.length; ++i ){
 	var employee = employees[ i ];
-	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.enableDelete, employee.createDate, employee.updateDate );
+	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.car, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.enableDelete, employee.createDate, employee.updateDate );
 	$employee.appendTo( $employeeList );
 }
 
@@ -912,6 +949,9 @@ $addBtn.on("click", function(){
 	// 이름 초기화
 	$addEmployeeNameInp.val("");
 	
+	// 차번호 초기화
+	$addEmployeeCarInp.val("");
+	
 	// 연락처 초기화
 	$addEmployeePhoneInp.val("");
 	
@@ -1001,6 +1041,12 @@ $addCompleteBtn.on("click", function(){
 	}
 	
 	var imageSrc = $addEmployeeImg.getImage();
+	
+	var car = $addEmployeeCarInp.val().trim();
+	if( car == "" ){
+		car = null;
+	}
+	
 	var phone = $addEmployeePhoneInp.val().trim();
 	if( phone == "" ){
 		phone = null;
@@ -1021,7 +1067,7 @@ $addCompleteBtn.on("click", function(){
 		memo = null;
 	}
 	
-	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newEmployeeName, imageSrc, phone, mail, birthday, memo );
+	var $employeeItem = $TemplateModule.createEmployee( groupId, groupName, null, newEmployeeName, imageSrc, car, phone, mail, birthday, memo );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -1201,6 +1247,10 @@ $modBtn.on("click", function(){
 	var employeeName = $selectedEmployeeItem.getName();
 	$modEmployeeNameInp.val( employeeName );
 	
+	// 차번호 설정
+	var employeeCar = $selectedEmployeeItem.getCar();
+	$modEmployeeCarInp.val( employeeCar );
+	
 	// 연락처 설정
 	var employeePhone = $selectedEmployeeItem.getPhone();
 	$modEmployeePhoneInp.val( employeePhone );
@@ -1344,6 +1394,12 @@ $modCompleteBtn.on("click", function(){
 	
 	var imageSrc = $modEmployeeImg.getImage();
 	$selectedEmployeeItem.setImage( imageSrc );
+	
+	var car = $modEmployeeCarInp.val().trim();
+	if( car == "" ){
+		car = null;
+	}
+	$selectedEmployeeItem.setCar( car );
 	
 	var phone = $modEmployeePhoneInp.val().trim();
 	if( phone == "" ){

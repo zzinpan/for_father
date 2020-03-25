@@ -263,6 +263,7 @@
 			groupId: "GRP::ETC",
 			id: "EMP::FACTORY",
 			name: "공장",
+			car: null,
 			phone: null,
 			mail: null,
 			birthday: null,
