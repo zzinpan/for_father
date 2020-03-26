@@ -30,10 +30,11 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 /* 그룹 */
 .product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 218px ); overflow: auto; padding: 0px 0px 40px 0px; }
 	.product-group-header { background-color: #4FC3F7; color: white; font-weight: bold; height: 37px; text-align: center; }
-	.product-group-item { position: relative; cursor: pointer; width: 100%; box-shadow: 1px 0px 0px 1px #ccc; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; z-index: 0; }
-	.product-group-item.odd { background-color: #E1F5FE; }
-	.product-group-item.select { box-shadow: 0px 0px 2px 1px #2196F3 !important; z-index: 2; }
-	.product-group-item:hover { box-shadow: 0px 0px 2px 1px #aaa; z-index: 1; }
+	.product-group-item { position: relative; cursor: pointer; width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; z-index: 0; }
+	.product-group-list .product-group-item:nth-child(2n) { background-color: #f8f8f8; }
+	.product-group-list .product-group-item:last-child { border-bottom: #eee solid 2px; }
+	.product-group-item:hover { box-shadow: 0px 0px 0px 1px #aaa !important; z-index: 1; }
+	.product-group-item.select { box-shadow: 0px 0px 0px 1px #2196F3 !important; z-index: 2; }
 		
 		.product-group-order { display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: 50px; margin: 0px; }
 		.product-group-name { display: inline-block; float: left; padding: 10px 0px; font-size: 12px; width: calc( 100% - 120px ); margin: 0px; }
@@ -46,6 +47,11 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 		.product-group-content-use-status { padding: 0px; border-top: #ccc solid 1px; text-align: center; font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
 		.product-group-content-use-status.use { background-color: #E8F5E9; }
 		.product-group-content-use-status.unuse { background-color: #eee; }
+		
+/* 품목 컬럼 */
+.product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: center; margin-bottom: 40px; width: 100%; }
+	.product-column-parent { position: relative; display: inline-block; font-size: 12px; padding: 0px 10px; height: 60px; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc; }
+		.product-column-parent-name { position: relative; margin-top: calc( 50% + 9px ); }
 		
 /* 라이브러리 커스텀 */		
 .ui-autocomplete.ui-widget {
@@ -80,33 +86,28 @@ if (!String.prototype.padStart) {
 <body>
 <div class="container" style="position: relative; height: 100%;">
 	<div class="row" style="position: relative; margin-top: 50px; height: calc( 100% - 50px );">
-		<div class="col-md-offset-2 col-md-8" style="position: relative; height: 100%;">
+		<div class="ccol-md-12" style="position: relative; height: 100%;">
 			<div class="smc-header">
 				품목 관리
 			</div>
-			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
 			
-				<div style="padding: 20px 0px; background-color: #eee; margin-bottom: 40px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 12px; height: 60px;">
-					<div class="col-md-12">
-						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">사용여부</div>
-						<div style="float: left; display: inline-block;">
-							<select id="search-use-sel" class="smc-select" style="width: 70px;">
-								<option value="ALL" selected="selected">전체</option>
-								<option value="USE">사용</option>
-								<option value="UNUSE">미사용</option>
-							</select>
+			
+			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
+				
+				
+					<div class="col-md-12" style="height: 32px;">
+						<div class="col-md-6">
+							<div style="display: inline-block; font-size: 12px; font-weight: bold;">품목 미리보기</div>
 						</div>
-						<div style="float: left; display: inline-block; margin: 1px 10px 0px 20px;">소속명</div>
-						<div style="float: left; display: inline-block;">
-							<input id="search-product-group-name-inp" type="text" style="font-size: 12px; border: #ccc solid 1px; padding: 1px 0px 0px 4px; width: 100px; border-radius: 4px;">
+						<div class="col-md-6">
+							<div id="save-btn" class="smc-btn blue">저장</div>
 						</div>
-						<div id="search-btn" class="smc-btn bluegray" style="height: 20px; padding-top: 3px;">검색</div>
+					</div>
+				<div class="col-md-12" style="position: relative;">
+					<div id="product-column-list" class="product-column-list">
 					</div>
 				</div>
 				
-				<div class="col-md-12" style="height: 32px; border-bottom: #ccc solid 2px; margin-bottom: 40px;">
-					<div id="save-btn" class="smc-btn blue">저장</div>
-				</div>
 				
 				<!-- 품목그룹 -->
 				<div class="col-md-6" style="position: relative; height: calc( 100% - 172px );">
@@ -251,10 +252,8 @@ if (!String.prototype.padStart) {
 var $window = $(window); // 윈도우
 var $body = $("body"); // 바디
 
-// 검색
-var $searchUseSel = $("#search-use-sel"); // 사용여부 선택창
-var $searchBtn = $("#search-btn"); // 검색 버튼
-var $searchGroupNameInp = $("#search-group-name-inp"); // 소속명 검색 입력창
+// 컬럼
+$productColumnList = $("#product-column-list"); // 컬럼 목록
  
 // 상단 버튼 부분
 var $addProductGroupBtn = $("#add-product-group-btn"); // 품목그룹 추가 버튼
@@ -345,6 +344,12 @@ var $TemplateModule = (function(){
 					'사용',
 				'</div>',
 			'</div>'
+		].join(""),
+		
+		"product-column-parent": [
+			'<div class="product-column-parent">',
+				'<div class="product-column-parent-name">5G/L</div>',
+			'</div>'
 		].join("")
 	 
 	};
@@ -352,7 +357,7 @@ var $TemplateModule = (function(){
 	return {
 	
 		// jQuery 신규 제품그룹 객체 생성
-		createProductGroup: (function(){
+		createProduct: (function(){
 		
 			// 현재 UI 순서로 갱신
 			$.fn.updateOrder = function updateOrder(){
@@ -360,6 +365,7 @@ var $TemplateModule = (function(){
 				var $items = this.parent().find(".product-group-item");
 				var idx = $items.index( this );
 				this.find(".product-group-order").text( idx + 1 );
+				this.data( "order", idx );
 				
 			};
 		
@@ -372,6 +378,7 @@ var $TemplateModule = (function(){
 			$.fn.setName = function setName( name ){
 				this.data("name", name);
 				this.find(".product-group-name").text(name);
+				this.data("$column").find(".product-column-parent-name").text( name );
 			};
 			
 			// 사용여부 조회
@@ -392,8 +399,10 @@ var $TemplateModule = (function(){
 				this.data("use", bool);
 				if( bool == true ){
 					this.find(".product-group-content-use-status").removeClass("unuse").addClass("use").text("사용");
+					this.data("$column").show();
 				}else{
 					this.find(".product-group-content-use-status").removeClass("use").addClass("unuse").text("미사용");
+					this.data("$column").hide();
 				}
 			};
 		
@@ -408,20 +417,23 @@ var $TemplateModule = (function(){
 			$.fn.getSaveData = function getSaveData(){
 				
 				var data = this.data();
-				delete data.employees;
-				
+				return data; 
+			
 			};
 		
 			return function( id, name, use, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "product-group-item" ] );
+				var $column = $( template[ "product-column-parent" ] );
+				$column.appendTo( $productColumnList );
 				$clone.data({
 					id: null,
 					name: null,
 					use: null,
 					enableDelete: null,
 					createDate: null,					
-					updateDate: null
+					updateDate: null,
+					$column: $column
 				});
 				
 				// 아이디
@@ -488,15 +500,13 @@ var $TemplateModule = (function(){
 /****************************************
 	데이터 로드
 ****************************************/
-var productGroups = <%- productGroups %>;
-// for( var i=0; i<productGroups.length; ++i ){
-// 	var productGroup = productGroups[ i ];
-// 	var $productGroup = $TemplateModule.createProductGroup( i+1, productGroup.id, productGroup.name, productGroup.use, productGroup.enableDelete, productGroup.createDate, productGroup.updateDate );
-// 	$productGroup.appendTo( $productGroupList );
-// }
-for( var i=0; i<6; ++i ){
-	var productGroup = productGroups[ 0 ];
-	var $productGroup = $TemplateModule.createProductGroup( productGroup.id, productGroup.name, productGroup.use, productGroup.enableDelete, productGroup.createDate, productGroup.updateDate );
+var products = <%- products %>;
+for( var i=0; i<products.length; ++i ){
+	var product = products[ i ];
+	if( product.parentId != null ){
+		continue;
+	}
+	var $productGroup = $TemplateModule.createProduct( product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
 	$productGroup.appendTo( $productGroupList );
 }
 updateProductGroupItemsOrder();
@@ -508,57 +518,7 @@ $groupCntSpan.update();
 /****************************************
 	이벤트
 ****************************************/
- 
-//검색 버튼 클릭 이벤트
-$searchBtn.on("click", function(){
-	
-	// 직원목록
-	var $groupItems = $productGroupList.find(".product-group-item");
-	for( var i=0; i<$groupItems.length; ++i ){
-		var $groupItem = $groupItems.eq( i );
-		$groupItem.show();
-	}
-	
-	var useFilter = $searchUseSel.val(); // USE UNUSE ALL
-	var nameFilter = $searchGroupNameInp.val().trim().toUpperCase();
-	
-	// 사용여부 검색
-	if( useFilter != "ALL" ){
-		
-		var filterUseValue = useFilter == "USE";
-		
-		for( var i=0; i<$groupItems.length; ++i ){
-			var $groupItem = $groupItems.eq( i );
-			if( $groupItem.getUse() != filterUseValue ){
-				$groupItem.hide();
-			}
-		}
-		$groupItems = $groupItems.filter(":visible");
-	}
-	
-	// 이름 검색
-	for( var i=0; i<$groupItems.length; ++i ){
-		var $groupItem = $groupItems.eq( i );
-		if( $groupItem.getName().toUpperCase().indexOf( nameFilter ) == -1 ){
-			$groupItem.hide();
-		}
-	}
-	$groupItems = $groupItems.filter(":visible");
-	
-	// 수량 갱신
-	$groupCntSpan.update();
-	
-});
 
-// 이름 검색창 키 이벤트
-$searchGroupNameInp.on("keypress", function( e ){
-	
-	if( e.keyCode == 13 ){
-		$searchBtn.trigger( "click" );
-	}
-	
-});
- 
 // 추가 버튼 클릭 이벤트
 $addProductGroupBtn.on("click", function(){
 	
@@ -598,7 +558,7 @@ $addProductGroupCompleteBtn.on("click", function(){
 		}
 	}
 	
-	var $groupItem = $TemplateModule.createProductGroup( null, newGroupName );
+	var $groupItem = $TemplateModule.createProduct( null, newGroupName );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -608,7 +568,7 @@ $addProductGroupCompleteBtn.on("click", function(){
 		
 		// 넓어지는 애니메이션으로 표시
 		$groupItem.css( { "height": "0px" } );
-		$groupItem.prependTo( $productGroupList );
+		$groupItem.appendTo( $productGroupList );
 		updateProductGroupItemsOrder();
 		
 		$groupItem.animate( { "height": "37px" }, 500 );
@@ -702,6 +662,7 @@ $addProductGroupNameInp.on("keypress", function( e ){
 			$this.after( $select );
 		}
 		
+		updateProductGroupItemsOrder();
 		
 	});
 	
@@ -892,6 +853,7 @@ $saveBtn.on("click", function(){
 	
 });
 
+alert("품목 순서 변경 시, 품목미리보기도 변경\n품목 그리드가 넓어져 생성일등 추가하기")
 
 //자동 완성 갱신
 function updateSearchGroupNameAutoComplete(){
@@ -902,14 +864,6 @@ function updateSearchGroupNameAutoComplete(){
 		var $groupItem = $groupItems.eq( i );
 		names.push( $groupItem.getName() );
 	}
-	
-	// 직원명 자동검색 갱신
-	$searchGroupNameInp.autocomplete({
-		source: names,
-		focus: function( event, ui ) {
-			event.preventDefault();
-		}
-	});
 	
 }
 updateSearchGroupNameAutoComplete();

@@ -290,45 +290,20 @@
 	
 	// 품목 그룹 파일 생성
 	var productGroup = [
-		{
-			id: "PRG::NO_GROUP",
-			name: "그룹없음",
-			createDate: nowStr,
-			updateDate: nowStr,
-			use: true,
-			enableDelete: false
-		}
-	];
-	fs.writeFile( 
-			global.dataDir + "/productGroup.json", 
-			JSON.stringify( productGroup ),
-			"utf8",
-			function(err){ 
-				if (err == null) { 
-					console.log("create productGroup.json - complete");
-				} else { 
-					console.log("create productGroup.json - fail");
-					console.log( err );
-				} 
-		});
-	
-	
-	// 품목 파일 생성
-	var product = [
-		/*
-		{
-			productGroupId: "PRG::"
-			id: "PRI::",
-			name: "공병",
-			createDate: 2020-01-01,
-			updateDate: 2020-01-01,
-			use: true
-		}
-		*/
+//		{
+//			parentId: null,
+//			id: "PRG::xxx",
+//			name: "5G/L",
+//			order: 0,
+//			createDate: nowStr,
+//			updateDate: nowStr,
+//			use: true,
+//			enableDelete: false
+//		}
 	];
 	fs.writeFile( 
 			global.dataDir + "/product.json", 
-			JSON.stringify( product ),
+			JSON.stringify( productGroup ),
 			"utf8",
 			function(err){ 
 				if (err == null) { 
@@ -338,6 +313,8 @@
 					console.log( err );
 				} 
 		});
+	
+	
 	
 })();
 
