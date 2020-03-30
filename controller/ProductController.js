@@ -13,6 +13,7 @@ module.exports = [
 				"utf8",
 				function( err, products ){ 
 					
+					products = JSON.parse( products );
 					products.sort(function( a, b ){
 						
 						if( a.order < b.order ){
@@ -27,7 +28,7 @@ module.exports = [
 					});
 					
 					res.render( "WEB-INF/product/management.ejs", {
-						products: products
+						products: JSON.stringify( products )
 					} );
 				}
 			);
