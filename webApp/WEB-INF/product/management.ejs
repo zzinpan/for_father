@@ -53,8 +53,11 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 		
 /* 품목 컬럼 */
 .product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: center; margin-bottom: 40px; width: 100%; height: 60px; }
-	.product-column-parent { position: relative; display: inline-block; font-size: 12px; padding: 0px 10px; height: 60px; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc; }
-		.product-column-parent-name { position: relative; margin-top: 20px; }
+	.product-column-parent { position: relative; display: inline-block; font-size: 12px; height: 60px; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc; vertical-align: top; }
+		.product-column-parent-name { position: relative; padding: 21px 10px 22px 10px; }
+		.has-children > .product-column-parent-name { padding: 6px 10px 7px 10px; }
+		.product-column-children { display: inline-block; padding: 7px 10px 6px 10px; box-shadow: 1px -1px 0px 0px #ccc; }
+		.product-column-parent .product-column-children:last-child { display: inline-block; padding: 7px 10px 6px 10px; box-shadow: 0px -1px 0px 0px #ccc; }
 		
 /* 라이브러리 커스텀 */		
 .ui-autocomplete.ui-widget {
@@ -298,6 +301,7 @@ var $productGroupModBtn = $("#mod-product-group-btn"); // 수정 버튼
 var $addProductBtn = $("#add-product-btn"); // 품목 추가 버튼
 var $delProductBtn = $("#del-product-btn"); // 품목그룹 삭제 버튼
 var $productModBtn = $("#mod-product-btn"); // 수정 버튼
+var $moveProductBtn = $("#move-product-btn"); // 품목으로가져오기 버튼
 
 var $saveBtn = $("#save-btn"); // 저장 버튼
 
@@ -418,9 +422,15 @@ var $TemplateModule = (function(){
 		
 		"product-column-parent": [
 			'<div class="product-column-parent">',
-				'<div class="product-column-parent-name">5G/L</div>',
+				'<div class="product-column-name product-column-parent-name">5G/L</div>',
 			'</div>'
-		].join("")
+		].join(""),
+		
+		"product-column-children": [
+			'<div class="product-column-children">',
+				'<div class="product-column-name">Box</div>',
+			'</div>'
+		].join(""),
 	 
 	};
 
@@ -477,6 +487,14 @@ var $TemplateModule = (function(){
 				return this.data("parentId");
 			};
 			
+			// 아이디 설정
+			$.fn.setId = function setId( id ){
+				this.data("id", id);
+			};
+			$.fn.getId = function getId(){
+				return this.data("id");
+			};
+			
 			// 이름 설정
 			$.fn.setParentId = function setParentId( parentId ){
 				this.data("parentId", parentId);
@@ -491,7 +509,7 @@ var $TemplateModule = (function(){
 			$.fn.setName = function setName( name ){
 				this.data("name", name);
 				this.find(".product-group-name").text(name);
-				this.data("$column").find(".product-column-parent-name").text( name );
+				this.data("$column").find(".product-column-name").text( name );
 			};
 			
 			// 사용여부 조회
@@ -539,8 +557,17 @@ var $TemplateModule = (function(){
 			return function( parentId, id, name, use, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "product-group-item" ] );
-				var $column = $( template[ "product-column-parent" ] );
-				$column.appendTo( $productColumnList );
+				
+				var columnTemplateName = "product-column-parent";
+				var $columnParent = $productColumnList;
+				
+				if( parentId != "TOP" ){
+					columnTemplateName = "product-column-children";
+					$columnParent = ProductModule.map[ parentId ].data( "$column" );
+					$columnParent.addClass( "has-children" );
+				}
+				var $column = $( template[ columnTemplateName ] );
+				$column.appendTo( $columnParent );
 				$clone.data({
 					parentId: null,
 					id: null,
@@ -559,7 +586,7 @@ var $TemplateModule = (function(){
 				if( id == null ){
 					id = "PRG::" + ( Date.now() + Math.random() ).toString().replace(".", "");
 				}
-				$clone.data( "id", id );
+				$clone.setId( id );
 				
 				// 소속명 ( 필수값 )
 				$clone.setName( name );
@@ -615,7 +642,6 @@ var $TemplateModule = (function(){
 
 })();
  
- alert("품목추가시, 컬럼 미리보기 갱신해야됌")
  
 /****************************************
 	데이터 로드
@@ -623,12 +649,19 @@ var $TemplateModule = (function(){
 var ProductModule = {
 		
 		map: {},
+		parentChildrenMap: {},
 		add: function( parentId, $item ){
 			
-			if( ProductModule.map[ parentId ] == null ){
-				ProductModule.map[ parentId ] = [];
+			if( ProductModule.parentChildrenMap[ parentId ] == null ){
+				ProductModule.parentChildrenMap[ parentId ] = [];
 			}
-			ProductModule.map[ parentId ].push( $item );
+			ProductModule.parentChildrenMap[ parentId ].push( $item );
+			
+			var id = $item.getId();
+			if( ProductModule.parentChildrenMap[ id ] == null ){
+				ProductModule.parentChildrenMap[ id ] = [];
+			}
+			ProductModule.map[ id ] = $item;
 			
 		},
 		remove: function( id ){
@@ -751,7 +784,7 @@ $addProductCompleteBtn.on("click", function(){
 	}
 	
 	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
-	var parentId = $selectedGroupItem.getParentId();
+	var parentId = $selectedGroupItem.getId();
 	var $groupItem = $TemplateModule.createProduct( parentId, null, newGroupName );
 	ProductModule.add( parentId, $groupItem );
 	
@@ -789,6 +822,17 @@ $addProductGroupNameInp.on("keypress", function( e ){
 	}
 	
 });
+// 그룹명 입력 이벤트
+$addProductNameInp.on("keypress", function( e ){
+	
+	// 엔터키 == 완료버튼 클릭
+	if( e.keyCode == 13 ){
+		
+		$addProductCompleteBtn.trigger("click");
+		
+	}
+	
+});
 
 // 그룹순서 변경
 (function(){
@@ -803,14 +847,31 @@ $addProductGroupNameInp.on("keypress", function( e ){
 		
 		// 기존 선택 제거
 		var $this = $(this);
-		
 		$productGroupList.find(".product-group-item").not( $this ).removeClass( "select" );
-		$this.addClass("select");
 		
+		// 기존 자식 목록 제거
+		var $beforeProductItems = $productList.find(".product-group-item");
+		for( var i=0; i<$beforeProductItems.length; ++i ){
+			var $productItem = $beforeProductItems.eq( i );
+			$productItem.detach();
+		}
+		
+		var parentId = $this.getId();
+		console.log( parentId );
+		var $productItems = ProductModule.parentChildrenMap[ parentId ];
+		$productItems.forEach(function( $productItem ){
+			console.log( $productItem );
+			$productItem.appendTo( $productList );
+		});
+		$productCntSpan.update();
+		
+		$this.addClass("select");
+		$moveProductBtn.removeClass( "disable" );
 		$delProductGroupBtn.removeClass( "disable" );
 		$productGroupModBtn.removeClass( "disable" );
 		$addProductBtn.removeClass( "disable" );
 		$select = $this;
+		
 		
 	});
 	
