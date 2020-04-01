@@ -28,7 +28,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .mt20 { margin-top: 20px; }
 
 /* 그룹 */
-.product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 218px ); overflow: auto; padding: 0px 0px 40px 0px; }
+.product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 37px ); overflow: auto; padding: 0px; }
 	.product-group-header { background-color: #4FC3F7; color: white; font-weight: bold; height: 37px; text-align: center; }
 	.product-group-item { position: relative; cursor: pointer; width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; z-index: 0; }
 	.product-group-list .product-group-item:nth-child(2n) { background-color: #f8f8f8; }
@@ -139,7 +139,7 @@ if (!String.prototype.padStart) {
 							<div class="product-group-update">수정일</div>
 						</div>
 						<!-- 본문 -->
-						<div id="product-group-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
+						<div id="product-group-list" class="col-md-12 product-group-list">
 							
 						</div>
 					</div>
@@ -156,8 +156,8 @@ if (!String.prototype.padStart) {
 							<div class="smc-btn-wrap">
 								<div id="del-product-btn" class="smc-btn disable">삭제</div>
 								<div id="mod-product-btn" class="smc-btn disable">수정</div>
-								<div id="move-product-group-btn" class="smc-btn disable">품목그룹으로 내보내기</div>
-								<div id="move-product-btn" class="smc-btn disable">품목으로 가져오기</div>
+								<div id="export-product-btn" class="smc-btn disable">품목그룹으로 내보내기</div>
+								<div id="import-product-btn" class="smc-btn disable">품목으로 가져오기</div>
 								<div id="add-product-btn" class="smc-btn disable">추가</div>
 							</div>
 						</div>
@@ -173,7 +173,7 @@ if (!String.prototype.padStart) {
 							<div class="product-group-update">수정일</div>
 						</div>
 						<!-- 본문 -->
-						<div id="product-list" class="col-md-12 product-group-list" style="position: relative; height: calc( 100% - 142px );">
+						<div id="product-list" class="col-md-12 product-group-list">
 							
 						</div>
 					</div>
@@ -301,7 +301,8 @@ var $productGroupModBtn = $("#mod-product-group-btn"); // 수정 버튼
 var $addProductBtn = $("#add-product-btn"); // 품목 추가 버튼
 var $delProductBtn = $("#del-product-btn"); // 품목그룹 삭제 버튼
 var $productModBtn = $("#mod-product-btn"); // 수정 버튼
-var $moveProductBtn = $("#move-product-btn"); // 품목으로가져오기 버튼
+var $importProductBtn = $("#import-product-btn"); // 품목으로가져오기 버튼
+var $exportProductBtn = $("#export-product-btn"); // 품목그룹으로내보내기 버튼
 
 var $saveBtn = $("#save-btn"); // 저장 버튼
 
@@ -368,7 +369,17 @@ function updateProductGroupItemsOrder(){
 	var $items = $productGroupList.find(".product-group-item");
 	for( var i=0; i<$items.length; ++i ){
 		var $item = $items.eq( i );
-		$item.updateProductGroupOrder();
+		$item.updateProductOrder();
+	}
+	
+}
+
+function updateProductItemsOrder(){
+	
+	var $items = $productList.find(".product-group-item");
+	for( var i=0; i<$items.length; ++i ){
+		var $item = $items.eq( i );
+		$item.updateProductOrder();
 	}
 	
 }
@@ -436,11 +447,13 @@ var $TemplateModule = (function(){
 
 	return {
 	
+		template: template,
+		
 		// jQuery 신규 제품그룹 객체 생성
 		createProduct: (function(){
 		
 			// 현재 UI 순서로 갱신
-			$.fn.updateProductGroupOrder = function updateProductGroupOrder(){
+			$.fn.updateProductOrder = function updateProductOrder(){
 				
 				var $productGroupItems = this.parent().find(".product-group-item");
 				var gridIndex = $productGroupItems.index( this );
@@ -454,28 +467,7 @@ var $TemplateModule = (function(){
 					var $usedProductGroupItems = $productGroupItems.not(".unuse");
 					var columnIndex = $usedProductGroupItems.index( this );
 					this.find(".product-group-order").text( columnIndex + 1 );
-					var $columns = $productColumnList.find( ".product-column-parent" );
-					$column.insertAfter( $columns.eq( columnIndex ) );
-				}
-				
-				
-			};
-			// 현재 UI 순서로 갱신
-			$.fn.updateProductOrder = function updateProductOrder(){
-				
-				var $productItems = this.parent().find(".product-group-item");
-				var gridIndex = $productItems.index( this );
-				this.data( "order", gridIndex );
-				
-				var $column = this.data( "$column" );
-				if( this.hasClass("unuse") ){
-					this.find(".product-group-order").text( "-" );
-					$column.detach();
-				}else{
-					var $usedProductItems = $productItems.not(".unuse");
-					var columnIndex = $usedProductItems.index( this );
-					this.find(".product-group-order").text( columnIndex + 1 );
-					var $columns = $productColumnList.find( ".product-column-parent" );
+					var $columns = $column.parent().children();
 					$column.insertAfter( $columns.eq( columnIndex ) );
 				}
 				
@@ -509,7 +501,7 @@ var $TemplateModule = (function(){
 			$.fn.setName = function setName( name ){
 				this.data("name", name);
 				this.find(".product-group-name").text(name);
-				this.data("$column").find(".product-column-name").text( name );
+				this.data("$column").children(".product-column-name").text( name );
 			};
 			
 			// 사용여부 조회
@@ -648,10 +640,15 @@ var $TemplateModule = (function(){
 ****************************************/
 var ProductModule = {
 		
-		map: {},
-		parentChildrenMap: {},
-		add: function( parentId, $item ){
+		map: {
+			// id: $item
+		},
+		parentChildrenMap: {
+			// parentId: [ $item... ]
+		},
+		add: function( $item ){
 			
+			var parentId = $item.getParentId();
 			if( ProductModule.parentChildrenMap[ parentId ] == null ){
 				ProductModule.parentChildrenMap[ parentId ] = [];
 			}
@@ -664,19 +661,62 @@ var ProductModule = {
 			ProductModule.map[ id ] = $item;
 			
 		},
-		remove: function( id ){
+		remove: function( $item ){
+			
+			var id = $item.getId(); 
+			var parentId = $item.getParentId();
+			var $childrens = ProductModule.parentChildrenMap[ parentId ];
+			for( var i=0; i<$childrens.length; ++i ){
+				var $children = $childrens[ i ];
+				if( $children.getId() == id  ){
+					$childrens.splice( i, 1 );
+					break;
+				}
+			}
+			
+			var $myChildrens = ProductModule.parentChildrenMap[ id ];
+			if( $myChildrens != null ){
+				delete ProductModule.parentChildrenMap[ id ];
+			}
+			
+			delete ProductModule.map[ id ];
 			
 		}
 		
 };
 var products = <%- products %>;
+products.sort(function( a, b ){
+	
+	if( a.order < b.order ){
+		return -1;
+	}
+	
+	if( a.order > b.order ){
+		return 1;
+	}
+	
+	return 0;
+	
+});
+// 품목그룹 먼저 추가
 for( var i=0; i<products.length; ++i ){
 	var product = products[ i ];
-	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
-	if( product.parentId == "TOP" ){
-		$productGroup.appendTo( $productGroupList );
+	if( product.parentId != "TOP" ){
+		continue;
 	}
-	ProductModule.add( product.parentId, $productGroup );
+	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
+	$productGroup.appendTo( $productGroupList );
+	ProductModule.add( $productGroup );
+	
+}
+// 품목 추가
+for( var i=0; i<products.length; ++i ){
+	var product = products[ i ];
+	if( product.parentId == "TOP" ){
+		continue;
+	}
+	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
+	ProductModule.add( $productGroup );
 	
 }
 updateProductGroupItemsOrder();
@@ -692,6 +732,9 @@ $productGroupCntSpan.update();
 // 품목그룹 추가 버튼 클릭 이벤트
 $addProductGroupBtn.on("click", function(){
 	
+	// 팝업 그룹명 제거
+	$addProductGroupNameInp.val("");
+	
 	// 팝업 표시
 	$addProductGroupPopup.fadeIn( 500 );
 	parent.hideNav( 500 );
@@ -703,6 +746,9 @@ $addProductGroupBtn.on("click", function(){
 // 품목 추가 버튼 클릭 이벤트
 $addProductBtn.on("click", function(){
 	
+	// 팝업명 제거
+	$addProductNameInp.val("");
+	
 	// 팝업 표시
 	$addProductPopup.fadeIn( 500 );
 	parent.hideNav( 500 );
@@ -711,13 +757,22 @@ $addProductBtn.on("click", function(){
 	
 });
 
-// 추가팝업 - 취소 버튼 클릭 이벤트
+// 품목그룹 추가팝업 - 취소 버튼 클릭 이벤트
 $addProductGroupCancelBtn.on("click", function(){
 	
 	// 팝업 제거
 	parent.showNav( 500 );
 	$addProductGroupPopup.fadeOut( 500 );
 	$addProductGroupPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+// 품목 추가팝업 - 취소 버튼 클릭 이벤트
+$addProductCancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$addProductPopup.fadeOut( 500 );
+	$addProductPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
 	
 });
 
@@ -740,7 +795,7 @@ $addProductGroupCompleteBtn.on("click", function(){
 	}
 	
 	var $groupItem = $TemplateModule.createProduct( "TOP", null, newGroupName );
-	ProductModule.add( "TOP", $groupItem );
+	ProductModule.add( $groupItem );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -757,9 +812,6 @@ $addProductGroupCompleteBtn.on("click", function(){
 		
 		// 수량 표시 갱신
 		$productGroupCntSpan.update();
-		
-		// 팝업 그룹명 제거
-		$addProductGroupNameInp.val("");
 		
 	} );
 	
@@ -786,7 +838,7 @@ $addProductCompleteBtn.on("click", function(){
 	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
 	var parentId = $selectedGroupItem.getId();
 	var $groupItem = $TemplateModule.createProduct( parentId, null, newGroupName );
-	ProductModule.add( parentId, $groupItem );
+	ProductModule.add( $groupItem );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -797,15 +849,12 @@ $addProductCompleteBtn.on("click", function(){
 		// 넓어지는 애니메이션으로 표시
 		$groupItem.css( { "height": "0px" } );
 		$groupItem.appendTo( $productList );
-		updateProductGroupItemsOrder();
+		updateProductItemsOrder();
 		
 		$groupItem.animate( { "height": "37px" }, 500 );
 		
 		// 수량 표시 갱신
 		$productCntSpan.update();
-		
-		// 팝업 그룹명 제거
-		$addProductNameInp.val("");
 		
 	} );
 	
@@ -834,7 +883,7 @@ $addProductNameInp.on("keypress", function( e ){
 	
 });
 
-// 그룹순서 변경
+// 품목그룹순서 변경
 (function(){
 	
 	var $select = null;
@@ -848,6 +897,7 @@ $addProductNameInp.on("keypress", function( e ){
 		// 기존 선택 제거
 		var $this = $(this);
 		$productGroupList.find(".product-group-item").not( $this ).removeClass( "select" );
+		$productList.find(".product-group-item").removeClass( "select" );
 		
 		// 기존 자식 목록 제거
 		var $beforeProductItems = $productList.find(".product-group-item");
@@ -859,17 +909,36 @@ $addProductNameInp.on("keypress", function( e ){
 		var parentId = $this.getId();
 		console.log( parentId );
 		var $productItems = ProductModule.parentChildrenMap[ parentId ];
+		$productItems.sort(function( a, b ){
+			
+			var aOrder = a.data("order");
+			var bOrder = b.data("order");
+			if( aOrder < bOrder ){
+				return -1;
+			}
+			
+			if( aOrder > bOrder ){
+				return 1;
+			}
+			
+			return 0;
+			
+		});
 		$productItems.forEach(function( $productItem ){
 			console.log( $productItem );
 			$productItem.appendTo( $productList );
 		});
 		$productCntSpan.update();
+		updateProductItemsOrder();
 		
 		$this.addClass("select");
-		$moveProductBtn.removeClass( "disable" );
+		$importProductBtn.removeClass( "disable" );
 		$delProductGroupBtn.removeClass( "disable" );
 		$productGroupModBtn.removeClass( "disable" );
 		$addProductBtn.removeClass( "disable" );
+		$exportProductBtn.addClass( "disable" );
+		$productModBtn.addClass( "disable" );
+		$delProductBtn.addClass( "disable" );
 		$select = $this;
 		
 		
@@ -927,8 +996,84 @@ $addProductNameInp.on("keypress", function( e ){
 	});
 	
 })();
+// 품목순서 변경
+(function(){
+	
+	var $select = null;
+	var isMousedown = false;
+	
+	// 그룹아이템 마우스다운 이벤트
+	$productList.on("mousedown", ".product-group-item", function(){
+		
+		isMousedown = true;
+		
+		// 기존 선택 제거
+		var $this = $(this);
+		$productList.find(".product-group-item").not( $this ).removeClass( "select" );
+		
+		$this.addClass("select");
+		$exportProductBtn.removeClass( "disable" );
+		$productModBtn.removeClass( "disable" );
+		$delProductBtn.removeClass( "disable" );
+		$select = $this;
+		
+		
+	});
+	
+	$productList.on("mousemove", ".product-group-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		$select.css( { cursor: "move" } );
+		
+	});
+	
+	$productList.on("mouseenter", ".product-group-item", function(){
+		
+		if( isMousedown == false ){
+			return;
+		}
+		
+		if( $select == null ){
+			return;
+		}
+		
+		var $this = $(this);
+		if( $select.get(0) == $this.get(0) ){
+			return;
+		}
 
-// 삭제 버튼 클릭 이벤트
+		var mouseenterIdx = $productList.find( ".product-group-item" ).index( $this );
+		var moveIdx = $productList.find( ".product-group-item" ).index( $select );
+		
+		if( moveIdx > mouseenterIdx ){
+			$this.before( $select );
+		}else{
+			$this.after( $select );
+		}
+		
+		updateProductItemsOrder();
+		
+	});
+	
+	$productList.on("mouseup", ".product-group-item", function( e ){
+		
+		// 기존 선택 제거
+		var $select = $productList.find(".product-group-item.select");
+		$select.css( { cursor: "pointer" } );
+		isMousedown = false;
+		
+	});
+	
+})();
+
+// 품목그룹 삭제 버튼 클릭 이벤트
 $delProductGroupBtn.on("click", function(){
 	
 	// 활성화된 경우만 기능 동작
@@ -943,9 +1088,26 @@ $delProductGroupBtn.on("click", function(){
 		// 삭제모션
 		$selectedGroupItem.animate( { "height": "0px" }, 500, function(){
 			
-			// 삭제
+			// 하위 폼목을 품목그룹으로 변경
+			var $childrens = ProductModule.parentChildrenMap[ $selectedGroupItem.getId() ];
+			ProductModule.parentChildrenMap[ "TOP" ] = ProductModule.parentChildrenMap[ "TOP" ].concat( $childrens );
+			$childrens.forEach(function( $children ){
+				// 그리드 변경
+				$children.appendTo( $productGroupList );
+				
+				// 신규 컬럼생성하여 추가
+				var $newColumn = $( $TemplateModule.template[ "product-column-parent" ] );
+				$newColumn.find(".product-column-name").text( $children.getName() );
+				$newColumn.appendTo( $productColumnList );
+				$children.data( "$column", $newColumn );
+			});
+			
+			// 컬럼 삭제
 			var $column = $selectedGroupItem.data( "$column" );
 			$column.remove();
+			
+			// 맵핑 삭제
+			ProductModule.remove( $selectedGroupItem );
 			$selectedGroupItem.remove();
 			
 			// 수량 표시 갱신
@@ -954,7 +1116,49 @@ $delProductGroupBtn.on("click", function(){
 			// 버튼 비활성화
 			$delProductGroupBtn.addClass( "disable" );
 			$productGroupModBtn.addClass( "disable" );
+			$exportProductBtn.addClass( "disable" );
+			$productModBtn.addClass( "disable" );
+			$delProductBtn.addClass( "disable" );
 			updateProductGroupItemsOrder();
+			
+		} );
+		
+		
+	}
+	
+});
+
+// 품목 삭제 버튼 클릭 이벤트
+$delProductBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $delProductBtn.hasClass("disable") ){
+		return;
+	}
+	
+	var $selectedItem = $productList.find(".product-group-item.select");
+	var productName = $selectedItem.getName();
+	if( confirm( "'" + productName + "'을 삭제하시겠습니까?" ) ){
+		
+		// 삭제모션
+		$selectedItem.animate( { "height": "0px" }, 500, function(){
+			
+			// 컬럼 삭제
+			var $column = $selectedItem.data( "$column" );
+			$column.remove();
+			
+			// 맵퍼 삭제
+			ProductModule.remove( $selectedItem );
+			$selectedItem.remove();
+			
+			// 수량 표시 갱신
+			$productCntSpan.update();
+			
+			// 버튼 비활성화
+			$exportProductBtn.addClass( "disable" );
+			$productModBtn.addClass( "disable" );
+			$delProductBtn.addClass( "disable" );
+			updateProductItemsOrder();
 			
 		} );
 		
@@ -1075,34 +1279,33 @@ $productGroupModCompleteBtn.on("click", function(){
 
 // 저장 버튼 클릭 이벤트
 $saveBtn.on("click", function(){
-	
-	 var groups = [];
-	 var $groupItems = $productGroupList.find(".product-group-item");
-	 for( var i=0; i<$groupItems.length; ++i ){
-		 var $groupItem = $groupItems.eq( i );
-		 groups.push( $groupItem.getSaveData() );
-	 }
+
+	var groups = [];
+	for( var id in ProductModule.map ){
+		var $item = ProductModule.map[ id ];
+		groups.push( $item.getSaveData() );
+	}
 	 
-	 $.ajax({
+	$.ajax({
 		
-		 url: "/product/management/save",
-		 type: "post",
-		 headers: {
-	     	"Content-Type": "application/json"
-	     },
-		 data: JSON.stringify( groups ),
-		 dataType: "json",
-		 success: function( res ){
+		url: "/product/management/save",
+		type: "post",
+		headers: {
+	    	"Content-Type": "application/json"
+	    },
+		data: JSON.stringify( groups ),
+		dataType: "json",
+		success: function( res ){
 			 
-			 if( res.result == "SUCCESS" ){
-				 alert( "저장되었습니다." );
-			 }else{
-				 alert( "실패하였습니다.\n관리자에게 문의바랍니다." );
-			 }
+			if( res.result == "SUCCESS" ){
+				alert( "저장되었습니다." );
+			}else{
+				alert( "실패하였습니다.\n관리자에게 문의바랍니다." );
+			}
 			 
-		 }
+		}
 		 
-	 });
+	});
 	
 });
 
