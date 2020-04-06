@@ -291,15 +291,6 @@ if (!String.prototype.padStart) {
 		</div>
 		<div class="popup-row mt10">
 			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>품목그룹
-			</div>
-			<div class="col-md-8">
-				<select id="mod-product-group-sel" class="smc-select">
-				</select>
-			</div>
-		</div>
-		<div class="popup-row mt10">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
 				<span style="color: #ff0000;">*</span>품목명
 			</div>
 			<div class="col-md-8">
@@ -332,6 +323,35 @@ if (!String.prototype.padStart) {
 
 </div>
 
+<!-- 품목으로 가져오기 팝업 -->
+<div id="product-import-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 9999;">
+
+	<div id="product-import_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
+		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
+			품목으로 가져오기
+		</div>
+		<div class="popup-row mt10">
+			<div class="col-md-6" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
+				<span style="color: #ff0000;">*</span>가져올 수 있는 품목그룹
+			</div>
+			<div class="col-md-6">
+				<select id="product-import-group-sel" class="smc-select">
+					<option value="NO_SELECT">선택</option>
+				</select>
+			</div>
+		</div>
+		<div class="popup-row mt20">
+			<div class="col-md-12">
+				<div class="smc-btn-wrap">
+					<div id="product-import-complete-btn" class="smc-btn blue">완료</div>
+					<div id="product-import-cancel-btn" class="smc-btn">취소</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
 <script type="text/javascript">
 
 /**
@@ -342,7 +362,7 @@ var $window = $(window); // 윈도우
 var $body = $("body"); // 바디
 
 // 컬럼
-$productColumnList = $("#product-column-list"); // 컬럼 목록
+var $productColumnList = $("#product-column-list"); // 컬럼 목록
  
 // 상단 버튼 부분
 var $addProductGroupBtn = $("#add-product-group-btn"); // 품목그룹 추가 버튼
@@ -383,12 +403,18 @@ var $addProductNameInp = $("#add-product-name-inp"); // 품목그룹 추가 팝�
 // 품목그룹 수정 수정 팝업 부분
 var $productModPopup = $("#product-mod-popup"); // 수정 팝업 ( 배경 포함 )
 var $productModPopupContent = $("#product-mod_popup_content"); // 수정 팝업 ( 내용 )
-var $productModGroupSel = $("#mod-product-group-sel"); // 품목그룹 선택창
 var $productModCancelBtn = $("#product-mod-cancel-btn"); // 취소 버튼
 var $productModCompleteBtn = $("#product-mod-complete-btn"); // 완료 버튼
 var $productModNameInp = $("#product-mod-name-inp"); // 수정 팝업 - 소속명 입력창
 var $productModUseBtn = $("#product-mod-use-btn"); // 사용 버튼
 var $productModUnuseBtn = $("#product-mod-unuse-btn"); // 사용 버튼
+
+// 품목그룹 가져오기 팝업 부분
+var $productImportPopup = $("#product-import-popup"); // 수정 팝업 ( 배경 포함 )
+var $productImportPopupContent = $("#product-import_popup_content"); // 수정 팝업 ( 내용 )
+var $productImportCancelBtn = $("#product-import-cancel-btn"); // 취소 버튼
+var $productImportCompleteBtn = $("#product-import-complete-btn"); // 완료 버튼
+var $productImportGroupSel = $("#product-import-group-sel"); // 품목그룹 선택창
 
 // 그룹 목록 부분
 var $productGroupList = $("#product-group-list"); // 품목그룹 목록
@@ -418,26 +444,27 @@ var $productCntSpan = (function(){
 
 function updateProductGroupItemsOrder(){
 	
-	var $options = $productModGroupSel.find("option");
+	var $options = $productImportGroupSel.find("option");
 	var $items = $productGroupList.find(".product-group-item");
 	for( var i=0; i<$items.length; ++i ){
 		var $item = $items.eq( i );
 		$item.updateProductOrder();
 		var order = $item.getOrder();
 		var id = $item.getId();
-		$options.filter( "[value='"+id+"']" ).data( "order", order );
+		var $option = $options.filter( "[value='"+id+"']" );
+		$option.data( "order", order );
 	}
 	
 	// 품목그룹 선택창 순서 변경
 	var arr = [];
-	for( var i=0; i<$options.length; ++i ){
+	for( var i=1; i<$options.length; ++i ){
 		var $option = $options.eq( i ).detach();
 		var order = $option.data("order");
 		arr[ order ] = $option;
 	}
 	
 	arr.forEach(function( $option ){
-		$option.appendTo( $productModGroupSel );
+		$option.appendTo( $productImportGroupSel );
 	});
 	
 }
@@ -791,7 +818,7 @@ for( var i=0; i<products.length; ++i ){
 	ProductModule.add( $productGroup );
 	
 	var $option = $TemplateModule.createOption( product.id, product.name );
-	$option.appendTo( $productModGroupSel );
+	$option.appendTo( $productImportGroupSel );
 	
 }
 // 품목 추가
@@ -881,8 +908,9 @@ $addProductGroupCompleteBtn.on("click", function(){
 	
 	var $groupItem = $TemplateModule.createProduct( "TOP", null, newGroupName );
 	ProductModule.add( $groupItem );
+	
 	var $option = $TemplateModule.createOption( $groupItem.getId(), newGroupName );
-	$option.appendTo( $productModGroupSel );
+	$option.appendTo( $productImportGroupSel );
 	
 	// 팝업 제거
 	parent.showNav( 500 );
@@ -1315,9 +1343,6 @@ $productModBtn.on("click", function(){
 		$productModUseBtn.removeClass("select");
 	}
 	
-	// 해당 품목그룹 선택
-	$productModGroupSel.val( parentId );
-	
 	// 팝업 표시
 	$productModPopup.fadeIn( 500 );
 	parent.hideNav( 500 );
@@ -1454,7 +1479,7 @@ $productModCompleteBtn.on("click", function(){
 		}
 	}
 	
-	// 소속명 설정
+	// 품목명 설정
 	$selectedItem.setName( newName );
 	
 	// 사용여부 설정
@@ -1471,6 +1496,184 @@ $productModCompleteBtn.on("click", function(){
 	$productModPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
 		
 		updateProductItemsOrder();
+		
+	} );
+	
+});
+
+//품목으로 가져오기 버튼 클릭 이벤트
+$importProductBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $importProductBtn.hasClass("disable") ){
+		return;
+	}
+	
+	// 품목이 존재하는 품목그룹은 추가 불가능
+	var $options = $productImportGroupSel.find("option");
+	var $items = $productGroupList.find( ".product-group-item" );
+	for( var i=0; i<$items.length; ++i ){
+		var $item = $items.eq( i );
+		$item.updateProductOrder();
+		var order = $item.getOrder();
+		var id = $item.getId();
+		var $option = $options.filter( "[value='"+id+"']" );
+	}
+	
+	// "선택" 선택
+	$productImportGroupSel.val( "NO_SELECT" );
+	
+	// 팝업 표시
+	$productImportPopup.fadeIn( 500 );
+	parent.hideNav( 500 );
+	$productImportPopupContent.css( { "margin-top": "-40px" } ).animate( { "margin-top": "0px" }, 500 );
+	
+});
+
+//품목 가져오기팝업 - 완료 버튼 클릭 이벤트
+$productImportCompleteBtn.on("click", function(){
+	
+	
+	var importParentId = $productImportGroupSel.val();
+	if( importParentId == "NO_SELECT" ){
+		alert( "품목그룹을 선택하세요." );
+		return;
+	}
+	
+	// 선택된 품목그룹
+	var $selectedItem = $productGroupList.find(".product-group-item.select");
+	var selectedParentId = $selectedItem.getId();
+	if( selectedParentId == importParentId ){
+		alert( "자신을 품목으로 가져올 수 없습니다." );
+		return;
+	}
+	
+	if( 0 < ProductModule.parentChildrenMap[ importParentId ].length ){
+		alert( "품목이 없는 품목그룹만 가져올 수 있습니다." );
+		return;
+	}
+	
+	// 그룹명이 달라진 경우만 그룹명 검증
+	var $importParentItem = ProductModule.map[ importParentId ];
+	var importName = $importParentItem.getName();
+	var $items = $productList.find( ".product-group-item" );
+	for( var i=0; i<$items.length; ++i ){
+		var name =  $items.eq( i ).getName();
+		if( importName == name ){
+			alert( "이미 존재하는 품목명 입니다." );
+			return;
+		}
+	}
+	
+	// 수정일 갱신
+	$importParentItem.updateDate();
+	
+	
+	// 추가
+	var $selectedColumn = $selectedItem.data( "$column" );
+	$selectedColumn.addClass( "has-children" );
+	
+	// 기존 컬럼 제거
+	var $column = $importParentItem.data( "$column" );
+	$column.remove();
+	
+	// 신규 컬럼생성하여 추가
+	var $newColumn = $( $TemplateModule.template[ "product-column-children" ] );
+	$newColumn.find(".product-column-name").text( $importParentItem.getName() );
+	$newColumn.appendTo( $selectedColumn );
+	$importParentItem.data( "$column", $newColumn );
+	
+	ProductModule.remove( $importParentItem );
+	$importParentItem.setParentId( selectedParentId );
+	ProductModule.add( $importParentItem );
+	
+	
+	$productCntSpan.update();
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$productImportPopup.fadeOut( 500 );
+	$productImportPopupContent.css( { "margin-top": "0px" } );
+	$productImportPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
+		
+		$importParentItem.animate( { "height": "0px" }, 500, function(){
+			
+			// 수량 표시 갱신
+			$importParentItem.detach();
+			$importParentItem.appendTo( $productList );
+			$productGroupCntSpan.update();
+			$productCntSpan.update();
+			$importParentItem.updateProductOrder();
+			updateProductGroupItemsOrder();
+			$importParentItem.animate( { "height": "37px" }, 500 );
+			
+		} );
+		
+	} );
+	
+});
+
+//품목 수정팝업 - 취소 버튼 클릭 이벤트
+$productImportCancelBtn.on("click", function(){
+	
+	// 팝업 제거
+	parent.showNav( 500 );
+	$productImportPopup.fadeOut( 500 );
+	$productImportPopupContent.css( { "margin-top": "0px" } ).animate( { "margin-top": "-40px" }, 500 );
+	
+});
+
+// 품목그룹으로 내보내키 버튼 클릭 이벤트
+$exportProductBtn.on("click", function(){
+	
+	// 활성화된 경우만 기능 동작
+	if( $exportProductBtn.hasClass("disable") ){
+		return;
+	}
+
+	// 선택된 품목
+	var $selectedItem = $productList.find(".product-group-item.select");
+	var newName = $selectedItem.getName();
+	
+	var $items = $productGroupList.find( ".product-group-item" );
+	for( var i=0; i<$items.length; ++i ){
+		var name =  $items.eq( i ).getName();
+		if( newName == name ){
+			alert( "동일한 이름의 품목그룹이 있어 내보내지 못합니다." );
+			return;
+		}
+	}
+	
+	var $column = $selectedItem.data( "$column" );
+	$column.remove();
+	
+	// 신규 컬럼생성하여 추가
+	var $newColumn = $( $TemplateModule.template[ "product-column-parent" ] );
+	$newColumn.find(".product-column-name").text( $selectedItem.getName() );
+	$newColumn.appendTo( $productColumnList );
+	$selectedItem.data( "$column", $newColumn );
+	
+	$newColumn.appendTo( $productColumnList );
+	ProductModule.remove( $selectedItem );
+	$selectedItem.setParentId( "TOP" );
+	ProductModule.add( $selectedItem );
+	
+	// 버튼 비활성화
+	$exportProductBtn.addClass( "disable" );
+	$productModBtn.addClass( "disable" );
+	$delProductBtn.addClass( "disable" );
+	$selectedItem.removeClass( "select" );
+	
+	$selectedItem.animate( { "height": "0px" }, 500, function(){
+		
+		// 수량 표시 갱신
+		$selectedItem.detach();
+		$productGroupList.append( $selectedItem );
+		$productGroupCntSpan.update();
+		$productCntSpan.update();
+		$selectedItem.updateProductOrder();
+		updateProductItemsOrder();
+		$selectedItem.animate( { "height": "37px" }, 500 );
 		
 	} );
 	
