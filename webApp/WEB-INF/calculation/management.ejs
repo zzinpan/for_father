@@ -2,9 +2,10 @@
 <html>
 <head>
 <meta charset=UTF-8">
-<title>신나라유통 ERP > product > management</title>
+<title>신나라유통 ERP > calculation > management</title>
 <link rel="stylesheet" href="/lib/jquery-ui-1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="/lib/bootstrap/bootstrap-datepicker.min.css">
 <style type="text/css">
 body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
 .smc-btn { float: right; display: inline-block; padding: 4px 10px; vertical-align: bottom; font-weight: bold; font-size: 10px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px; }
@@ -53,11 +54,11 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 		.product-group-content-use-status.unuse { background-color: #eee; }
 		
 /* 품목 컬럼 */
-.product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: center; margin-bottom: 40px; width: 100%; height: 60px; }
-	.product-column-parent { position: relative; display: inline-block; font-size: 12px; height: 60px; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc; vertical-align: top; }
-		.product-column-parent-name { position: relative; padding: 21px 10px 22px 10px; }
+.product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: left; margin-bottom: 40px; width: 100%; height: 60px; }
+	.product-column-parent { position: relative; display: inline-block; text-align: center; font-size: 12px; height: 60px; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc; vertical-align: top; }
+		.product-column-parent-name { position: relative; padding: 21px 10px 22px 10px; background-color: #eee; }
 		.has-children > .product-column-parent-name { padding: 6px 10px 7px 10px; }
-		.product-column-children { display: inline-block; padding: 7px 10px 6px 10px; box-shadow: 1px -1px 0px 0px #ccc; }
+		.product-column-children { display: inline-block; padding: 7px 10px 6px 10px; box-shadow: 1px -1px 0px 0px #ccc; text-align: center; position: relative; z-index: 1; }
 		.product-column-parent .product-column-children:last-child { display: inline-block; padding: 7px 10px 6px 10px; box-shadow: 0px -1px 0px 0px #ccc; }
 		
 /* 라이브러리 커스텀 */		
@@ -68,6 +69,8 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <script src="/lib/bootstrap/bootstrap.min.js"></script>
+<script src="/lib/bootstrap/bootstrap-datepicker.min.js"></script>
+<script src="/lib/bootstrap/bootstrap-datepicker.ko.min.js"></script>
 <script type="text/javascript">
 /**
  	Polyfill
@@ -95,90 +98,53 @@ if (!String.prototype.padStart) {
 	<div class="row" style="position: relative; margin-top: 50px; height: calc( 100% - 50px );">
 		<div class="ccol-md-12" style="position: relative; height: 100%;">
 			<div class="smc-header">
-				품목 관리
+				입/출고 기록
 			</div>
 			
 			
 			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
 				
 				
-					<div class="col-md-12" style="height: 32px;">
-						<div class="col-md-6">
-							<div style="display: inline-block; font-size: 12px; font-weight: bold;">품목 미리보기</div>
-						</div>
-						<div class="col-md-6">
-							<div id="save-btn" class="smc-btn blue">저장</div>
+				<div class="col-md-12" style="height: 32px;">
+					<div class="col-md-4">
+						<div class="smc-count" style="padding-top: 8px;">입고 <span id="product-cnt-span">0</span>건 / 출고 0건</div>
+					</div>
+					<div class="col-md-4">
+						<div style="margin-top: -10px;">
+							<input id="calendar-inp" class="smc-inp" type="text" value="2020-04-07" style="cursor: pointer; text-align: center; border: none; font-size: 20px; font-weight: bold; margin-top: -16px" readonly="readonly">
 						</div>
 					</div>
-				<div class="col-md-12" style="position: relative;">
-					<div id="product-column-list" class="product-column-list">
+					<div class="col-md-4">
+						<div id="save-btn" class="smc-btn blue">저장</div>
+						<div id="del-product-group-btn" class="smc-btn disable">삭제</div>
+						<div id="add-product-group-btn" class="smc-btn">추가</div>
 					</div>
 				</div>
-				
-				
-				<!-- 품목그룹 -->
-				<div class="col-md-6" style="position: relative; height: calc( 100% - 172px );">
-					<!-- 상단 -->
-					<div class="smc-count">
-						<div class="col-md-4" style="padding-top: 8px;">총 <span id="product-group-cnt-span">0</span>건</div>
-						<div class="col-md-8">
-							<div class="smc-btn-wrap">
-								<div id="del-product-group-btn" class="smc-btn disable">삭제</div>
-								<div id="mod-product-group-btn" class="smc-btn disable">수정</div>
-								<div id="add-product-group-btn" class="smc-btn">추가</div>
+				<div class="col-md-12" style="position: relative; height: calc( 100% - 32px );">
+					<div class="product-column-list" style="position: relative; height: calc( 100% - 50px );">
+					
+						<div class="product-column-parent" style="position: relative; float: left; width: 60px; height: 100%;">
+							<div class="" style="padding: 21px 10px 22px 10px; height: 60px; box-shadow: 0px 0px 0px 1px #ccc;">구분</div>
+							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">전일재고</div>
+							<div class="" style="padding: 38px 0px 45px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 90px;">당일입고</div>
+							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">입고계</div>
+							<div class="" style="position: relative; box-shadow: 0px 0px 0px 1px #ccc; height: calc( 100% - 270px );">
+								<div style="position: relative; top: calc( 50% - 7px );">당일출고</div>
 							</div>
+							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">출고계</div>
+							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">당일재고</div>
 						</div>
+					
+						<!-- 데이터 목록 -->
+						<div id="product-column-list" style="width: calc( 100% - 120px ); display: inline-block; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc;">
+						
+						</div>
+					
+						<div class="product-column-parent" style="float: right; width: 60px;">
+							<div class="product-column-name product-column-parent-name">직원</div>
+						</div>
+					
 					</div>
-					
-					<div class="smc-grid">
-					
-						<div class="product-group-header">
-							<div class="product-group-order">순서</div>
-							<div class="product-group-name">품목그룹명</div>
-							<div class="product-group-use">사용여부</div>
-							<div class="product-group-regdate">등록일</div>
-							<div class="product-group-update">수정일</div>
-						</div>
-						<!-- 본문 -->
-						<div id="product-group-list" class="col-md-12 product-group-list">
-							
-						</div>
-					</div>
-					
-				</div>
-				
-				
-				<!-- 품목 -->
-				<div class="col-md-6" style="position: relative; height: calc( 100% - 172px );">
-					<!-- 상단 -->
-					<div class="smc-count">
-						<div class="col-md-3" style="padding-top: 8px;">총 <span id="product-cnt-span">0</span>건</div>
-						<div class="col-md-9">
-							<div class="smc-btn-wrap">
-								<div id="del-product-btn" class="smc-btn disable">삭제</div>
-								<div id="mod-product-btn" class="smc-btn disable">수정</div>
-								<div id="export-product-btn" class="smc-btn disable">품목그룹으로 내보내기</div>
-								<div id="import-product-btn" class="smc-btn disable">품목으로 가져오기</div>
-								<div id="add-product-btn" class="smc-btn disable">추가</div>
-							</div>
-						</div>
-					</div>
-					
-					<div class="smc-grid">
-					
-						<div class="product-group-header">
-							<div class="product-group-order">순서</div>
-							<div class="product-group-name">품목명</div>
-							<div class="product-group-use">사용여부</div>
-							<div class="product-group-regdate">등록일</div>
-							<div class="product-group-update">수정일</div>
-						</div>
-						<!-- 본문 -->
-						<div id="product-list" class="col-md-12 product-group-list">
-							
-						</div>
-					</div>
-					
 				</div>
 				
 			</div>
@@ -353,6 +319,13 @@ if (!String.prototype.padStart) {
 </div>
 
 <script type="text/javascript">
+
+$("#calendar-inp").datepicker({
+	language: "ko",
+	todayHighlight : true 
+}).on('changeDate', function(ev){
+	$calInps.datepicker('hide');
+});
 
 /**
 	jquery 변수
@@ -1200,26 +1173,12 @@ $delProductGroupBtn.on("click", function(){
 	var groupName = $selectedGroupItem.getName();
 	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n하위에 포함된 '품목'은 모두 '품목그룹'으로 변경됩니다." ) ){
 		
-		var $childrens = ProductModule.parentChildrenMap[ $selectedGroupItem.getId() ];
-		var $parents = ProductModule.parentChildrenMap[ "TOP" ];
-		for( var i=0; i<$childrens.length; ++i ){
-			var $children = $childrens[ i ];
-			var childrenName = $children.getName();
-			for( var j=0; j<$parents.length; ++j ){
-				var $parent = $parents[ j ];
-				var parentName = $parent.getName();
-				if( childrenName == parentName ){
-					alert( "품목그룹에 이미 \"" + childrenName + "\"이(가) 있습니다." );
-					return;
-				}
-			}
-		}
-		
 		// 삭제모션
 		$selectedGroupItem.animate( { "height": "0px" }, 500, function(){
 			
 			// 하위 폼목을 품목그룹으로 변경
-			ProductModule.parentChildrenMap[ "TOP" ] = $parents.concat( $childrens );
+			var $childrens = ProductModule.parentChildrenMap[ $selectedGroupItem.getId() ];
+			ProductModule.parentChildrenMap[ "TOP" ] = ProductModule.parentChildrenMap[ "TOP" ].concat( $childrens );
 			$childrens.forEach(function( $children ){
 				// 그리드 변경
 				$children.appendTo( $productGroupList );
@@ -1229,7 +1188,6 @@ $delProductGroupBtn.on("click", function(){
 				$newColumn.find(".product-column-name").text( $children.getName() );
 				$newColumn.appendTo( $productColumnList );
 				$children.data( "$column", $newColumn );
-				$children.setParentId( "TOP" );
 			});
 			
 			// 컬럼 삭제
@@ -1289,14 +1247,6 @@ $delProductBtn.on("click", function(){
 			$productModBtn.addClass( "disable" );
 			$delProductBtn.addClass( "disable" );
 			updateProductItemsOrder();
-			
-			// 부모의 자식이 없는 경우, 컬럼 병합형태로 변경
-			var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
-			var $parentColumn = $selectedGroupItem.data( "$column" );
-			var hasChildren = 0 < $parentColumn.find( ".product-column-children" ).length;
-			if( hasChildren == false ){
-				$parentColumn.removeClass( "has-children" );
-			}
 			
 		} );
 		
