@@ -117,31 +117,103 @@ if (!String.prototype.padStart) {
 					<div class="col-md-4">
 						<div id="save-btn" class="smc-btn blue">저장</div>
 						<div id="del-product-group-btn" class="smc-btn disable">삭제</div>
-						<div id="add-product-group-btn" class="smc-btn">추가</div>
+						<div id="add-product-group-btn" class="smc-btn">출고 추가</div>
+						<div id="add-product-group-btn" class="smc-btn">입고 추가</div>
 					</div>
 				</div>
 				<div class="col-md-12" style="position: relative; height: calc( 100% - 32px );">
 					<div class="product-column-list" style="position: relative; height: calc( 100% - 50px );">
 					
-						<div class="product-column-parent" style="position: relative; float: left; width: 60px; height: 100%;">
-							<div class="" style="padding: 21px 10px 22px 10px; height: 60px; box-shadow: 0px 0px 0px 1px #ccc;">구분</div>
-							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">전일재고</div>
-							<div class="" style="padding: 38px 0px 45px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 90px;">당일입고</div>
-							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">입고계</div>
-							<div class="" style="position: relative; box-shadow: 0px 0px 0px 1px #ccc; height: calc( 100% - 270px );">
+						<div style="position: absolute; z-index: -1; top: 0px; height: 60px; border-bottom: #ccc solid 1px; width: 100%; background-color: #f8f8f8;"></div>
+						<div style="position: absolute; z-index: -1; top: 60px; height: 30px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; top: 90px; height: 90px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; top: 180px; height: 30px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; bottom: 31px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; bottom: 1px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
+						
+						
+						<div class="" style="font-size: 12px; text-align: center; background-color: #F1F1F1; position: relative; float: left; width: 60px; height: 100%;">
+							<div class="" style="padding: 21px 10px 22px 10px; height: 60px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px;">구분</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 30px;">전일재고</div>
+							<div class="" style="padding: 38px 0px 45px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 90px;">당일입고</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 30px;">입고계</div>
+							<div class="" style="position: relative; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: calc( 100% - 270px );">
 								<div style="position: relative; top: calc( 50% - 7px );">당일출고</div>
 							</div>
-							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">출고계</div>
-							<div class="" style="padding: 8px 0px 15px 0px; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">당일재고</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 30px;">출고계</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; height: 30px;">당일재고</div>
 						</div>
 					
 						<!-- 데이터 목록 -->
-						<div id="product-column-list" style="width: calc( 100% - 120px ); display: inline-block; background-color: #eee; box-shadow: 0px 0px 0px 1px #ccc;">
-						
+						<div id="product-column-list" style="position: relative; width: calc( 100% - 138px ); display: inline-block; height: 100%;">
+							<div style="position: relative; display: inline-block; font-size: 12px; border-right: #ccc solid 1px; height: 100%;">
+								<!-- 컬럼 -->
+								<div style="height: 60px; padding: 21px 10px 22px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center;">5G/L</div>
+								<!-- 전일 재고 -->
+								<div style="text-align: right; height: 30px;">
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+								</div>
+								<!-- 당일 입고 -->
+								<div style="text-align: right; height: 90px; border-bottom: #ccc solid 1px; overflow: auto;">
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+								</div>
+								<!-- 입고계 -->
+								<div style="text-align: right; height: 30px;">
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+								</div>
+								<!-- 당일 출고 -->
+								<div style="position: relative; text-align: right; height: calc( 100% - 270px );">
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+<!-- 									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div> -->
+								</div>
+								<!-- 출고계 -->
+								<div style="text-align: right; height: 30px;">
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+								</div>
+								<!-- 당일 재고 -->
+								<div style="text-align: right; height: 30px;">
+									<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">14,545</div>
+								</div>
+							</div>
 						</div>
 					
-						<div class="product-column-parent" style="float: right; width: 60px;">
-							<div class="product-column-name product-column-parent-name">직원</div>
+						<div class="" style="position: relative; float: right; width: 18px; height: 100%; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
+							<div class="" style="height: 60px;"></div>
+							<div class="" style="height: 30px; border-bottom: #ccc solid 1px;"></div>
+							<div class="" style="height: 90px; overflow: hidden scroll; border-bottom: #ccc solid 1px;">
+								<div style="height: 120px;"></div>
+							</div>
+							<div class="" style="height: 30px; border-bottom: #ccc solid 1px;"></div>
+							<div class="" style="position: relative; height: calc( 100% - 270px ); overflow: hidden scroll; border-bottom: #ccc solid 1px;"></div>
+						</div>
+						<div class="" style="float: right; width: 60px; height: 60px; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
+							<div class="" style="height: 60px; padding: 21px 10px 22px 10px; border-bottom: #ccc solid 1px;">직원</div>
 						</div>
 					
 					</div>
@@ -152,170 +224,6 @@ if (!String.prototype.padStart) {
 		</div>
 		
 	</div>
-</div>
-
-<!-- 품목그룹추가 팝업 -->
-<div id="add-product-group-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 4;">
-
-	<div id="add_product_group_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
-		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			품목그룹 추가
-		</div>
-		<div class="popup-row">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>품목그룹명
-			</div>
-			<div class="col-md-8">
-				<input id="add-product-group-name-inp" class="smc-inp" type="text" placeholder="품목그룹명을 입력해주세요.">
-			</div>
-		</div>
-		<div class="popup-row mt20">
-			<div class="col-md-12">
-				<div class="smc-btn-wrap">
-					<div id="add-product-group-complete-btn" class="smc-btn blue">완료</div>
-					<div id="add-product-group-cancel-btn" class="smc-btn">취소</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-</div>
-<!-- 품목추가 팝업 -->
-<div id="add-product-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 4;">
-
-	<div id="add_product_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
-		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			품목 추가
-		</div>
-		<div class="popup-row">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>품목명
-			</div>
-			<div class="col-md-8">
-				<input id="add-product-name-inp" class="smc-inp" type="text" placeholder="품목명을 입력해주세요.">
-			</div>
-		</div>
-		<div class="popup-row mt20">
-			<div class="col-md-12">
-				<div class="smc-btn-wrap">
-					<div id="add-product-complete-btn" class="smc-btn blue">완료</div>
-					<div id="add-product-cancel-btn" class="smc-btn">취소</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-</div>
-
-<!-- 품목그룹수정 팝업 -->
-<div id="product-group-mod-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 9999;">
-
-	<div id="product-group-mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
-		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			품목그룹 수정
-		</div>
-		<div class="popup-row">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>품목그룹명
-			</div>
-			<div class="col-md-8">
-				<input id="product-group-mod-name-inp" class="smc-inp" type="text" placeholder="품목그룹명을 입력해주세요.">
-			</div>
-		</div>
-		<div class="popup-row mt10">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>사용여부
-			</div>
-			<div class="col-md-8">
-				<div id="product-group-mod-use-btn" class="smc-btn" style="float: left;">사용</div>
-				<div id="product-group-mod-unuse-btn" class="smc-btn"  style="float: left;">미사용</div>
-			</div>
-		</div>
-		<div class="popup-row mt6">
-			<div class="col-md-offset-4 col-md-8" style="font-size: 10px; color: #616161;">
-				&nbsp; ※미사용은 정산을 수행할 수 없습니다.
-			</div>
-		</div>
-		<div class="popup-row mt20">
-			<div class="col-md-12">
-				<div class="smc-btn-wrap">
-					<div id="product-group-mod-complete-btn" class="smc-btn blue">완료</div>
-					<div id="product-group-mod-cancel-btn" class="smc-btn">취소</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-</div>
-
-<!-- 품목수정 팝업 -->
-<div id="product-mod-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 9999;">
-
-	<div id="product-mod_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
-		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			품목 수정
-		</div>
-		<div class="popup-row mt10">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>품목명
-			</div>
-			<div class="col-md-8">
-				<input id="product-mod-name-inp" class="smc-inp" type="text" placeholder="품목명을 입력해주세요.">
-			</div>
-		</div>
-		<div class="popup-row mt10">
-			<div class="col-md-4" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>사용여부
-			</div>
-			<div class="col-md-8">
-				<div id="product-mod-use-btn" class="smc-btn" style="float: left;">사용</div>
-				<div id="product-mod-unuse-btn" class="smc-btn"  style="float: left;">미사용</div>
-			</div>
-		</div>
-		<div class="popup-row mt6">
-			<div class="col-md-offset-4 col-md-8" style="font-size: 10px; color: #616161;">
-				&nbsp; ※미사용은 정산을 수행할 수 없습니다.
-			</div>
-		</div>
-		<div class="popup-row mt20">
-			<div class="col-md-12">
-				<div class="smc-btn-wrap">
-					<div id="product-mod-complete-btn" class="smc-btn blue">완료</div>
-					<div id="product-mod-cancel-btn" class="smc-btn">취소</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-</div>
-
-<!-- 품목으로 가져오기 팝업 -->
-<div id="product-import-popup" class="smc-popup" style="position: absolute; left: 0px; top: 0px; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); display: none; z-index: 9999;">
-
-	<div id="product-import_popup_content" style="position: absolute; background-color: white; border-radius: 4px; left: calc( 50% - 200px ); top: calc( 50% - 88px ); width: 400px; padding: 20px;">
-		<div class="col-md-12 smc-header" style="border-bottom: #ccc solid 2px;">
-			품목으로 가져오기
-		</div>
-		<div class="popup-row mt10">
-			<div class="col-md-6" style="text-align: right; font-size: 12px; font-weight: bold; padding-top: 3px;">
-				<span style="color: #ff0000;">*</span>가져올 수 있는 품목그룹
-			</div>
-			<div class="col-md-6">
-				<select id="product-import-group-sel" class="smc-select">
-					<option value="NO_SELECT">선택</option>
-				</select>
-			</div>
-		</div>
-		<div class="popup-row mt20">
-			<div class="col-md-12">
-				<div class="smc-btn-wrap">
-					<div id="product-import-complete-btn" class="smc-btn blue">완료</div>
-					<div id="product-import-cancel-btn" class="smc-btn">취소</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
 </div>
 
 <script type="text/javascript">
@@ -500,13 +408,22 @@ var $TemplateModule = (function(){
 		].join(""),
 		
 		"product-column-parent": [
-			'<div class="product-column-parent">',
-				'<div class="product-column-name product-column-parent-name">5G/L</div>',
-			'</div>'
+			'<div style="display: inline-block;">',
+				'<div class="product-column-parent">',
+					'<div class="product-column-name product-column-parent-name">5G/L</div>',
+				'</div>',
+				'<div class="" style="background-color: white; box-shadow: 0px 0px 0px 1px #ccc; height: 30px;">45</div>',
+			'</div>',
 		].join(""),
 		
 		"product-column-children": [
 			'<div class="product-column-children">',
+				'<div class="product-column-name">Box</div>',
+			'</div>'
+		].join(""),
+		
+		"product-item": [
+			'<div class="product-column-item">',
 				'<div class="product-column-name">Box</div>',
 			'</div>'
 		].join(""),
@@ -629,7 +546,7 @@ var $TemplateModule = (function(){
 			};
 		
 			return function( parentId, id, name, use, enableDelete, createDate, updateDate ){
-		 
+
 				var $clone = $( template[ "product-group-item" ] );
 				
 				var columnTemplateName = "product-column-parent";
@@ -781,29 +698,29 @@ products.sort(function( a, b ){
 	
 });
 // 품목그룹 먼저 추가
-for( var i=0; i<products.length; ++i ){
-	var product = products[ i ];
-	if( product.parentId != "TOP" ){
-		continue;
-	}
-	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
-	$productGroup.appendTo( $productGroupList );
-	ProductModule.add( $productGroup );
+// for( var i=0; i<products.length; ++i ){
+// 	var product = products[ i ];
+// 	if( product.parentId != "TOP" ){
+// 		continue;
+// 	}
+// 	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
+// 	$productGroup.appendTo( $productGroupList );
+// 	ProductModule.add( $productGroup );
 	
-	var $option = $TemplateModule.createOption( product.id, product.name );
-	$option.appendTo( $productImportGroupSel );
+// 	var $option = $TemplateModule.createOption( product.id, product.name );
+// 	$option.appendTo( $productImportGroupSel );
 	
-}
-// 품목 추가
-for( var i=0; i<products.length; ++i ){
-	var product = products[ i ];
-	if( product.parentId == "TOP" ){
-		continue;
-	}
-	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
-	ProductModule.add( $productGroup );
+// }
+// // 품목 추가
+// for( var i=0; i<products.length; ++i ){
+// 	var product = products[ i ];
+// 	if( product.parentId == "TOP" ){
+// 		continue;
+// 	}
+// 	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
+// 	ProductModule.add( $productGroup );
 	
-}
+// }
 updateProductGroupItemsOrder();
 
 //수량 표시 갱신
