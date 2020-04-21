@@ -238,7 +238,8 @@
 			id: "GRP::ETC",
 			name: "기타",
 			use: true,
-			enableDelete: false,
+			remove: false,
+			enableRemove: false,
 			createDate: nowStr,
 			updateDate: nowStr
 			
@@ -272,7 +273,8 @@
 			createDate: nowStr,
 			updateDate: nowStr,
 			use: true,
-			enableDelete: false
+			remove: false,
+			enableRemove: false
 		}
 	];
 	fs.writeFile( 
@@ -298,7 +300,8 @@
 //			createDate: nowStr,
 //			updateDate: nowStr,
 //			use: true,
-//			enableDelete: false
+//			remove: false,
+//			enableRemove: false
 //		}
 	];
 	fs.writeFile( 
@@ -313,6 +316,51 @@
 					console.log( err );
 				} 
 		});
+	
+	var recordsDir = global.dataDir + "/records";
+	if (!fs.existsSync(recordsDir)){
+	    fs.mkdirSync(recordsDir);
+	    
+	    console.log( "create records folder - complete" );
+	    
+//	    var yyyy = now.yyyy;
+//	    var makeDay = new Date( yyyy + "-01-01" );
+//	    
+//	    var basicData = {
+//	    		
+//	    		
+//	    		
+//	    };
+//	    
+//	    while( true ){
+//	    	
+//	    	var targetYyyy = makeDay.getFullYear().toString();
+//	    	if( yyyy != targetYyyy ){
+//	    		console.log( "create records folder - complete", yyyy , targetYyyy );
+//	    		break;
+//	    	}
+//	    	
+//	    	var targetDir = recordsDir + "/" + targetYyyy;
+//	    	if (!fs.existsSync(targetDir)){
+//	    		fs.mkdirSync(targetDir);
+//	    	}
+//	    	
+//	    	var targetMM = ( makeDay.getMonth() + 1 ).toString().padStart( 2, 0 );
+//	    	targetDir = targetDir + "/" + targetMM;
+//	    	if (!fs.existsSync(targetDir)){
+//	    		fs.mkdirSync(targetDir);
+//	    	}
+//	    	
+//	    	var targetDd = makeDay.getDate().toString().padStart( 2, 0 );
+//			console.log( targetYyyy + "-" + targetMM + "-" + targetDd );
+//			
+//	    	fs.writeFileSync( targetDir + "/" + targetYyyy + "-" + targetMM + "-" + targetDd + ".json", "{}" );
+//	    	makeDay.setDate( makeDay.getDate() + 1 );
+//	    	
+//	    }
+	    
+	}
+	
 	
 	
 	

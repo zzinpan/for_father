@@ -641,9 +641,9 @@ var $TemplateModule = (function(){
 			};
 		
 			// 삭제가능 여부
-			$.fn.setEnableDelete = function( enableDelete ){
-				this.data("enableDelete", enableDelete);
-				if( enableDelete == false ){
+			$.fn.setEnableRemove = function( enableRemove ){
+				this.data("enableRemove", enableRemove);
+				if( enableRemove == false ){
 					this.addClass("disable");
 				}
 			};
@@ -658,6 +658,16 @@ var $TemplateModule = (function(){
 				}
 			};
 		
+			// 삭제여부 설정
+			$.fn.setRemove = function( bool ){
+				this.data("remove", bool);
+				if( bool == true ){
+					this.hide();
+				}else{
+					this.show();
+				}
+			};
+		
 			// 수정일 갱신
 			$.fn.updateDate = function updateDate(){
 				var now = TimeModule.now();
@@ -667,12 +677,12 @@ var $TemplateModule = (function(){
 			
 			// 저장용 데이터
 			$.fn.getSaveData = function getSaveData(){
-				var data = this.data();
+				var data = JSON.parse( JSON.stringify( this.data() ) );
 				delete data.groupName;
 				return data;
 			};
 			
-			return function( groupId, groupName, id, name, imageSrc, car, phone, mail, birthday, memo, use, enableDelete, createDate, updateDate ){
+			return function( groupId, groupName, id, name, imageSrc, car, phone, mail, birthday, memo, use, remove, enableRemove, createDate, updateDate ){
 		 
 				var $clone = $( template[ "employee-item" ] );
 				$clone.data({
@@ -687,7 +697,8 @@ var $TemplateModule = (function(){
 					birthday: null,
 					memo: null,
 					use: null,
-					enableDelete: null,
+					remove: null,
+					enableRemove: null,
 					createDate: null,					
 					updateDate: null
 				});
@@ -730,10 +741,16 @@ var $TemplateModule = (function(){
 				}
 				$clone.setUse( use );
 				
-				if( enableDelete == null ){
-					enableDelete = true;
+				// 삭제여부
+				if( remove == null ){
+					remove = false;
 				}
-				$clone.setEnableDelete( enableDelete );
+				$clone.setRemove( remove );
+				
+				if( enableRemove == null ){
+					enableRemove = true;
+				}
+				$clone.setEnableRemove( enableRemove );
 				
 				// 등록일
 				if( createDate == null ){
@@ -825,7 +842,7 @@ for( var i=0; i<GroupModule.count(); ++i ){
 var employees = <%-employees%>;
 for( var i=0; i<employees.length; ++i ){
 	var employee = employees[ i ];
-	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.car, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.enableDelete, employee.createDate, employee.updateDate );
+	var $employee = $TemplateModule.createEmployee( employee.groupId, GroupModule.getById( employee.groupId ).name, employee.id, employee.name, employee.image, employee.car, employee.phone, employee.mail, employee.birthday, employee.memo, employee.use, employee.remove, employee.enableRemove, employee.createDate, employee.updateDate );
 	$employee.appendTo( $employeeList );
 }
 
@@ -1190,13 +1207,15 @@ $delBtn.on("click", function(){
 	
 	var $selectedEmployeeItem = $employeeList.find(".employee-item.select");
 	var employeeName = $selectedEmployeeItem.getName();
-	if( confirm( "'" + employeeName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다." ) ){
+	if( confirm( "'" + employeeName + "'을 삭제하시겠습니까?" ) ){
 		
 		// 삭제모션
 		$selectedEmployeeItem.animate( { "width": "0px" }, 500, function(){
 			
 			// 삭제
-			$selectedEmployeeItem.remove();
+			$selectedEmployeeItem.setRemove( true );
+			$selectedEmployeeItem.updateDate();
+			$selectedEmployeeItem.removeClass( "select" );
 			
 			// 수량 표시 갱신
 			$employeeCntSpan.update();

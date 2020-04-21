@@ -60,6 +60,11 @@ module.exports = [
 				JSON.stringify( groups ),
 				"utf8",
 				function(err){ 
+					
+					/**
+					 	@TODO 삭제된 소속 데이터의 직원들은 소속이 기타로 변경되야한다.
+					 **/
+					
 					if (err == null) { 
 						res.send( { result: "SUCCESS", data: null } );
 					} else { 

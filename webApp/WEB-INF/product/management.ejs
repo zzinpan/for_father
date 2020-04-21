@@ -613,6 +613,16 @@ var $TemplateModule = (function(){
 				this.data("$column").children(".product-column-name").text( name );
 			};
 			
+			// 이름 설정
+			$.fn.setRemove = function setRemove( remove ){
+				this.data("remove", remove);
+				if( remove == true ){
+					this.hide();
+				}else{
+					this.show();
+				}
+			};
+			
 			// 사용여부 조회
 			$.fn.getUse = function(){
 				return this.data("use"); 
@@ -650,7 +660,8 @@ var $TemplateModule = (function(){
 			// 저장용 데이터
 			$.fn.getSaveData = function getSaveData(){
 				
-				var data = this.data();
+				var data = JSON.parse( JSON.stringify( this.data() ) );
+				delete data.$column;
 				return data; 
 			
 			};
@@ -1238,7 +1249,10 @@ $delProductGroupBtn.on("click", function(){
 			
 			// 맵핑 삭제
 			ProductModule.remove( $selectedGroupItem );
-			$selectedGroupItem.remove();
+			$selectedGroupItem.hide();
+			$selectedGroupItem.setRemove( true );  
+			$selectedGroupItem.updateDate();  
+			$selectedGroupItem.removeClass( "select" );
 			
 			// 수량 표시 갱신
 			$productGroupCntSpan.update();
@@ -1279,7 +1293,10 @@ $delProductBtn.on("click", function(){
 			
 			// 맵퍼 삭제
 			ProductModule.remove( $selectedItem );
-			$selectedItem.remove();
+			$selectedItem.hide();
+			$selectedItem.setRemove( true );
+			$selectedItem.updateDate();
+			$selectedItem.removeClass( "select" );
 			
 			// 수량 표시 갱신
 			$productCntSpan.update();

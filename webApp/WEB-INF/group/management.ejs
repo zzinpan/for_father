@@ -331,9 +331,9 @@ var $TemplateModule = (function(){
 			};
 		
 			// 삭제가능 여부
-			$.fn.setEnableDelete = function( enableDelete ){
-				this.data("enableDelete", enableDelete);
-				if( enableDelete == false ){
+			$.fn.setEnableRemove = function( enableRemove ){
+				this.data("enableRemove", enableRemove);
+				if( enableRemove == false ){
 					this.addClass("disable");
 				}
 			};
@@ -348,6 +348,16 @@ var $TemplateModule = (function(){
 				}
 			};
 		
+			// 삭제 설정
+			$.fn.setRemove = function( bool ){
+				this.data("remove", bool);
+				if( bool == true ){
+					this.hide();
+				}else{
+					this.show();
+				}
+			};
+		
 			// 수정일 갱신
 			$.fn.updateDate = function updateDate(){
 				var now = TimeModule.now();
@@ -358,19 +368,21 @@ var $TemplateModule = (function(){
 			// 저장용 데이터
 			$.fn.getSaveData = function getSaveData(){
 				
-				var data = this.data();
+				var data = JSON.parse( JSON.stringify( this.data() ) );
 				delete data.employees;
+				return data;
 				
 			};
 		
-			return function( id, name, employeeCnt, use, enableDelete, createDate, updateDate ){
+			return function( id, name, employeeCnt, use, remove, enableRemove, createDate, updateDate ){
 		 
 				var $clone = $( template[ "group-item" ] );
 				$clone.data({
 					id: null,
 					name: null,
 					use: null,
-					enableDelete: null,
+					remove: null,
+					enableRemove: null,
 					createDate: null,					
 					updateDate: null
 				});
@@ -396,10 +408,16 @@ var $TemplateModule = (function(){
 				}
 				$clone.setUse( use );
 				
-				if( enableDelete == null ){
-					enableDelete = true;
+				// 삭제여부
+				if( remove == null ){
+					remove = false;
 				}
-				$clone.setEnableDelete( enableDelete );
+				$clone.setRemove( remove );
+				
+				if( enableRemove == null ){
+					enableRemove = true;
+				}
+				$clone.setEnableRemove( enableRemove );
 				
 				// 등록일
 				if( createDate == null ){
@@ -448,7 +466,7 @@ var $TemplateModule = (function(){
 var groups = <%- groups %>;
 for( var i=0; i<groups.length; ++i ){
 	var group = groups[ i ];
-	var $group = $TemplateModule.createGroup( group.id, group.name, group.employees.length, group.use, group.enableDelete, group.createDate, group.updateDate );
+	var $group = $TemplateModule.createGroup( group.id, group.name, group.employees.length, group.use, group.remove, group.enableRemove, group.createDate, group.updateDate );
 	$group.appendTo( $groupList );
 }
 
@@ -675,13 +693,15 @@ $delBtn.on("click", function(){
 	
 	var $selectedGroupItem = $groupList.find(".group-item.select");
 	var groupName = $selectedGroupItem.getName();
-	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n정산 이력이 있다면 삭제되지않고, '사용안함'으로 변경됩니다.\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
+	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n해당 직원들의 소속이'기타'로 변경됩니다." ) ){
 		
 		// 삭제모션
 		$selectedGroupItem.animate( { "width": "0px" }, 500, function(){
 			
 			// 삭제
-			$selectedGroupItem.remove();
+			$selectedGroupItem.setRemove( true );
+			$selectedGroupItem.updateDate();
+			$selectedGroupItem.removeClass( "select" );
 			
 			// 수량 표시 갱신
 			$groupCntSpan.update();

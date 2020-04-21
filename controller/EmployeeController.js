@@ -17,8 +17,24 @@ module.exports = [
 						global.dataDir + "/group.json",
 						"utf8",
 						function( err, groups ){ 
+							
+							groups = JSON.parse( groups );
+							groups = groups.filter(function( group ){
+								
+								if( group.use == false ){
+									return false;
+								}
+								
+								if( group.remove == true ){
+									return false;
+								}
+								
+								return true;
+								
+							});
+							
 							res.render( "WEB-INF/employee/management.ejs", {
-								groups: groups,
+								groups: JSON.stringify( groups ),
 								employees: employees
 							} );
 						}
