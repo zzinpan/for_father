@@ -23,6 +23,56 @@ iframe { position: absolute; top: 40px; width: 100%; height: calc( 100% - 80px )
 iframe.hide { top: 0px; opacity: 0; }
 footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; background-color: #ECEFF1; color: #616161; text-align: center; font-size: 10px; padding: 13px; }
 </style>
+<script type="text/javascript">
+if (typeof Object.assign != 'function') {
+  // Must be writable: true, enumerable: false, configurable: true
+  Object.defineProperty(Object, "assign", {
+    value: function assign(target, varArgs) { // .length of function is 2
+      'use strict';
+      if (target == null) { // TypeError if undefined or null
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var to = Object(target);
+
+      for (var index = 1; index < arguments.length; index++) {
+        var nextSource = arguments[index];
+
+        if (nextSource != null) { // Skip over if undefined or null
+          for (var nextKey in nextSource) {
+            // Avoid bugs when hasOwnProperty is shadowed
+            if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
+              to[nextKey] = nextSource[nextKey];
+            }
+          }
+        }
+      }
+      return to;
+    },
+    writable: true,
+    configurable: true
+  });
+}
+
+//https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+if (!String.prototype.padStart) {
+ String.prototype.padStart = function padStart(targetLength,padString) {
+     targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+     padString = String((typeof padString !== 'undefined' ? padString : ' '));
+     if (this.length > targetLength) {
+         return String(this);
+     }
+     else {
+         targetLength = targetLength-this.length;
+         if (targetLength > padString.length) {
+             padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+         }
+         return padString.slice(0,targetLength) + String(this);
+     }
+ };
+}
+</script>
 <script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
 <script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
 <script src="https://unpkg.com/@popperjs/core@2"></script>
@@ -65,10 +115,10 @@ footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; 
 			</div>
 		</div>
 	</div>
-	<div class="header_btn header_record_btn select" data-target-src="/record/management/view">
+	<div class="header_btn header_record_btn select record-btn" data-target-src="/record/management/view">
 		<div>정산</div>
 		<div class="sub_header">
-			<div class="sub_header_btn select" data-target-src="/record/management/view">
+			<div id="record-btn" class="sub_header_btn select record-btn" data-target-src="/record/management/view">
 				<div id='dot' class='dot'></div>
 				<div>입/출고 기록</div>
 			</div>
@@ -76,7 +126,7 @@ footer { position: fixed; bottom: 0px; width: 100%; border-top: #ccc solid 1px; 
 	</div>
 	<div class="header_btn" data-target-src="/stats/main">통계</div>
 </header>
-<iframe id="sub_view" class="hide" src="/record/management/view"></iframe>
+<iframe id="sub_view" class="hide" src=""></iframe>
 <footer>
 	신나라유통
 </footer>
@@ -105,6 +155,9 @@ var $subView = $("#sub_view");
 
 var $header = $("header");
 var $footer = $("footer");
+
+// 입/출고 기록 버튼
+var $recordBtns = $(".record-btn");
 
 /**
  * 이벤트
@@ -188,6 +241,15 @@ $subView.on( "load", function(){
 	
 } );
 
+// 오늘날짜추가
+var now = new Date();
+var yyyy = now.getFullYear().toString();
+var MM = ( now.getMonth() + 1 ).toString().padStart( 2, 0 );
+var dd = now.getDate().toString().padStart( 2, 0 );
+var src = "/record/management/view?date=" + yyyy + "-" + MM + "-" + dd;
+$recordBtns.attr("data-target-src", src);
+// 임시
+$subView.attr("src", src);
 
 
 window.hideNav = function( duration, callback ){

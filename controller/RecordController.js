@@ -4,6 +4,42 @@ module.exports = (function (){
 	
 	return [
 		
+//		/**
+//		 * 품목관리 화면
+//		 */
+//		{
+//			url: "/record/management/view",
+//			type: "get",
+//			method: function( req, res, next ){
+//				
+//				fs.readFile(
+//					global.dataDir + "/product.json",
+//					"utf8",
+//					function( err, products ){ 
+//						
+//						products = JSON.parse( products );
+//						products.sort(function( a, b ){
+//							
+//							if( a.order < b.order ){
+//								return -1;
+//							}
+//							if( a.order > b.order ){
+//								return 1;
+//							}
+//							
+//							return 0;
+//							
+//						});
+//						
+//						res.render( "WEB-INF/record/management.ejs", {
+//							products: JSON.stringify( products )
+//						} );
+//					}
+//				);
+//					
+//			}
+//		},
+		
 		/**
 		 * 품목관리 화면
 		 */
@@ -12,43 +48,7 @@ module.exports = (function (){
 			type: "get",
 			method: function( req, res, next ){
 				
-				fs.readFile(
-					global.dataDir + "/product.json",
-					"utf8",
-					function( err, products ){ 
-						
-						products = JSON.parse( products );
-						products.sort(function( a, b ){
-							
-							if( a.order < b.order ){
-								return -1;
-							}
-							if( a.order > b.order ){
-								return 1;
-							}
-							
-							return 0;
-							
-						});
-						
-						res.render( "WEB-INF/record/management.ejs", {
-							products: JSON.stringify( products )
-						} );
-					}
-				);
-					
-			}
-		},
-		
-		/**
-		 * 품목관리 화면
-		 */
-		{
-			url: "/record/management/get",
-			type: "get",
-			method: function( req, res, next ){
-				
-				var requestDate = req.body.date;
+				var requestDate = req.query.date;
 				var yyyyMMddArr = requestDate.split("-");
 				var requestFileName = requestDate + ".json";
 				
@@ -70,7 +70,7 @@ module.exports = (function (){
 				fileNames.sort();
 				
 				// 기본 데이터 구조
-				var responseData = {
+				var records = {
 						
 						// 전일재고
 						beforeTotalSummary: {},
@@ -93,19 +93,37 @@ module.exports = (function (){
 						
 				};
 				
-				// 최신부터 오래된 날자로 순회
+				// 최신부터 오래된 날짜로 순회
 				for( var i=fileNames.length-1; i>-1; --i ){
 					var fileName = fileNames[ i ];
+					
+					// 해당 날짜의 데이터가 존재하면, 바로 전달
 					if( fileName == requestFileName ){
-						responseData = fs.readFileSync( global.dataDir + "/records/" + yyyyMMddArr[0] + "/" + yyyyMMddArr[1] + "/" + requestFileName );
+						records = fs.readFileSync( global.dataDir + "/records/" + yyyyMMddArr[0] + "/" + yyyyMMddArr[1] + "/" + requestFileName );
 						break;
 					}
+					
+					// 해당 날짜의 데이터가 존재하지않다면, 기본 데이터 구조를 갱신하여 전달
 					if( fileName < requestFileName ){
 						var fileNameArr = fileName.split("-");
 						var beforeData = fs.readFileSync( global.dataDir + "/records/" + fileNameArr[0] + "/" + fileNameArr[1] + "/" + fileName );
 						beforeData = JSON.parse( beforeData );
 						
-						// 데이터만들어줘야댐..
+						// 전 데이터를 전일재고로 입력
+						records.beforeTotalSummary = beforeData.todayTotalSummary;
+						
+						// 전일재고를 당일재고로 입력
+						records.todayTotalSummary = records.beforeTotalSummary;
+						
+						
+						for( var columnId in records.beforeTotalSummary ){
+							
+							// 당일 입고 합계 0으로 입력
+							todayInputSummary[ columnId ] = 0;
+							
+							// 당일 출고 합계 0으로 입력
+							todayInputSummary[ columnId ] = 0;
+						}
 						
 						break;
 					}
@@ -132,8 +150,10 @@ module.exports = (function (){
 								
 							});
 							
+							console.log( JSON.stringify( records ) );
 							res.render( "WEB-INF/record/management.ejs", {
-								products: JSON.stringify( products )
+								products: JSON.stringify( products ),
+								records: JSON.stringify( records )
 							} );
 						}
 				);

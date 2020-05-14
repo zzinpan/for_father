@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=UTF-8">
+<title>신나라유통 ERP > calculation > management</title>
+<link rel="stylesheet" href="/lib/jquery-ui-1.12.1/jquery-ui.min.css">
+<link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="/lib/bootstrap/bootstrap-datepicker.min.css">
+<style type="text/css">
+body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; color: #616161; }
+.smc-btn { float: right; display: inline-block; padding: 4px 10px; vertical-align: bottom; font-weight: bold; font-size: 10px; box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; cursor: pointer; margin-left: 4px; }
+.smc-btn:not(.disable):hover { box-shadow: 0px 0px 1px 1px #aaa; !important; }
+.smc-btn.select { box-shadow: 0px 0px 1px 1px #2196F3 !important; }
+.smc-btn.blue { background-color: #2196F3; color: white; box-shadow: 0px 0px 0px 1px #2196F3; }
+.smc-btn.bluegray { background-color: #607D8B; color: white; box-shadow: 0px 0px 0px 1px #90A4AE; }
+.smc-btn.disable { background-color: #eee; color: #aaa; cursor: not-allowed; }
+.smc-header { font-size: 20px; padding: 10px; color: #222; font-weight: bold; margin-bottom: 20px; }
+.smc-desc { background-color: #eee; color: #616161; padding: 10px; font-size: 12px; }
+.smc-inp { border: none; border-bottom: #ccc solid 1px; padding: 4px 10px; font-size: 10px; width: 100%; }
+.smc-inp::placeholder { color: #cccccc; }
+.smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
+.smc-count { font-size: 10px; height: 28px; }
+.smc-grid { position: relative; box-shadow: 0px 0px 0px 1px #ccc; height: calc( 100% - 67px ); border-radius: 4px; }
+.small-title { font-weight: bold; margin-bottom: 40px; }
+.smc-select { width: 100px; border: #ccc solid 1px; padding-left: 4px; border-radius: 4px; font-size: 12px; }
+
+.popup-row { float: left; width: 100%; }
+.mt6 { margin-top: 6px; }
+.mt10 { margin-top: 10px; }
+.mt20 { margin-top: 20px; }
+
+/* 품목 컬럼 */
+.product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: left; margin-bottom: 40px; width: 100%; height: 60px; }
+	.product-group-column { position: relative; display: inline-block; font-size: 12px; border-right: #ccc solid 1px; height: 100%; vertical-align: top; }
+		.product-group-name { position: relative; height: 30px; background-color: red; }
+		.product-column { position: relative; height: calc( 100% - 30px ); background-color: orange; }
+		.product-column.no-parent { position: relative; height: 100%; background-color: orange; }
+			.product-name { height: 30px; }
+			.no-parent > .product-name { height: 60px; }
+			.before-total-summary { text-align: right; height: 30px; }
+			.today-inputs { text-align: right; height: 90px; border-bottom: #ccc solid 1px; overflow: hidden; }
+			.today-input-summary { text-align: right; height: 30px; }
+			.today-outputs { position: relative; text-align: right; height: calc( 100% - 240px ); overflow: hidden; }
+			.no-parent > .today-outputs { position: relative; text-align: right; height: calc( 100% - 270px ); overflow: hidden; }
+			.today-output-summary { text-align: right; height: 30px; }
+			.today-total-summary { text-align: right; height: 30px; }
+
+/* 공용 */
+.record { height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px; }
+		
+/* 라이브러리 커스텀 */		
+.ui-autocomplete.ui-widget {
+	font-size: 10px;
+}
+</style>
+<script type="text/javascript" src="/lib/jquery/jquery-3.2.1.min.js"></script>
+<script type="text/javascript" src="/lib/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+<script src="/lib/bootstrap/bootstrap.min.js"></script>
+<script src="/lib/bootstrap/bootstrap-datepicker.min.js"></script>
+<script src="/lib/bootstrap/bootstrap-datepicker.ko.min.js"></script>
+<script type="text/javascript">
+/**
+ 	Polyfill
+ **/
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength,padString) {
+        targetLength = targetLength>>0; //truncate if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0,targetLength) + String(this);
+        }
+    };
+}
+</script>
+</head>
+<body>
+<div class="container" style="position: relative; height: 100%;">
+	<div class="row" style="position: relative; margin-top: 50px; height: calc( 100% - 50px );">
+		<div class="ccol-md-12" style="position: relative; height: 100%;">
+			<div class="smc-header">
+				입/출고 기록
+			</div>
+			
+			
+			<div class="col-md-12" style="position: relative; height: calc( 100% - 68px );">
+				
+				
+				<div class="col-md-12" style="height: 32px;">
+					<div class="col-md-4">
+						<div class="smc-count" style="padding-top: 8px;">입고 <span id="product-cnt-span">0</span>건 / 출고 0건</div>
+					</div>
+					<div class="col-md-4">
+						<div style="margin-top: -10px;">
+							<input id="calendar-inp" class="smc-inp" type="text" value="2020-04-07" style="cursor: pointer; text-align: center; border: none; font-size: 20px; font-weight: bold; margin-top: -16px" readonly="readonly">
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div id="save-btn" class="smc-btn blue">저장</div>
+						<div id="del-product-group-btn" class="smc-btn disable">삭제</div>
+						<div id="add-product-group-btn" class="smc-btn">출고 추가</div>
+						<div id="add-product-group-btn" class="smc-btn">입고 추가</div>
+					</div>
+				</div>
+				<div class="col-md-12" style="position: relative; height: calc( 100% - 32px );">
+					<div class="product-column-list" style="position: relative; height: calc( 100% - 50px );">
+					
+						<div style="position: absolute; z-index: -1; top: 0px; height: 60px; border-bottom: #ccc solid 1px; width: 100%; background-color: #f8f8f8;"></div>
+						<div style="position: absolute; z-index: -1; top: 60px; height: 30px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; top: 90px; height: 90px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; top: 180px; height: 30px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; bottom: 31px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; bottom: 1px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
+						
+						
+						<div class="" style="font-size: 12px; text-align: center; background-color: #F1F1F1; position: relative; float: left; width: 60px; height: 100%;">
+							<div class="" style="padding: 21px 10px 22px 10px; height: 60px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px;">구분</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 30px;">전일재고</div>
+							<div class="" style="padding: 38px 0px 45px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 90px;">당일입고</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 30px;">입고계</div>
+							<div class="" style="position: relative; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: calc( 100% - 270px );">
+								<div style="position: relative; top: calc( 50% - 7px );">당일출고</div>
+							</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px; height: 30px;">출고계</div>
+							<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; height: 30px;">당일재고</div>
+						</div>
+					
+						<!-- 데이터 목록 -->
+						<div id="product-column-list" style="position: relative; width: calc( 100% - 138px ); display: inline-block; height: 100%;">
+							<!-- 제품 컬럼 --> 
+							<div class="product-group-column">
+								<!-- 구분 --> 
+								<div class="product-column no-parent">
+									<div class="product-name">품목명</div>
+									<!-- 전일 재고 --> 
+									<div class="before-total-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 입고 --> 
+									<div class="today-inputs">
+									</div> 
+									<!-- 입고계 --> 
+									<div class="today-input-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 출고 --> 
+									<div class="today-outputs"> 
+									</div>
+									<!-- 출고계 --> 
+									<div class="today-output-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 재고 --> 
+									<div class="today-total-summary"> 
+										<div class="record">0</div> 
+									</div> 
+								</div>
+							</div>
+							<!-- 제품 컬럼 --> 
+							<div class="product-group-column">
+								<!-- 구분 --> 
+								<div class="product-group-name">품목그룹명</div>
+								<div class="product-column">
+									<div class="product-name">품목명</div>
+									<!-- 전일 재고 --> 
+									<div class="before-total-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 입고 --> 
+									<div class="today-inputs">
+									</div> 
+									<!-- 입고계 --> 
+									<div class="today-input-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 출고 --> 
+									<div class="today-outputs"> 
+									</div>
+									<!-- 출고계 --> 
+									<div class="today-output-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 재고 --> 
+									<div class="today-total-summary"> 
+										<div class="record">0</div> 
+									</div> 
+								</div>
+							</div>
+						</div>
+					
+						<div class="" style="position: relative; float: right; width: 18px; height: 100%; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
+							<div class="" style="height: 60px;"></div>
+							<div class="" style="height: 30px; border-bottom: #ccc solid 1px;"></div>
+							<div class="" style="height: 90px; overflow: hidden scroll; border-bottom: #ccc solid 1px;">
+								<div id="in-record-scroll" style="height: 0px;"></div>
+							</div>
+							<div class="" style="height: 30px; border-bottom: #ccc solid 1px;"></div>
+							<div class="" style="position: relative; height: calc( 100% - 270px ); overflow: hidden scroll; border-bottom: #ccc solid 1px;">
+								<div id="out-record-scroll" style="height: 0px;"></div>
+							</div>
+						</div>
+						<div class="" style="float: right; width: 60px; height: 60px; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
+							<div class="" style="height: 60px; padding: 21px 10px 22px 10px; border-bottom: #ccc solid 1px;">직원</div>
+						</div>
+					
+					</div>
+				</div>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+</div>
+
+<script type="text/javascript">
+
+$("#calendar-inp").datepicker({
+	language: "ko",
+	todayHighlight : true 
+}).on('changeDate', function(ev){
+	$calInps.datepicker('hide');
+});
+
+/**
+	jquery 변수
+**/
+
+var $window = $(window); // 윈도우
+var $body = $("body"); // 바디
+
+var TemplateModule = (function(){
+	
+	var record = '<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>';
+	
+	var ItemColumn = [
+		'<!-- 제품 컬럼 -->',
+		'<div style="position: relative; display: inline-block; font-size: 12px; border-right: #ccc solid 1px; height: 100%;">',
+		'	<!-- 구분 -->',
+		'	<div style="height: 60px; padding: 21px 10px 22px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center;">항목명</div>',
+		'	<!-- 전일 재고 -->',
+		'	<div style="text-align: right; height: 30px;">',
+		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
+		'	</div>',
+		'	<!-- 당일 입고 -->',
+		'	<div style="text-align: right; height: 90px; border-bottom: #ccc solid 1px; overflow: hidden;">',
+		'	</div>',
+		'	<!-- 입고계 -->',
+		'	<div style="text-align: right; height: 30px;">',
+		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
+		'	</div>',
+		'	<!-- 당일 출고 -->',
+		'	<div style="position: relative; text-align: right; height: calc( 100% - 270px ); overflow: hidden;">',
+		'	</div>',
+		'	<!-- 출고계 -->',
+		'	<div style="text-align: right; height: 30px;">',
+		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
+		'	</div>',
+		'	<!-- 당일 재고 -->',
+		'	<div style="text-align: right; height: 30px;">',
+		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
+		'	</div>',
+		'</div>'
+	];
+	
+})();
+
+
+/**
+ * 데이터 표시
+ */
+ var products = <%- products %>;
+ var records = <%- records %>;
+ products.forEach(function( product ){
+	 
+	 
+	 
+ });
+
+function updateBodyHeight(){
+	$body.css("height", window.innerHeight + "px");
+}
+updateBodyHeight();
+
+// 윈도우 크기 변경 이벤트
+$window.on("resize", function(){
+	updateBodyHeight();
+});
+
+</script>
+</body>
+</html>
