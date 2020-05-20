@@ -31,12 +31,13 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 
 /* 품목 컬럼 */
 .product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: left; margin-bottom: 40px; width: 100%; height: 60px; }
-	.product-group-column { position: relative; display: inline-block; font-size: 12px; border-right: #ccc solid 1px; height: 100%; vertical-align: top; }
-		.product-group-name { position: relative; height: 30px; background-color: red; }
-		.product-column { position: relative; height: calc( 100% - 30px ); background-color: orange; }
-		.product-column.no-parent { position: relative; height: 100%; background-color: orange; }
-			.product-name { height: 30px; }
-			.no-parent > .product-name { height: 60px; }
+	.product-group-column { position: relative; display: inline-block; font-size: 0px; border-right: #ccc solid 1px; height: 100%; vertical-align: top; }
+		.product-group-name { position: relative; height: 30px; font-size: 12px; padding: 7px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center; }
+		.product-column { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: #ccc solid 1px; }
+		.product-column:last-child { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: none; }
+		.product-column.no-parent { position: relative; height: 100%; border-right: none; }
+			.product-name { height: 30px; padding: 6px 10px; font-size: 12px; background-color: #F1F1F1; border-bottom: #ccc solid 1px; }
+			.no-parent > .product-name { height: 60px; padding: 20px 10px; font-size: 12px; }
 			.before-total-summary { text-align: right; height: 30px; }
 			.today-inputs { text-align: right; height: 90px; border-bottom: #ccc solid 1px; overflow: hidden; }
 			.today-input-summary { text-align: right; height: 30px; }
@@ -44,9 +45,10 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 			.no-parent > .today-outputs { position: relative; text-align: right; height: calc( 100% - 270px ); overflow: hidden; }
 			.today-output-summary { text-align: right; height: 30px; }
 			.today-total-summary { text-align: right; height: 30px; }
+				.today-total-summary > .record { border-bottom: none; }
 
 /* 공용 */
-.record { height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px; }
+.record { height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px; font-size: 12px; }
 		
 /* 라이브러리 커스텀 */		
 .ui-autocomplete.ui-widget {
@@ -112,11 +114,11 @@ if (!String.prototype.padStart) {
 					<div class="product-column-list" style="position: relative; height: calc( 100% - 50px );">
 					
 						<div style="position: absolute; z-index: -1; top: 0px; height: 60px; border-bottom: #ccc solid 1px; width: 100%; background-color: #f8f8f8;"></div>
-						<div style="position: absolute; z-index: -1; top: 60px; height: 30px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; top: 60px; height: 30px; border-bottom: #ccc solid 1px; width: 100%; background-color: #fbfbfb;"></div>
 						<div style="position: absolute; z-index: -1; top: 90px; height: 90px; border-bottom: #ccc solid 1px; width: 100%;"></div>
-						<div style="position: absolute; z-index: -1; top: 180px; height: 30px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; top: 180px; height: 30px; border-bottom: #ccc solid 1px; width: 100%; background-color: #fbfbfb;"></div>
 						<div style="position: absolute; z-index: -1; bottom: 31px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
-						<div style="position: absolute; z-index: -1; bottom: 1px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
+						<div style="position: absolute; z-index: -1; bottom: 1px; height: 30px; border-top: #ccc solid 1px; width: 100%;  background-color: #f9f9f9;"></div>
 						
 						
 						<div class="" style="font-size: 12px; text-align: center; background-color: #F1F1F1; position: relative; float: left; width: 60px; height: 100%;">
@@ -191,6 +193,31 @@ if (!String.prototype.padStart) {
 										<div class="record">0</div> 
 									</div> 
 								</div>
+								<div class="product-column">
+									<div class="product-name">품목명</div>
+									<!-- 전일 재고 --> 
+									<div class="before-total-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 입고 --> 
+									<div class="today-inputs">
+									</div> 
+									<!-- 입고계 --> 
+									<div class="today-input-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 출고 --> 
+									<div class="today-outputs"> 
+									</div>
+									<!-- 출고계 --> 
+									<div class="today-output-summary"> 
+										<div class="record">0</div> 
+									</div> 
+									<!-- 당일 재고 --> 
+									<div class="today-total-summary"> 
+										<div class="record">0</div> 
+									</div> 
+								</div>
 							</div>
 						</div>
 					
@@ -237,37 +264,47 @@ var $body = $("body"); // 바디
 
 var TemplateModule = (function(){
 	
-	var record = '<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>';
+	var record = '<div class="record">0</div>';
 	
 	var ItemColumn = [
-		'<!-- 제품 컬럼 -->',
-		'<div style="position: relative; display: inline-block; font-size: 12px; border-right: #ccc solid 1px; height: 100%;">',
-		'	<!-- 구분 -->',
-		'	<div style="height: 60px; padding: 21px 10px 22px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center;">항목명</div>',
-		'	<!-- 전일 재고 -->',
-		'	<div style="text-align: right; height: 30px;">',
-		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
-		'	</div>',
-		'	<!-- 당일 입고 -->',
-		'	<div style="text-align: right; height: 90px; border-bottom: #ccc solid 1px; overflow: hidden;">',
-		'	</div>',
-		'	<!-- 입고계 -->',
-		'	<div style="text-align: right; height: 30px;">',
-		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
-		'	</div>',
-		'	<!-- 당일 출고 -->',
-		'	<div style="position: relative; text-align: right; height: calc( 100% - 270px ); overflow: hidden;">',
-		'	</div>',
-		'	<!-- 출고계 -->',
-		'	<div style="text-align: right; height: 30px;">',
-		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
-		'	</div>',
-		'	<!-- 당일 재고 -->',
-		'	<div style="text-align: right; height: 30px;">',
-		'		<div style="height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px;">0</div>',
+		'<!-- 제품 컬럼 --> ',
+		'<div class="product-group-column">',
+		'	<!-- 구분 --> ',
+		'	<div class="product-column no-parent">',
+		'		<div class="product-name">품목명</div>',
+		'		<!-- 전일 재고 --> ',
+		'		<div class="before-total-summary"> ',
+		'			<div class="record">0</div> ',
+		'		</div> ',
+		'		<!-- 당일 입고 --> ',
+		'		<div class="today-inputs">',
+		'		</div> ',
+		'		<!-- 입고계 --> ',
+		'		<div class="today-input-summary"> ',
+		'			<div class="record">0</div> ',
+		'		</div> ',
+		'		<!-- 당일 출고 --> ',
+		'		<div class="today-outputs"> ',
+		'		</div>',
+		'		<!-- 출고계 --> ',
+		'		<div class="today-output-summary"> ',
+		'			<div class="record">0</div> ',
+		'		</div> ',
+		'		<!-- 당일 재고 --> ',
+		'		<div class="today-total-summary"> ',
+		'			<div class="record">0</div> ',
+		'		</div> ',
 		'	</div>',
 		'</div>'
-	];
+	].join("");
+	
+	return {
+		
+		addGroupColumn: function( id, name,  ){
+			
+		}
+		
+	};
 	
 })();
 
@@ -279,7 +316,24 @@ var TemplateModule = (function(){
  var records = <%- records %>;
  products.forEach(function( product ){
 	 
+	 if( product.parentId != "TOP" ){
+		 return;
+	 }
 	 
+	 /**
+	 
+	 	자식 기준으로 record를 저장한다?
+	 			-> 부모 삭제 시, 자식이 부모가 되며 데이터 사용 가능 but 신규 자식을 생성할 경우, 어떻게해야됨?
+		
+		컬럼 자체를 date record마다 저장한다? ok ( 품목그룹삭제시, remove = true 주고, 자식도 remove = true )
+				-> A: A-1: 10, A-2:20  A-1삭제
+	 
+	 **/
+	 
+// 	 if( product.use ==  )
+	 
+	
+	alert("품목관리 정렬로직 다시 진행중 UI 따로, 데이터 따로, 데이터는 안지우므로, order = data.length ui는 갱신 필요 ( 컬럼쪽도 잘뵈)")
 	 
  });
 
