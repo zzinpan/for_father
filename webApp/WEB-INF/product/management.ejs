@@ -32,7 +32,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .product-group-list { position: relative; text-align: center; background-color: ; height: calc( 100% - 37px ); overflow: auto; padding: 0px; }
 	.product-group-header { background-color: #4FC3F7; color: white; font-weight: bold; height: 37px; text-align: center; }
 	.product-group-item { position: relative; cursor: pointer; width: 100%; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none; z-index: 0; }
-	.product-group-list .product-group-item:nth-child(2n) { background-color: #f8f8f8; }
+	.product-group-list .product-group-item.odd { background-color: #f8f8f8; }
 	.product-group-list .product-group-item:last-child { border-bottom: #eee solid 2px; }
 	.product-group-item:hover { box-shadow: 0px 0px 0px 1px #aaa !important; z-index: 1; }
 	.product-group-item.select { box-shadow: 0px 0px 0px 1px #2196F3 !important; z-index: 2; }
@@ -442,39 +442,41 @@ var $productCntSpan = (function(){
 	
 })();
 
-function updateProductGroupItemsOrder(){
+function updateProductGroupItemsUIOrder(){
 	
-	var $options = $productImportGroupSel.find("option");
-	var $items = $productGroupList.find(".product-group-item");
-	for( var i=0; i<$items.length; ++i ){
-		var $item = $items.eq( i );
-		$item.updateProductOrder();
-		var order = $item.getOrder();
-		var id = $item.getId();
-		var $option = $options.filter( "[value='"+id+"']" );
-		$option.data( "order", order );
+	var $groups = $productGroupList.find(".product-group-item").filter(":visible");
+	$groups.removeClass( "odd" );
+	for( var i=0; i<$groups.length; ++i ){
+		var $group = $groups.eq( i );
+		$group.find(".product-group-order").text( i+1 );
+		$group.setOrder( i );
+
+		if( i % 2 != 0 ){
+			$group.addClass( "odd" );
+		}
+		
+		var $column = $group.data( "$column" );
+		$column.appendTo( $productColumnList );
+		
 	}
-	
-	// 품목그룹 선택창 순서 변경
-	var arr = [];
-	for( var i=1; i<$options.length; ++i ){
-		var $option = $options.eq( i ).detach();
-		var order = $option.data("order");
-		arr[ order ] = $option;
-	}
-	
-	arr.forEach(function( $option ){
-		$option.appendTo( $productImportGroupSel );
-	});
 	
 }
 
-function updateProductItemsOrder(){
+function updateProductItemsUIOrder(){
 	
-	var $items = $productList.find(".product-group-item");
-	for( var i=0; i<$items.length; ++i ){
-		var $item = $items.eq( i );
-		$item.updateProductOrder();
+	var $products = $productList.find(".product-group-item").filter(":visible");
+	$products.removeClass( "odd" );
+	for( var i=0; i<$products.length; ++i ){
+		var $product = $products.eq( i );
+		$product.find(".product-group-order").text( i+1 );
+		$product.setOrder( i );
+		
+		if( i % 2 != 0 ){
+			$product.addClass( "odd" );
+		}
+		
+		var $column = $product.data( "$column" );
+		$column.appendTo( $column.parent() );
 	}
 	
 }
@@ -556,27 +558,8 @@ var $TemplateModule = (function(){
 		// jQuery 신규 제품그룹 객체 생성
 		createProduct: (function(){
 		
-			// 현재 UI 순서로 갱신
-			$.fn.updateProductOrder = function updateProductOrder(){
-				
-				var $productGroupItems = this.parent().find(".product-group-item");
-				var gridIndex = $productGroupItems.index( this );
-				this.data( "order", gridIndex );
-				
-				var $column = this.data( "$column" );
-				var use = this.data( use );
-				if( use ){
-					var $usedProductGroupItems = $productGroupItems.not(".unuse");
-					var columnIndex = $usedProductGroupItems.index( this );
-					this.find(".product-group-order").text( columnIndex + 1 );
-					var $columns = $column.parent().children();
-					$column.insertAfter( $columns.eq( columnIndex ) );
-				}else{
-					this.find(".product-group-order").text( "-" );
-					$column.detach();
-				}
-				
-				
+			$.fn.setOrder = function setOrder( order ){
+				this.data( "order", order );
 			};
 			
 			$.fn.getOrder = function getOrder(){
@@ -666,7 +649,7 @@ var $TemplateModule = (function(){
 			
 			};
 		
-			return function( parentId, id, name, use, enableDelete, createDate, updateDate ){
+			return function( parentId, id, name, order, use, remove, enableDelete, createDate, updateDate ){
 		 
 				var $clone = $( template[ "product-group-item" ] );
 				
@@ -679,12 +662,15 @@ var $TemplateModule = (function(){
 					$columnParent.addClass( "has-children" );
 				}
 				var $column = $( template[ columnTemplateName ] );
-				$column.appendTo( $columnParent );
+				if( remove == false ){
+					$column.appendTo( $columnParent );
+				}
 				$clone.data({
 					parentId: null,
 					id: null,
 					name: null,
 					use: null,
+					remove: null,
 					enableDelete: null,
 					createDate: null,					
 					updateDate: null,
@@ -708,6 +694,18 @@ var $TemplateModule = (function(){
 					use = true;
 				}
 				$clone.setUse( use );
+				
+				// 정렬순서
+				if( order == null ){
+					order = 0;
+				}
+				$clone.setOrder( order );
+				
+				// 삭제여부
+				if( remove == null ){
+					remove = false;
+				}
+				$clone.setRemove( remove );
 				
 				if( enableDelete == null ){
 					enableDelete = true;
@@ -783,53 +781,49 @@ var ProductModule = {
 		},
 		remove: function( $item ){
 			
-			var id = $item.getId(); 
-			var parentId = $item.getParentId();
-			var $childrens = ProductModule.parentChildrenMap[ parentId ];
-			for( var i=0; i<$childrens.length; ++i ){
-				var $children = $childrens[ i ];
-				if( $children.getId() == id  ){
-					$childrens.splice( i, 1 );
-					break;
-				}
-			}
+// 			var id = $item.getId(); 
+// 			var parentId = $item.getParentId();
+// 			var $childrens = ProductModule.parentChildrenMap[ parentId ];
+// 			for( var i=0; i<$childrens.length; ++i ){
+// 				var $children = $childrens[ i ];
+// 				if( $children.getId() == id  ){
+// 					$childrens.splice( i, 1 );
+// 					break;
+// 				}
+// 			}
 			
-			var $myChildrens = ProductModule.parentChildrenMap[ id ];
-			if( $myChildrens != null ){
-				delete ProductModule.parentChildrenMap[ id ];
-			}
+// 			var $myChildrens = ProductModule.parentChildrenMap[ id ];
+// 			if( $myChildrens != null ){
+// 				delete ProductModule.parentChildrenMap[ id ];
+// 			}
 			
-			delete ProductModule.map[ id ];
+// 			delete ProductModule.map[ id ];
 			
 		}
 		
 };
 var products = <%- products %>;
 products.sort(function( a, b ){
-	
-	if( a.order < b.order ){
-		return -1;
-	}
-	
-	if( a.order > b.order ){
-		return 1;
-	}
-	
-	return 0;
-	
+	return a.order < b.order;
 });
+
 // 품목그룹 먼저 추가
 for( var i=0; i<products.length; ++i ){
 	var product = products[ i ];
 	if( product.parentId != "TOP" ){
 		continue;
 	}
-	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
+	
+	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.order, product.use, product.remove, product.enableDelete, product.createDate, product.updateDate );
 	$productGroup.appendTo( $productGroupList );
 	ProductModule.add( $productGroup );
 	
-	var $option = $TemplateModule.createOption( product.id, product.name );
-	$option.appendTo( $productImportGroupSel );
+	if( product.remove == true ){
+		$productGroup.hide();
+	}else{
+		var $option = $TemplateModule.createOption( product.id, product.name );
+		$option.appendTo( $productImportGroupSel );
+	}
 	
 }
 // 품목 추가
@@ -838,11 +832,16 @@ for( var i=0; i<products.length; ++i ){
 	if( product.parentId == "TOP" ){
 		continue;
 	}
-	var $productGroup = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.use, product.enableDelete, product.createDate, product.updateDate );
-	ProductModule.add( $productGroup );
+	
+	var $product = $TemplateModule.createProduct( product.parentId, product.id, product.name, product.order, product.use, product.remove, product.enableDelete, product.createDate, product.updateDate );
+	ProductModule.add( $product );
+	
+	if( product.remove == true ){
+		$product.hide();
+	}
 	
 }
-updateProductGroupItemsOrder();
+updateProductGroupItemsUIOrder();
 
 //수량 표시 갱신
 $productGroupCntSpan.update();
@@ -868,6 +867,11 @@ $addProductGroupBtn.on("click", function(){
 
 // 품목 추가 버튼 클릭 이벤트
 $addProductBtn.on("click", function(){
+	
+	var isSelectedProductGroup = 0 < $productGroupList.find(".product-group-item.select").length;
+	if( isSelectedProductGroup == false ){
+		return;
+	}
 	
 	// 팝업명 제거
 	$addProductNameInp.val("");
@@ -917,7 +921,7 @@ $addProductGroupCompleteBtn.on("click", function(){
 		}
 	}
 	
-	var $groupItem = $TemplateModule.createProduct( "TOP", null, newGroupName );
+	var $groupItem = $TemplateModule.createProduct( "TOP", null, newGroupName, $groupItems.length );
 	ProductModule.add( $groupItem );
 	
 	var $option = $TemplateModule.createOption( $groupItem.getId(), newGroupName );
@@ -932,7 +936,7 @@ $addProductGroupCompleteBtn.on("click", function(){
 		// 넓어지는 애니메이션으로 표시
 		$groupItem.css( { "height": "0px" } );
 		$groupItem.appendTo( $productGroupList );
-		updateProductGroupItemsOrder();
+		updateProductGroupItemsUIOrder();
 		
 		$groupItem.animate( { "height": "37px" }, 500 );
 		
@@ -963,7 +967,8 @@ $addProductCompleteBtn.on("click", function(){
 	
 	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
 	var parentId = $selectedGroupItem.getId();
-	var $groupItem = $TemplateModule.createProduct( parentId, null, newGroupName );
+	var order = ProductModule.parentChildrenMap[ parentId ].length;
+	var $groupItem = $TemplateModule.createProduct( parentId, null, newGroupName, order );
 	ProductModule.add( $groupItem );
 	
 	// 팝업 제거
@@ -975,7 +980,7 @@ $addProductCompleteBtn.on("click", function(){
 		// 넓어지는 애니메이션으로 표시
 		$groupItem.css( { "height": "0px" } );
 		$groupItem.appendTo( $productList );
-		updateProductItemsOrder();
+		updateProductItemsUIOrder();
 		
 		$groupItem.animate( { "height": "37px" }, 500 );
 		
@@ -1055,7 +1060,7 @@ $addProductNameInp.on("keypress", function( e ){
 			$productItem.appendTo( $productList );
 		});
 		$productCntSpan.update();
-		updateProductItemsOrder();
+		updateProductItemsUIOrder();
 		
 		$this.addClass("select");
 		$importProductBtn.removeClass( "disable" );
@@ -1108,7 +1113,7 @@ $addProductNameInp.on("keypress", function( e ){
 			$this.after( $select );
 		}
 		
-		updateProductGroupItemsOrder();
+		updateProductGroupItemsUIOrder();
 		
 	});
 	
@@ -1184,7 +1189,7 @@ $addProductNameInp.on("keypress", function( e ){
 			$this.after( $select );
 		}
 		
-		updateProductItemsOrder();
+		updateProductItemsUIOrder();
 		
 	});
 	
@@ -1209,39 +1214,12 @@ $delProductGroupBtn.on("click", function(){
 	
 	var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
 	var groupName = $selectedGroupItem.getName();
-	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n하위에 포함된 '품목'은 모두 '품목그룹'으로 변경됩니다." ) ){
+	if( confirm( "'" + groupName + "'을 삭제하시겠습니까?\n하위에 포함된 '품목'도 모두 삭제됩니다." ) ){
 		
 		var $childrens = ProductModule.parentChildrenMap[ $selectedGroupItem.getId() ];
-		var $parents = ProductModule.parentChildrenMap[ "TOP" ];
-		for( var i=0; i<$childrens.length; ++i ){
-			var $children = $childrens[ i ];
-			var childrenName = $children.getName();
-			for( var j=0; j<$parents.length; ++j ){
-				var $parent = $parents[ j ];
-				var parentName = $parent.getName();
-				if( childrenName == parentName ){
-					alert( "품목그룹에 이미 \"" + childrenName + "\"이(가) 있습니다." );
-					return;
-				}
-			}
-		}
 		
 		// 삭제모션
 		$selectedGroupItem.animate( { "height": "0px" }, 500, function(){
-			
-			// 하위 폼목을 품목그룹으로 변경
-			ProductModule.parentChildrenMap[ "TOP" ] = $parents.concat( $childrens );
-			$childrens.forEach(function( $children ){
-				// 그리드 변경
-				$children.appendTo( $productGroupList );
-				
-				// 신규 컬럼생성하여 추가
-				var $newColumn = $( $TemplateModule.template[ "product-column-parent" ] );
-				$newColumn.find(".product-column-name").text( $children.getName() );
-				$newColumn.appendTo( $productColumnList );
-				$children.data( "$column", $newColumn );
-				$children.setParentId( "TOP" );
-			});
 			
 			// 컬럼 삭제
 			var $column = $selectedGroupItem.data( "$column" );
@@ -1253,17 +1231,23 @@ $delProductGroupBtn.on("click", function(){
 			$selectedGroupItem.setRemove( true );  
 			$selectedGroupItem.updateDate();  
 			$selectedGroupItem.removeClass( "select" );
+			$childrens.forEach(function( $children ){
+				$children.setRemove( true );
+			});
 			
 			// 수량 표시 갱신
 			$productGroupCntSpan.update();
+			$productCntSpan.update();
 			
 			// 버튼 비활성화
+			$addProductBtn.addClass( "disable" );
 			$delProductGroupBtn.addClass( "disable" );
 			$productGroupModBtn.addClass( "disable" );
 			$exportProductBtn.addClass( "disable" );
+			$importProductBtn.addClass( "disable" );
 			$productModBtn.addClass( "disable" );
 			$delProductBtn.addClass( "disable" );
-			updateProductGroupItemsOrder();
+			updateProductGroupItemsUIOrder();
 			
 		} );
 		
@@ -1305,7 +1289,7 @@ $delProductBtn.on("click", function(){
 			$exportProductBtn.addClass( "disable" );
 			$productModBtn.addClass( "disable" );
 			$delProductBtn.addClass( "disable" );
-			updateProductItemsOrder();
+			updateProductItemsUIOrder();
 			
 			// 부모의 자식이 없는 경우, 컬럼 병합형태로 변경
 			var $selectedGroupItem = $productGroupList.find(".product-group-item.select");
@@ -1488,7 +1472,7 @@ $productGroupModCompleteBtn.on("click", function(){
 	$productGroupModPopupContent.css( { "margin-top": "0px" } );
 	$productGroupModPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
 		
-		updateProductGroupItemsOrder();
+		updateProductGroupItemsUIOrder();
 		
 	} );
 	
@@ -1535,7 +1519,7 @@ $productModCompleteBtn.on("click", function(){
 	$productModPopupContent.css( { "margin-top": "0px" } );
 	$productModPopupContent.animate( { "margin-top": "-40px" }, 500, function(){
 		
-		updateProductItemsOrder();
+		updateProductItemsUIOrder();
 		
 	} );
 	
@@ -1643,8 +1627,7 @@ $productImportCompleteBtn.on("click", function(){
 			$importParentItem.appendTo( $productList );
 			$productGroupCntSpan.update();
 			$productCntSpan.update();
-			$importParentItem.updateProductOrder();
-			updateProductGroupItemsOrder();
+			updateProductGroupItemsUIOrder();
 			$importParentItem.animate( { "height": "37px" }, 500 );
 			
 		} );
@@ -1711,8 +1694,7 @@ $exportProductBtn.on("click", function(){
 		$productGroupList.append( $selectedItem );
 		$productGroupCntSpan.update();
 		$productCntSpan.update();
-		$selectedItem.updateProductOrder();
-		updateProductItemsOrder();
+		updateProductItemsUIOrder();
 		$selectedItem.animate( { "height": "37px" }, 500 );
 		
 	} );

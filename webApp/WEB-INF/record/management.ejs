@@ -261,48 +261,50 @@ $("#calendar-inp").datepicker({
 
 var $window = $(window); // 윈도우
 var $body = $("body"); // 바디
+var $productColumnList = $("#product-column-list"); // 컬롬 목록
 
 var TemplateModule = (function(){
 	
 	var record = '<div class="record">0</div>';
 	
-	var ItemColumn = [
+	var ColumnGroup = [
 		'<!-- 제품 컬럼 --> ',
 		'<div class="product-group-column">',
 		'	<!-- 구분 --> ',
 		'	<div class="product-column no-parent">',
 		'		<div class="product-name">품목명</div>',
-		'		<!-- 전일 재고 --> ',
-		'		<div class="before-total-summary"> ',
-		'			<div class="record">0</div> ',
-		'		</div> ',
-		'		<!-- 당일 입고 --> ',
-		'		<div class="today-inputs">',
-		'		</div> ',
-		'		<!-- 입고계 --> ',
-		'		<div class="today-input-summary"> ',
-		'			<div class="record">0</div> ',
-		'		</div> ',
-		'		<!-- 당일 출고 --> ',
-		'		<div class="today-outputs"> ',
-		'		</div>',
-		'		<!-- 출고계 --> ',
-		'		<div class="today-output-summary"> ',
-		'			<div class="record">0</div> ',
-		'		</div> ',
-		'		<!-- 당일 재고 --> ',
-		'		<div class="today-total-summary"> ',
-		'			<div class="record">0</div> ',
-		'		</div> ',
 		'	</div>',
 		'</div>'
 	].join("");
 	
 	return {
 		
-		addGroupColumn: function( id, name,  ){
+		createColumnGroup: (function(){
 			
-		}
+			var fns = {
+				setId: function( id ){
+					this.data( "id", id );
+				},
+				setName: function( name ){
+					this.data( "name", name );
+					this.find( ".product-name" ).text( name );
+				}
+			};
+			
+			return function( id, name ){
+				
+				var $columnGroup = $( ColumnGroup );
+				for( var fnNm in fns ){
+					$columnGroup[ fnNm ] = fns[ fnNm ];
+				}
+				
+				$columnGroup.setId( id );
+				$columnGroup.setName( name );
+				return $columnGroup;
+				
+			};
+			
+		})()
 		
 	};
 	
@@ -313,27 +315,23 @@ var TemplateModule = (function(){
  * 데이터 표시
  */
  var products = <%- products %>;
+ products.sort(function( a, b ){
+	return a.order < b.order;
+});
+ 
  var records = <%- records %>;
- products.forEach(function( product ){
+ products.forEach(function( productGroup ){
 	 
-	 if( product.parentId != "TOP" ){
+	 if( productGroup.parentId != "TOP" ){
 		 return;
 	 }
 	 
-	 /**
+	 if( productGroup.remove == true ){
+		 return;
+	 }
 	 
-	 	자식 기준으로 record를 저장한다?
-	 			-> 부모 삭제 시, 자식이 부모가 되며 데이터 사용 가능 but 신규 자식을 생성할 경우, 어떻게해야됨?
-		
-		컬럼 자체를 date record마다 저장한다? ok ( 품목그룹삭제시, remove = true 주고, 자식도 remove = true )
-				-> A: A-1: 10, A-2:20  A-1삭제
-	 
-	 **/
-	 
-// 	 if( product.use ==  )
-	 
-	
-	alert("품목관리 정렬로직 다시 진행중 UI 따로, 데이터 따로, 데이터는 안지우므로, order = data.length ui는 갱신 필요 ( 컬럼쪽도 잘뵈)")
+	 var $columnGroup = TemplateModule.createColumnGroup( productGroup.id, productGroup.name );
+	 $columnGroup.appendTo( $productColumnList );
 	 
  });
 
