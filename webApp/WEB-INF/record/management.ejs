@@ -35,14 +35,14 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 		.product-group-name { position: relative; height: 30px; font-size: 12px; padding: 7px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center; }
 		.product-column { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: #ccc solid 1px; }
 		.product-column:last-child { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: none; }
-		.product-column.no-parent { position: relative; height: 100%; border-right: none; }
+		.product-column.top-parent { position: relative; height: 100%; border-right: none; }
 			.product-name { height: 30px; padding: 6px 10px; font-size: 12px; background-color: #F1F1F1; border-bottom: #ccc solid 1px; }
-			.no-parent > .product-name { height: 60px; padding: 20px 10px; font-size: 12px; }
+			.top-parent > .product-name { height: 60px; padding: 20px 10px; font-size: 12px; }
 			.before-total-summary { text-align: right; height: 30px; }
 			.today-inputs { text-align: right; height: 90px; border-bottom: #ccc solid 1px; overflow: hidden; }
 			.today-input-summary { text-align: right; height: 30px; }
 			.today-outputs { position: relative; text-align: right; height: calc( 100% - 240px ); overflow: hidden; }
-			.no-parent > .today-outputs { position: relative; text-align: right; height: calc( 100% - 270px ); overflow: hidden; }
+			.top-parent > .today-outputs { position: relative; text-align: right; height: calc( 100% - 270px ); overflow: hidden; }
 			.today-output-summary { text-align: right; height: 30px; }
 			.today-total-summary { text-align: right; height: 30px; }
 				.today-total-summary > .record { border-bottom: none; }
@@ -138,7 +138,7 @@ if (!String.prototype.padStart) {
 							<!-- 제품 컬럼 --> 
 							<div class="product-group-column">
 								<!-- 구분 --> 
-								<div class="product-column no-parent">
+								<div class="product-column top-parent">
 									<div class="product-name">품목명</div>
 									<!-- 전일 재고 --> 
 									<div class="before-total-summary"> 
@@ -266,45 +266,53 @@ var $productColumnList = $("#product-column-list"); // 컬롬 목록
 var TemplateModule = (function(){
 	
 	var record = '<div class="record">0</div>';
-	
-	var ColumnGroup = [
-		'<!-- 제품 컬럼 --> ',
-		'<div class="product-group-column">',
-		'	<!-- 구분 --> ',
-		'	<div class="product-column no-parent">',
-		'		<div class="product-name">품목명</div>',
+	var columnGroupName = '<div class="product-group-name">품목그룹명</div>';
+	var columnGroup = '<div class="product-group-column"></div>';
+	var column = [
+		'<div class="product-column top-parent">',
+		'	<div class="product-name">품목명</div>',
+		'	<!-- 전일 재고 --> ',
+		'	<div class="before-total-summary"> ',
+		'		<div class="record">0</div> ',
+		'	</div> ',
+		'	<!-- 당일 입고 --> ',
+		'	<div class="today-inputs">',
+		'	</div> ',
+		'	<!-- 입고계 --> ',
+		'	<div class="today-input-summary"> ',
+		'		<div class="record">0</div> ',
+		'	</div> ',
+		'	<!-- 당일 출고 --> ',
+		'	<div class="today-outputs"> ',
 		'	</div>',
+		'	<!-- 출고계 --> ',
+		'	<div class="today-output-summary"> ',
+		'		<div class="record">0</div> ',
+		'	</div> ',
+		'	<!-- 당일 재고 --> ',
+		'	<div class="today-total-summary"> ',
+		'		<div class="record">0</div> ',
+		'	</div> ',
 		'</div>'
 	].join("");
 	
 	return {
 		
-		createColumnGroup: (function(){
+		createColumnGroup: function(){
+			return $( columnGroup );
+		},
+		
+		createColumn: function( id, name ){
 			
-			var fns = {
-				setId: function( id ){
-					this.data( "id", id );
-				},
-				setName: function( name ){
-					this.data( "name", name );
-					this.find( ".product-name" ).text( name );
-				}
-			};
+			var $column = $( column );
+			$column.data({
+				id: id,
+				name: name
+			});
+			$column.find(".product-name").text( name );
+			return $column;
 			
-			return function( id, name ){
-				
-				var $columnGroup = $( ColumnGroup );
-				for( var fnNm in fns ){
-					$columnGroup[ fnNm ] = fns[ fnNm ];
-				}
-				
-				$columnGroup.setId( id );
-				$columnGroup.setName( name );
-				return $columnGroup;
-				
-			};
-			
-		})()
+		}
 		
 	};
 	
@@ -314,13 +322,35 @@ var TemplateModule = (function(){
 /**
  * 데이터 표시
  */
- var products = <%- products %>;
- products.sort(function( a, b ){
-	return a.order < b.order;
+var products = <%- products %>;
+products.sort(function( a, b ){
+	if( a.order < b.order ){ return -1 };
+	if( a.order > b.order ){ return 1 };
+	return 0;
 });
- 
- var records = <%- records %>;
- products.forEach(function( productGroup ){
+
+var Manager = (function(){
+	
+	function getById( id ){
+		for( var i=0; i<this.length; ++i ){
+			var $columns = this[ i ];
+			if( $columns.data("id") == id ){
+				return $columns;
+			}
+		}
+	}
+
+	var $columns = [];
+	$columns.get = getById;
+	
+	return {
+		$columns: $columns
+	};
+	
+})();
+
+var records = <%- records %>;
+products.forEach(function( productGroup ){
 	 
 	 if( productGroup.parentId != "TOP" ){
 		 return;
@@ -330,10 +360,32 @@ var TemplateModule = (function(){
 		 return;
 	 }
 	 
-	 var $columnGroup = TemplateModule.createColumnGroup( productGroup.id, productGroup.name );
+	 var $columnGroup = TemplateModule.createColumnGroup();
+	 var $column = TemplateModule.createColumn( productGroup.id, productGroup.name );
+	 
+	 Manager.$column.push( $column );
+	 $columnGroup.append( $column );
 	 $columnGroup.appendTo( $productColumnList );
 	 
- });
+});
+products.forEach(function( product ){
+	 
+	 if( product.parentId == "TOP" ){
+		 return;
+	 }
+	 
+	 if( product.remove == true ){
+		 return;
+	 }
+	 
+	 var $productGroup = Manager.$column.get( product.parentId );
+	 if( $productGroup == null ){
+		 return;
+	 }
+	 
+	 /********* 여기 진행중..  **************/
+	 
+});
 
 function updateBodyHeight(){
 	$body.css("height", window.innerHeight + "px");
