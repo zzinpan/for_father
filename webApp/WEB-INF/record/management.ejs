@@ -105,9 +105,9 @@ if (!String.prototype.padStart) {
 					</div>
 					<div class="col-md-4">
 						<div id="save-btn" class="smc-btn blue">저장</div>
-						<div id="del-product-group-btn" class="smc-btn disable">삭제</div>
-						<div id="add-product-group-btn" class="smc-btn">출고 추가</div>
-						<div id="add-product-group-btn" class="smc-btn">입고 추가</div>
+						<div id="del-btn" class="smc-btn disable">삭제</div>
+						<div id="add-output-btn" class="smc-btn">출고 추가</div>
+						<div id="add-input-btn" class="smc-btn">입고 추가</div>
 					</div>
 				</div>
 				<div class="col-md-12" style="position: relative; height: calc( 100% - 32px );">
@@ -135,90 +135,6 @@ if (!String.prototype.padStart) {
 					
 						<!-- 데이터 목록 -->
 						<div id="product-column-list" style="position: relative; width: calc( 100% - 138px ); display: inline-block; height: 100%;">
-							<!-- 제품 컬럼 --> 
-							<div class="product-group-column">
-								<!-- 구분 --> 
-								<div class="product-column top-parent">
-									<div class="product-name">품목명</div>
-									<!-- 전일 재고 --> 
-									<div class="before-total-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 입고 --> 
-									<div class="today-inputs">
-									</div> 
-									<!-- 입고계 --> 
-									<div class="today-input-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 출고 --> 
-									<div class="today-outputs"> 
-									</div>
-									<!-- 출고계 --> 
-									<div class="today-output-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 재고 --> 
-									<div class="today-total-summary"> 
-										<div class="record">0</div> 
-									</div> 
-								</div>
-							</div>
-							<!-- 제품 컬럼 --> 
-							<div class="product-group-column">
-								<!-- 구분 --> 
-								<div class="product-group-name">품목그룹명</div>
-								<div class="product-column">
-									<div class="product-name">품목명</div>
-									<!-- 전일 재고 --> 
-									<div class="before-total-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 입고 --> 
-									<div class="today-inputs">
-									</div> 
-									<!-- 입고계 --> 
-									<div class="today-input-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 출고 --> 
-									<div class="today-outputs"> 
-									</div>
-									<!-- 출고계 --> 
-									<div class="today-output-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 재고 --> 
-									<div class="today-total-summary"> 
-										<div class="record">0</div> 
-									</div> 
-								</div>
-								<div class="product-column">
-									<div class="product-name">품목명</div>
-									<!-- 전일 재고 --> 
-									<div class="before-total-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 입고 --> 
-									<div class="today-inputs">
-									</div> 
-									<!-- 입고계 --> 
-									<div class="today-input-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 출고 --> 
-									<div class="today-outputs"> 
-									</div>
-									<!-- 출고계 --> 
-									<div class="today-output-summary"> 
-										<div class="record">0</div> 
-									</div> 
-									<!-- 당일 재고 --> 
-									<div class="today-total-summary"> 
-										<div class="record">0</div> 
-									</div> 
-								</div>
-							</div>
 						</div>
 					
 						<div class="" style="position: relative; float: right; width: 18px; height: 100%; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
@@ -232,8 +148,18 @@ if (!String.prototype.padStart) {
 								<div id="out-record-scroll" style="height: 0px;"></div>
 							</div>
 						</div>
-						<div class="" style="float: right; width: 60px; height: 60px; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
-							<div class="" style="height: 60px; padding: 21px 10px 22px 10px; border-bottom: #ccc solid 1px;">직원</div>
+						<div class="" style="position: relative; height: 100%; float: right; width: 60px; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
+							<div class="" style="font-size: 12px; text-align: center; background-color: #F1F1F1; position: relative; float: left; width: 60px; height: 100%;">
+								<div class="" style="padding: 21px 10px 22px 10px; height: 60px; border-right: #ccc solid 1px; border-bottom: #ccc solid 1px;">직원</div>
+								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #F8F8F8; border-bottom: #ccc solid 1px; height: 30px;"></div>
+								<div class="" style="padding: 38px 0px 45px 0px; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: 90px;"></div>
+								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #F8F8F8; border-bottom: #ccc solid 1px; height: 30px;"></div>
+								<div class="" style="position: relative; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: calc( 100% - 270px );">
+									<div style="position: relative; top: calc( 50% - 7px );"></div>
+								</div>
+								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: 30px;"></div>
+								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #F8F8F8; height: 30px;"></div>
+							</div>
 						</div>
 					
 					</div>
@@ -263,13 +189,24 @@ var $window = $(window); // 윈도우
 var $body = $("body"); // 바디
 var $productColumnList = $("#product-column-list"); // 컬롬 목록
 
+var $addInputBtn = $("#add-input-btn"); // 입고 추가 버튼
+var $addOutputBtn = $("#add-output-btn"); // 출고 추가 버튼
+
 var TemplateModule = (function(){
+	
+	function recordGetValue(){
+		return this.data( "value" );
+	}
+	function recordSetValue( number ){
+		this.data( "value", number );
+		this.text( number );
+	}
 	
 	var record = '<div class="record">0</div>';
 	var columnGroupName = '<div class="product-group-name">품목그룹명</div>';
 	var columnGroup = '<div class="product-group-column"></div>';
 	var column = [
-		'<div class="product-column top-parent">',
+		'<div class="product-column">',
 		'	<div class="product-name">품목명</div>',
 		'	<!-- 전일 재고 --> ',
 		'	<div class="before-total-summary"> ',
@@ -277,6 +214,10 @@ var TemplateModule = (function(){
 		'	</div> ',
 		'	<!-- 당일 입고 --> ',
 		'	<div class="today-inputs">',
+// 		'		<div class="record" style="padding-top: 0px;">',
+					alert("여기해야됨 - record 추가할때, parent의 너비구해서 input너비 계산 필요, 인풋 스타일링 필요"),
+// 					'<input type="text" placeholder="0" style="width: 100%;">',
+// 				'</div> ',
 		'	</div> ',
 		'	<!-- 입고계 --> ',
 		'	<div class="today-input-summary"> ',
@@ -298,8 +239,23 @@ var TemplateModule = (function(){
 	
 	return {
 		
-		createColumnGroup: function(){
-			return $( columnGroup );
+		createColumnGroupName: function( name ){
+			
+			var $columnGroupName = $( columnGroupName );
+			$columnGroupName.text( name );
+			return $columnGroupName;
+			
+		},
+		
+		createColumnGroup: function( id, name ){
+			
+			var $columnGroup = $( columnGroup );
+			$columnGroup.data({
+				id: id,
+				name: name
+			});
+			
+			return $columnGroup;
 		},
 		
 		createColumn: function( id, name ){
@@ -311,6 +267,15 @@ var TemplateModule = (function(){
 			});
 			$column.find(".product-name").text( name );
 			return $column;
+			
+		},
+		
+		createRecord: function(){
+			
+			var $record = $( record );
+			$record.getValue = recordGetValue;
+			$record.setValue = recordSetValue;
+			return $record;
 			
 		}
 		
@@ -339,11 +304,24 @@ var Manager = (function(){
 			}
 		}
 	}
+	function removeById( id ){
+		for( var i=0; i<this.length; ++i ){
+			var $columns = this[ i ];
+			if( $columns.data("id") == id ){
+				return this.splice( i, 1 );
+			}
+		}
+	}
 
 	var $columns = [];
+	var $columnGroups = [];
 	$columns.get = getById;
+	$columnGroups.get = getById;
+	$columns.remove = removeById;
+	$columnGroups.remove = removeById;
 	
 	return {
+		$columnGroups: $columnGroups,
 		$columns: $columns
 	};
 	
@@ -360,10 +338,13 @@ products.forEach(function( productGroup ){
 		 return;
 	 }
 	 
-	 var $columnGroup = TemplateModule.createColumnGroup();
+	 var $columnGroup = TemplateModule.createColumnGroup( productGroup.id, productGroup.name );
 	 var $column = TemplateModule.createColumn( productGroup.id, productGroup.name );
+	 $column.addClass("top-parent");
 	 
-	 Manager.$column.push( $column );
+	 Manager.$columnGroups.push( $columnGroup );
+	 Manager.$columns.push( $column );
+	 
 	 $columnGroup.append( $column );
 	 $columnGroup.appendTo( $productColumnList );
 	 
@@ -378,14 +359,47 @@ products.forEach(function( product ){
 		 return;
 	 }
 	 
-	 var $productGroup = Manager.$column.get( product.parentId );
+	 var $productGroup = Manager.$columnGroups.get( product.parentId );
 	 if( $productGroup == null ){
 		 return;
 	 }
 	 
-	 /********* 여기 진행중..  **************/
+	 var $column = TemplateModule.createColumn( product.id, product.name );
+	 if( 0 == $productGroup.find(".product-group-name").length ){
+		 
+		 // 기존 그룹 컬럼 제거
+		 $productGroup.find(".product-column").remove();
+		 Manager.$columns.remove( $productGroup.data( "id" )  );
+		 
+		 // 그룹명 추가
+		 var $ColumnGroupName = TemplateModule.createColumnGroupName( $productGroup.data( "name" ) );
+		 $productGroup.append( $ColumnGroupName );
+	 }
+	 $productGroup.append( $column );
+	 Manager.$columns.push( $column );
 	 
 });
+
+
+// 입고 추가 버튼 클릭 이벤트
+$addInputBtn.on("click", function(){
+	
+	Manager.$columns.forEach(function( $column ){
+		
+		var $record = TemplateModule.createRecord();
+		$record.setValue( 0 );
+		$column.find(".today-inputs").append( $record );
+		
+	});
+	
+});
+
+
+
+
+
+
+
 
 function updateBodyHeight(){
 	$body.css("height", window.innerHeight + "px");
