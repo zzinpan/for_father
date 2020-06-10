@@ -33,7 +33,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .product-column-list { box-shadow: 0px 0px 0px 1px #ccc; border-radius: 4px; font-size: 0px; overflow-x: auto; white-space: nowrap; text-align: left; margin-bottom: 40px; width: 100%; height: 60px; }
 	.product-group-column { position: relative; display: inline-block; font-size: 0px; border-right: #ccc solid 1px; height: 100%; vertical-align: top; }
 		.product-group-name { position: relative; height: 30px; font-size: 12px; padding: 7px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center; }
-		.product-column { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: #ccc solid 1px; }
+		.product-column { position: relative; height: calc( 100% - 30px ); min-width: 50px; text-align: center; display: inline-block; border-right: #ccc solid 1px; }
 		.product-column:last-child { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: none; }
 		.product-column.top-parent { position: relative; height: 100%; border-right: none; }
 			.product-name { height: 30px; padding: 6px 10px; font-size: 12px; background-color: #F1F1F1; border-bottom: #ccc solid 1px; }
@@ -201,8 +201,17 @@ var TemplateModule = (function(){
 		this.data( "value", number );
 		this.text( number );
 	}
+	function inputRecordSetValue( number ){
+		this.data( "value", number );
+		this.find("input").val( number );
+	}
 	
 	var record = '<div class="record">0</div>';
+	var inputRecord = [
+		'<div class="record" style="padding: 3px 2px;">',
+		'	<input type="text" placeholder="0" style="text-align: right; padding-right: 4px; width: 100%;">',
+		'</div> '
+	].join("");
 	var columnGroupName = '<div class="product-group-name">품목그룹명</div>';
 	var columnGroup = '<div class="product-group-column"></div>';
 	var column = [
@@ -214,10 +223,6 @@ var TemplateModule = (function(){
 		'	</div> ',
 		'	<!-- 당일 입고 --> ',
 		'	<div class="today-inputs">',
-// 		'		<div class="record" style="padding-top: 0px;">',
-					alert("여기해야됨 - record 추가할때, parent의 너비구해서 input너비 계산 필요, 인풋 스타일링 필요"),
-// 					'<input type="text" placeholder="0" style="width: 100%;">',
-// 				'</div> ',
 		'	</div> ',
 		'	<!-- 입고계 --> ',
 		'	<div class="today-input-summary"> ',
@@ -276,6 +281,15 @@ var TemplateModule = (function(){
 			$record.getValue = recordGetValue;
 			$record.setValue = recordSetValue;
 			return $record;
+			
+		},
+		
+		createInputRecord: function(){
+			
+			var $inputRecord = $( inputRecord );
+			$inputRecord.getValue = recordGetValue;
+			$inputRecord.setValue = inputRecordSetValue;
+			return $inputRecord;
 			
 		}
 		
@@ -386,8 +400,9 @@ $addInputBtn.on("click", function(){
 	
 	Manager.$columns.forEach(function( $column ){
 		
-		var $record = TemplateModule.createRecord();
+		var $record = TemplateModule.createInputRecord();
 		$record.setValue( 0 );
+		$record.width( $column.width() );
 		$column.find(".today-inputs").append( $record );
 		
 	});
@@ -396,7 +411,7 @@ $addInputBtn.on("click", function(){
 
 
 
-
+alert("인풋 온체인지이벤트에서 입고계 썸해줘야대");
 
 
 
