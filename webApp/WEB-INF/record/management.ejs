@@ -80,6 +80,7 @@ if (!String.prototype.padStart) {
         }
     };
 }
+
 </script>
 </head>
 <body>
@@ -209,7 +210,7 @@ var TemplateModule = (function(){
 	var record = '<div class="record">0</div>';
 	var inputRecord = [
 		'<div class="record" style="padding: 3px 2px;">',
-		'	<input type="text" placeholder="0" style="text-align: right; padding-right: 4px; width: 100%;">',
+		'	<input type="text" value="0" min="0" step="1" style="text-align: right; padding-right: 4px; width: 100%;">',
 		'</div> '
 	].join("");
 	var columnGroupName = '<div class="product-group-name">품목그룹명</div>';
@@ -409,9 +410,64 @@ $addInputBtn.on("click", function(){
 	
 });
 
+function updateSummary(){
+	
+	var $this = $(this);
+	var $productCloumn = $this.closest( ".product-column" );
+	
+	var $beforeTotalSummary = $productCloumn.find(".before-total-summary .record");
+	var beforeTotalSummary = parseFloat( $beforeTotalSummary.text() );
+	
+	var $todayInputSummary = $productCloumn.find(".today-input-summary .record");
+	var $todayInputs = $productCloumn.find(".today-inputs .record input");
+	
+	var todayInputs = 0;
+	for( var i=0; i<$todayInputs.length; ++i ){
+		
+		var todayInput = parseFloat( $todayInputs.eq( i ).val() );
+		if( isNaN( todayInput ) == true ){
+			todayInput = 0;
+		}
+		todayInputs += todayInput;
+	}
+	$todayInputSummary.text( todayInputs );
+	
+	var $todayOutputSummary = $productCloumn.find(".today-output-summary .record");
+	var $todayOutputs = $productCloumn.find(".today-outputs .record input");
+	
+	var todayOutputs = 0;
+	for( var i=0; i<$todayOutputs.length; ++i ){
+		
+		var todayOutput = parseFloat( $todayOutputs.eq( i ).val() );;
+		if( isNaN( todayOutput ) == true ){
+			todayOutput = 0;
+		}
+		todayOutputs += todayOutput;
+	}
+	$todayOutputSummary.text( todayOutputs );
+	
+	var $todayTotalSummary = $productCloumn.find(".today-total-summary .record");
+	$todayTotalSummary.text( beforeTotalSummary + todayInputs - todayOutputs );
+	var width = $productCloumn.width() - 4;
+	console.log( width );
+	
+	for( var i=0; i<$todayInputs.length; ++i ){
+		$todayInputs.eq( i ).closest(".record").width( width );
+	}
+	for( var i=0; i<$todayOutputs.length; ++i ){
+		$todayOutputs.eq( i ).closest(".record").width( width );
+	}
+	
+}
 
+// 입력창
+$productColumnList.on("focus", "input", function(){
+	
+	$(this).select();
+	
+}).on("keydown", "input", updateSummary).on("keyup", "input", updateSummary);
 
-alert("인풋 온체인지이벤트에서 입고계 썸해줘야대");
+alert("입고 추가 시, 스크롤 동작하도록 해야돼");
 
 
 
