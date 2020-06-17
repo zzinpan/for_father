@@ -97,7 +97,7 @@ if (!String.prototype.padStart) {
 				
 				<div class="col-md-12" style="height: 32px;">
 					<div class="col-md-4">
-						<div class="smc-count" style="padding-top: 8px;">입고 <span id="product-cnt-span">0</span>건 / 출고 0건</div>
+						<div class="smc-count" style="padding-top: 8px;">입고 <span id="input-cnt">0</span>건 / 출고 <span id="output-cnt">0</span>건</div>
 					</div>
 					<div class="col-md-4">
 						<div style="margin-top: -10px;">
@@ -116,8 +116,9 @@ if (!String.prototype.padStart) {
 					
 						<div style="position: absolute; z-index: -1; top: 0px; height: 60px; border-bottom: #ccc solid 1px; width: 100%; background-color: #f8f8f8;"></div>
 						<div style="position: absolute; z-index: -1; top: 60px; height: 30px; border-bottom: #ccc solid 1px; width: 100%; background-color: #fbfbfb;"></div>
-						<div style="position: absolute; z-index: -1; top: 90px; height: 90px; border-bottom: #ccc solid 1px; width: 100%;"></div>
+						<div id="in-record-div" style="position: absolute; z-index: -1; top: 90px; height: 90px; border-bottom: #ccc solid 1px; width: 100%;"></div>
 						<div style="position: absolute; z-index: -1; top: 180px; height: 30px; border-bottom: #ccc solid 1px; width: 100%; background-color: #fbfbfb;"></div>
+						<div id="out-record-div" style="position: absolute; z-index: -1; top: 210px;  height: calc( 100% - 270px ); width: 100%;"></div>
 						<div style="position: absolute; z-index: -1; bottom: 31px; height: 30px; border-top: #ccc solid 1px; width: 100%;"></div>
 						<div style="position: absolute; z-index: -1; bottom: 1px; height: 30px; border-top: #ccc solid 1px; width: 100%;  background-color: #f9f9f9;"></div>
 						
@@ -141,12 +142,12 @@ if (!String.prototype.padStart) {
 						<div class="" style="position: relative; float: right; width: 18px; height: 100%; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
 							<div class="" style="height: 60px;"></div>
 							<div class="" style="height: 30px; border-bottom: #ccc solid 1px;"></div>
-							<div class="" style="height: 90px; overflow: hidden scroll; border-bottom: #ccc solid 1px;">
-								<div id="in-record-scroll" style="height: 0px;"></div>
+							<div id="in-record-scroll" class="" style="height: 90px; overflow: hidden scroll; border-bottom: #ccc solid 1px;">
+								<div id="in-record-scroll-bar" style="height: 0px;"></div>
 							</div>
 							<div class="" style="height: 30px; border-bottom: #ccc solid 1px;"></div>
-							<div class="" style="position: relative; height: calc( 100% - 270px ); overflow: hidden scroll; border-bottom: #ccc solid 1px;">
-								<div id="out-record-scroll" style="height: 0px;"></div>
+							<div class="out-record-scroll" style="position: relative; height: calc( 100% - 270px ); overflow: hidden scroll; border-bottom: #ccc solid 1px;">
+								<div id="out-record-scroll-bar" style="height: 0px;"></div>
 							</div>
 						</div>
 						<div class="" style="position: relative; height: 100%; float: right; width: 60px; font-size: 12px; text-align: center; background-color: #F1F1F1; border-left: #ccc solid 1px;">
@@ -155,8 +156,7 @@ if (!String.prototype.padStart) {
 								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #F8F8F8; border-bottom: #ccc solid 1px; height: 30px;"></div>
 								<div class="" style="padding: 38px 0px 45px 0px; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: 90px;"></div>
 								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #F8F8F8; border-bottom: #ccc solid 1px; height: 30px;"></div>
-								<div class="" style="position: relative; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: calc( 100% - 270px );">
-									<div style="position: relative; top: calc( 50% - 7px );"></div>
+								<div id="output-employee-column" class="" style="position: relative; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: calc( 100% - 270px );">
 								</div>
 								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #ffffff; border-bottom: #ccc solid 1px; height: 30px;"></div>
 								<div class="" style="padding: 8px 0px 15px 0px; border-right: #ccc solid 1px; background-color: #F8F8F8; height: 30px;"></div>
@@ -192,6 +192,20 @@ var $productColumnList = $("#product-column-list"); // 컬롬 목록
 
 var $addInputBtn = $("#add-input-btn"); // 입고 추가 버튼
 var $addOutputBtn = $("#add-output-btn"); // 출고 추가 버튼
+
+var $inputCnt = $("#input-cnt"); // 입고수 표시
+var $outputCnt = $("#output-cnt"); // 출고수 표시
+
+var $inRecordScroll = $("#in-record-scroll"); // 입고 스크롤
+var $inRecordScrollBar = $("#in-record-scroll-bar"); // 입고 스크롤
+
+var $outRecordScroll = $("#out-record-scroll"); // 입고 스크롤
+var $outRecordScrollBar = $("#out-record-scroll-bar"); // 입고 스크롤
+
+var $inRecordDiv = $("#in-record-div"); // 입고 스크롤 영역
+var $outRecordDiv = $("#out-record-div"); // 출고 스크롤 영역
+
+var $outputEmployeeColumn = $("#output-employee-column"); // 출고 직원 컬럼
 
 var TemplateModule = (function(){
 	
@@ -309,6 +323,8 @@ products.sort(function( a, b ){
 	return 0;
 });
 
+console.log( <%- employees %> );
+
 var Manager = (function(){
 	
 	function getById( id ){
@@ -398,7 +414,10 @@ products.forEach(function( product ){
 
 // 입고 추가 버튼 클릭 이벤트
 $addInputBtn.on("click", function(){
+
+	var inputCnt = parseInt( $inputCnt.text() );
 	
+	inputCnt++;
 	Manager.$columns.forEach(function( $column ){
 		
 		var $record = TemplateModule.createInputRecord();
@@ -408,7 +427,44 @@ $addInputBtn.on("click", function(){
 		
 	});
 	
+	$inRecordScrollBar.height( inputCnt * 30 );
+	$inputCnt.text( inputCnt );
+	
 });
+
+$addOutputBtn.on("click", function(){
+	
+	var outputCnt = parseInt( $outputCnt.text() );
+	
+	outputCnt++;
+	Manager.$columns.forEach(function( $column ){
+		
+		var $record = TemplateModule.createInputRecord();
+		$record.setValue( 0 );
+		$record.width( $column.width() );
+		$column.find(".today-outputs").append( $record );
+		
+	});
+	
+	var $record = TemplateModule.createInputRecord();
+	$record.setValue( "선택" );
+	$record.find("input").css({
+		"text-align": "center"
+	});
+	$outputEmployeeColumn.append( $record );
+	
+	$outRecordScrollBar.height( outputCnt * 30 );
+	$outputCnt.text( outputCnt );
+	
+});
+
+String.prototype.addNumberComma = function() {
+    return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}; 
+
+String.prototype.removeNumberComma = function() {
+    return this.replace(/,/gi, "");
+}; 
 
 function updateSummary(){
 	
@@ -430,7 +486,7 @@ function updateSummary(){
 		}
 		todayInputs += todayInput;
 	}
-	$todayInputSummary.text( todayInputs );
+	$todayInputSummary.text( todayInputs.toString().addNumberComma() );
 	
 	var $todayOutputSummary = $productCloumn.find(".today-output-summary .record");
 	var $todayOutputs = $productCloumn.find(".today-outputs .record input");
@@ -444,12 +500,11 @@ function updateSummary(){
 		}
 		todayOutputs += todayOutput;
 	}
-	$todayOutputSummary.text( todayOutputs );
+	$todayOutputSummary.text( todayOutputs.toString().addNumberComma() );
 	
 	var $todayTotalSummary = $productCloumn.find(".today-total-summary .record");
-	$todayTotalSummary.text( beforeTotalSummary + todayInputs - todayOutputs );
+	$todayTotalSummary.text( ( beforeTotalSummary + todayInputs - todayOutputs ).toString().addNumberComma() );
 	var width = $productCloumn.width() - 4;
-	console.log( width );
 	
 	for( var i=0; i<$todayInputs.length; ++i ){
 		$todayInputs.eq( i ).closest(".record").width( width );
@@ -460,27 +515,61 @@ function updateSummary(){
 	
 }
 
+// 스크롤
+$body.on("wheel", function( e ){
+	
+	if( 
+			inRecordDivRect.x <= e.pageX && 
+			e.pageX <= inRecordDivRect.x + inRecordDivRect.width && 
+			inRecordDivRect.y <= e.pageY && 
+			e.pageY <= inRecordDivRect.y + inRecordDivRect.height
+	){
+		
+		var beforeScrollTop = $(".today-inputs").scrollTop();
+		var afterScrollTop = beforeScrollTop + e.originalEvent.deltaY / 10 * 3;
+		$(".today-inputs").scrollTop( afterScrollTop );
+		$inRecordScroll.scrollTop( afterScrollTop );
+		return;	
+	}
+	
+	if( 
+			outRecordDivRect.x <= e.pageX && 
+			e.pageX <= outRecordDivRect.x + outRecordDivRect.width && 
+			outRecordDivRect.y <= e.pageY && 
+			e.pageY <= outRecordDivRect.y + outRecordDivRect.height
+	){
+		
+		var beforeScrollTop = $(".today-outputs").scrollTop();
+		var afterScrollTop = beforeScrollTop + e.originalEvent.deltaY / 10 * 3;
+		$(".today-outputs").scrollTop( afterScrollTop );
+		$outRecordScroll.scrollTop( afterScrollTop );
+		
+	}
+	
+});
+
 // 입력창
-$productColumnList.on("focus", "input", function(){
+$body.on("focus", "input", function(){
 	
 	$(this).select();
 	
 }).on("keydown", "input", updateSummary).on("keyup", "input", updateSummary);
 
-alert("입고 추가 시, 스크롤 동작하도록 해야돼");
-
-
-
-
 function updateBodyHeight(){
 	$body.css("height", window.innerHeight + "px");
 }
-updateBodyHeight();
+
+var inRecordDivRect =  null;
+var outRecordDivRect =  null;
 
 // 윈도우 크기 변경 이벤트
 $window.on("resize", function(){
 	updateBodyHeight();
-});
+	inRecordDivRect = $inRecordDiv.get(0).getBoundingClientRect();
+	outRecordDivRect = $outRecordDiv.get(0).getBoundingClientRect();
+}).trigger("resize");
+
+alert( "출고 추가 시, 직원 검색 추가해야됨. 깃랩처럼 사용자 입력 시, 자동완성 [북부]김성용 선택시, 자동 입력 blur 시, id 자동 맵핑" )
 
 </script>
 </body>

@@ -150,11 +150,44 @@ module.exports = (function (){
 								
 							});
 							
-							console.log( JSON.stringify( records ) );
-							res.render( "WEB-INF/record/management.ejs", {
-								products: JSON.stringify( products ),
-								records: JSON.stringify( records )
-							} );
+							fs.readFile(
+									global.dataDir + "/employee.json",
+									"utf8",
+									function( err, employees ){ 
+										
+										fs.readFile(
+											global.dataDir + "/group.json",
+											"utf8",
+											function( err, groups ){ 
+												
+												groups = JSON.parse( groups );
+												groups = groups.filter(function( group ){
+													
+													if( group.use == false ){
+														return false;
+													}
+													
+													if( group.remove == true ){
+														return false;
+													}
+													
+													return true;
+													
+												});
+												
+												res.render( "WEB-INF/record/management.ejs", {
+													products: JSON.stringify( products ),
+													records: JSON.stringify( records ),
+													groups: JSON.stringify( groups ),
+													employees: employees
+												} );
+												
+											}
+										);
+										
+									}
+								);
+							
 						}
 				);
 				
