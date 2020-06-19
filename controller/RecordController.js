@@ -178,8 +178,8 @@ module.exports = (function (){
 												res.render( "WEB-INF/record/management.ejs", {
 													products: JSON.stringify( products ),
 													records: JSON.stringify( records ),
-													groups: JSON.stringify( groups ),
-													employees: employees
+													groups: groups,
+													employees: JSON.parse( employees )
 												} );
 												
 											}

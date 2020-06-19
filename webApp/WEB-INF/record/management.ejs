@@ -47,6 +47,13 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 			.today-total-summary { text-align: right; height: 30px; }
 				.today-total-summary > .record { border-bottom: none; }
 
+/* 직원 목록 */
+.employee-list { position: fixed; left: 50%; top: 50%; display: ; box-shadow: 0px 0px 0px 1px #ccc; max-height: 200px; overflow-y: auto; border-radius: 4px; background-color: white; }
+	.employee-item { border-bottom: #ccc solid 1px; padding: 10px 20px; cursor: pointer; white-space: nowrap; }
+	.employee-item.focus { background-color: #2196F3; color: white; }
+	.employee-item:not(.focus):hover { background-color: #eee; }
+	.employee-item:last-child { border-bottom: none; }
+
 /* 공용 */
 .record { height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px; font-size: 12px; }
 		
@@ -81,6 +88,53 @@ if (!String.prototype.padStart) {
     };
 }
 
+
+//https://tc39.github.io/ecma262/#sec-array.prototype.find
+if (!Array.prototype.find) {
+  Object.defineProperty(Array.prototype, 'find', {
+    value: function(predicate) {
+     // 1. Let O be ? ToObject(this value).
+      if (this == null) {
+        throw new TypeError('"this" is null or not defined');
+      }
+
+      var o = Object(this);
+
+      // 2. Let len be ? ToLength(? Get(O, "length")).
+      var len = o.length >>> 0;
+
+      // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+      if (typeof predicate !== 'function') {
+        throw new TypeError('predicate must be a function');
+      }
+
+      // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+      var thisArg = arguments[1];
+
+      // 5. Let k be 0.
+      var k = 0;
+
+      // 6. Repeat, while k < len
+      while (k < len) {
+        // a. Let Pk be ! ToString(k).
+        // b. Let kValue be ? Get(O, Pk).
+        // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+        // d. If testResult is true, return kValue.
+        var kValue = o[k];
+        if (predicate.call(thisArg, kValue, k, o)) {
+          return kValue;
+        }
+        // e. Increase k by 1.
+        k++;
+      }
+
+      // 7. Return undefined.
+      return undefined;
+    },
+    configurable: true,
+    writable: true
+  });
+}
 </script>
 </head>
 <body>
@@ -173,6 +227,18 @@ if (!String.prototype.padStart) {
 	</div>
 </div>
 
+<div id="employee-list" class="employee-list" style="display: none;">
+	<% 
+		employees.forEach(function( employee ){
+			
+			var group = groups.find(function( group ){
+				return employee.groupId == group.id;
+			});
+			%><div class="employee-item" data-id="<%= employee.id %>" data-name="<%= employee.name %>">[<%= group.name %>] <%= employee.name %></div><%
+		});
+	 %>
+</div>
+
 <script type="text/javascript">
 
 $("#calendar-inp").datepicker({
@@ -206,6 +272,8 @@ var $inRecordDiv = $("#in-record-div"); // 입고 스크롤 영역
 var $outRecordDiv = $("#out-record-div"); // 출고 스크롤 영역
 
 var $outputEmployeeColumn = $("#output-employee-column"); // 출고 직원 컬럼
+
+var $employeeList = $("#employee-list"); // 직원 목록
 
 var TemplateModule = (function(){
 	
@@ -322,8 +390,6 @@ products.sort(function( a, b ){
 	if( a.order > b.order ){ return 1 };
 	return 0;
 });
-
-console.log( <%- employees %> );
 
 var Manager = (function(){
 	
@@ -447,16 +513,84 @@ $addOutputBtn.on("click", function(){
 	});
 	
 	var $record = TemplateModule.createInputRecord();
-	$record.setValue( "선택" );
+	$record.setValue( "" );
 	$record.find("input").css({
 		"text-align": "center"
-	});
+	}).attr("placeholder", "직원명");;
 	$outputEmployeeColumn.append( $record );
 	
 	$outRecordScrollBar.height( outputCnt * 30 );
 	$outputCnt.text( outputCnt );
 	
 });
+
+$outputEmployeeColumn.on("click", "input", function( e ){
+	
+	e.stopPropagation();
+	
+	var $input = $(this);
+	var rect = $input.get( 0 ).getBoundingClientRect();
+	$employeeList.css({
+		left: rect.x + "px",
+		top: rect.y + $input.height() + 8 + "px"
+	});
+
+	$employeeList.data("$input", $input);
+	$employeeList.show();
+	$input.trigger("keyup");
+	
+});
+
+
+$outputEmployeeColumn.on("keyup", "input", function( e ){
+	
+	var $input = $(this);
+	var text = $input.val().toUpperCase();
+	var $employees = $employeeList.find(".employee-item");
+	var beforeVisibleCnt = $employees.filter(":visible").length;
+	for( var i=0; i<$employees.length; ++i ){
+		var $employee = $employees.eq( i );
+		if( -1 < $employee.text().toUpperCase().indexOf( text ) ){
+			$employee.show();
+		}else{
+			$employee.hide();
+		}
+	}
+	
+});
+
+$employeeList.on("click", ".employee-item", function( e ){
+	
+	var $employee = $(this);
+	var $employeeList = $employee.closest( ".employee-list" );
+	var $input = $employeeList.data("$input");
+	if( $input == null ){
+		return;
+	}
+	
+	$employeeList.data("$input", null);
+	$input.val( $employee.attr("data-name") );
+	$input.data( "employeeId", $employee.attr("data-id") );
+	
+});
+
+// $outputEmployeeColumn.on("keypress", "input", function( e ){
+	
+// 	alert();
+	
+// 	if( e.keyCode == 40 ){
+		
+		
+		
+// 	}
+	
+// // 	$employees.filter(":visible").eq( 0 ).addClass("focus");
+	
+// // 	$employeeList.find(".employee-item");
+	
+// });
+
+
 
 String.prototype.addNumberComma = function() {
     return this.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -549,7 +683,11 @@ $body.on("wheel", function( e ){
 });
 
 // 입력창
-$body.on("focus", "input", function(){
+$body.on("click", function(){
+	
+	$employeeList.hide();
+	
+}).on("focus", "input", function(){
 	
 	$(this).select();
 	
@@ -569,7 +707,9 @@ $window.on("resize", function(){
 	outRecordDivRect = $outRecordDiv.get(0).getBoundingClientRect();
 }).trigger("resize");
 
-alert( "출고 추가 시, 직원 검색 추가해야됨. 깃랩처럼 사용자 입력 시, 자동완성 [북부]김성용 선택시, 자동 입력 blur 시, id 자동 맵핑" )
+// alert( "출고 추가 시, 직원 검색 추가해야됨. 깃랩처럼 사용자 입력 시, 자동완성 [북부]김성용 선택시, 자동 입력 blur 시, id 자동 맵핑" )
+
+// 저장 전, input의 직원 아이디가 있는지 검증 걸어야됨 ( 사용작 입력의 경우 없을 수 있음 이때는, 조회해서 값넣고, 2개이상이면, 먼가 조치가 필요)
 
 </script>
 </body>
