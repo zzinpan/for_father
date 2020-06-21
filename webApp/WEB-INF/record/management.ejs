@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset=UTF-8">
-<title>신나라유통 ERP > calculation > management</title>
+<title>신나라유통 ERP > record > management</title>
 <link rel="stylesheet" href="/lib/jquery-ui-1.12.1/jquery-ui.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap.min.css">
 <link rel="stylesheet" href="/lib/bootstrap/bootstrap-datepicker.min.css">
@@ -17,8 +17,8 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 .smc-header { font-size: 20px; padding: 10px; color: #222; font-weight: bold; margin-bottom: 20px; }
 .smc-desc { background-color: #eee; color: #616161; padding: 10px; font-size: 12px; }
 .smc-inp { border: none; border-bottom: #ccc solid 1px; padding: 4px 10px; font-size: 10px; width: 100%; }
-.smc-inp::placeholder { color: #cccccc; }
-.smc-inp:focus { outline: none; border-bottom: #2196F3 solid 1px; }
+input::placeholder { color: #cccccc; }
+input:focus { outline: none; border: #2196F3 solid 1px; padding: 2px 5px 2px 3px; border-radius: 2px; }
 .smc-count { font-size: 10px; height: 28px; }
 .smc-grid { position: relative; box-shadow: 0px 0px 0px 1px #ccc; height: calc( 100% - 67px ); border-radius: 4px; }
 .small-title { font-weight: bold; margin-bottom: 40px; }
@@ -56,6 +56,7 @@ body { margin: 0px; padding: 0px; overflow: hidden; font-family: sans-serif; col
 
 /* 공용 */
 .record { height: 30px; padding: 8px 10px 9px 10px; border-bottom: #ccc solid 1px; font-size: 12px; }
+.record.select-row { background-color: #E3F2FD; }
 		
 /* 라이브러리 커스텀 */		
 .ui-autocomplete.ui-widget {
@@ -155,7 +156,7 @@ if (!Array.prototype.find) {
 					</div>
 					<div class="col-md-4">
 						<div style="margin-top: -10px;">
-							<input id="calendar-inp" class="smc-inp" type="text" value="2020-04-07" style="cursor: pointer; text-align: center; border: none; font-size: 20px; font-weight: bold; margin-top: -16px" readonly="readonly">
+							<input id="calendar-inp" class="smc-inp" type="text" value="<%= requestDate %>" style="cursor: pointer; text-align: center; border: none; font-size: 20px; font-weight: bold; margin-top: -16px" readonly="readonly">
 						</div>
 					</div>
 					<div class="col-md-4">
@@ -241,11 +242,16 @@ if (!Array.prototype.find) {
 
 <script type="text/javascript">
 
+var now = new Date();
 $("#calendar-inp").datepicker({
 	language: "ko",
-	todayHighlight : true 
-}).on('changeDate', function(ev){
-	$calInps.datepicker('hide');
+	todayHighlight : true,
+	beforeShowDay: function(date){
+        return now.getTime() > date.getTime();
+    }
+}).on('changeDate', function(e){
+	var yyyyMMdd = $.datepicker.formatDate('yy-mm-dd', e.date); 
+	parent.reload( "/record/management/view?date=" + yyyyMMdd );
 });
 
 /**
@@ -482,13 +488,15 @@ products.forEach(function( product ){
 $addInputBtn.on("click", function(){
 
 	var inputCnt = parseInt( $inputCnt.text() );
-	
 	inputCnt++;
+	
+	var rowId = Date.now().toString() + Math.random();
 	Manager.$columns.forEach(function( $column ){
 		
 		var $record = TemplateModule.createInputRecord();
 		$record.setValue( 0 );
 		$record.width( $column.width() );
+		$record.attr("data-row-id", rowId);
 		$column.find(".today-inputs").append( $record );
 		
 	});
@@ -501,13 +509,15 @@ $addInputBtn.on("click", function(){
 $addOutputBtn.on("click", function(){
 	
 	var outputCnt = parseInt( $outputCnt.text() );
-	
 	outputCnt++;
+	
+	var rowId = Date.now().toString() + Math.random();
 	Manager.$columns.forEach(function( $column ){
 		
 		var $record = TemplateModule.createInputRecord();
 		$record.setValue( 0 );
 		$record.width( $column.width() );
+		$record.attr("data-row-id", rowId);
 		$column.find(".today-outputs").append( $record );
 		
 	});
@@ -516,7 +526,8 @@ $addOutputBtn.on("click", function(){
 	$record.setValue( "" );
 	$record.find("input").css({
 		"text-align": "center"
-	}).attr("placeholder", "직원명");;
+	});
+	$record.attr("data-row-id", rowId);
 	$outputEmployeeColumn.append( $record );
 	
 	$outRecordScrollBar.height( outputCnt * 30 );
@@ -689,7 +700,15 @@ $body.on("click", function(){
 	
 }).on("focus", "input", function(){
 	
-	$(this).select();
+	var $this = $(this);
+	var $record = $this.closest( ".record" );
+	if( $record.length == 0 ){
+		return;
+	}
+	$(".record.select-row").removeClass( "select-row" );
+	var rowId = $record.attr("data-row-id");
+	$body.find(".record[data-row-id='"+rowId+"']").addClass( "select-row" );
+	$this.select();
 	
 }).on("keydown", "input", updateSummary).on("keyup", "input", updateSummary);
 

@@ -163,16 +163,21 @@ var $recordBtns = $(".record-btn");
  * 이벤트
  */
 
-// 헤더버튼 선택 및 페이지 이동
-function selectHeaderBtnAndMovePage( $targetHeaderBtn, src ){
-	
-	$headerBtns.not( $targetHeaderBtn ).stop().removeClass( "select", 100 );
-	$targetHeaderBtn.stop().addClass( "select", 100 );
+window.reload = function( src ){
 	
 	$subView.addClass( "hide", 500, function(){
 		$subView.attr( "src", src );
 		updateBirthdayIcon();
 	} );
+	
+};
+ 
+// 헤더버튼 선택 및 페이지 이동
+function selectHeaderBtnAndMovePage( $targetHeaderBtn, src ){
+	
+	$headerBtns.not( $targetHeaderBtn ).stop().removeClass( "select", 100 );
+	$targetHeaderBtn.stop().addClass( "select", 100 );
+	reload( src );
 	
 }
 

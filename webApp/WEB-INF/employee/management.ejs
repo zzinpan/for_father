@@ -1048,13 +1048,22 @@ $addCompleteBtn.on("click", function(){
 		return;
 	}
 	
+	var hasName = false;
 	var $employeeItems = $employeeList.find( ".employee-item" );
 	for( var i=0; i<$employeeItems.length; ++i ){
 		var employeeName =  $employeeItems.eq( i ).getName();
 		if( newEmployeeName == employeeName ){
-			alert( "이미 존재하는 직원 입니다." );
+			hasName = true;
+			break;	
+		}
+	}
+	
+	if( hasName == true ){
+		
+		if( confirm( "동명 직원이 존재합니다.\n직원을 추가 하시겠습니까?" ) == false ){
 			return;
 		}
+		
 	}
 	
 	var imageSrc = $addEmployeeImg.getImage();

@@ -49,6 +49,12 @@ module.exports = (function (){
 			method: function( req, res, next ){
 				
 				var requestDate = req.query.date;
+				if( requestDate == null ){
+					
+					var now = global.now();
+					requestDate = now.yyyy + "-" + now.MM + "-" + now.dd;
+					
+				}
 				var yyyyMMddArr = requestDate.split("-");
 				var requestFileName = requestDate + ".json";
 				
@@ -176,6 +182,7 @@ module.exports = (function (){
 												});
 												
 												res.render( "WEB-INF/record/management.ejs", {
+													requestDate: requestDate,
 													products: JSON.stringify( products ),
 													records: JSON.stringify( records ),
 													groups: groups,
