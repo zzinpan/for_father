@@ -34,6 +34,7 @@ input:focus { outline: none; border: #2196F3 solid 1px; padding: 2px 5px 2px 3px
 	.product-group-column { position: relative; display: inline-block; font-size: 0px; border-right: #ccc solid 1px; height: 100%; vertical-align: top; }
 		.product-group-name { position: relative; height: 30px; font-size: 12px; padding: 7px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center; }
 		.product-column { position: relative; height: calc( 100% - 30px ); min-width: 50px; text-align: center; display: inline-block; border-right: #ccc solid 1px; }
+		.product-column.select-column { background-color: #E3F2FD; }
 		.product-column:last-child { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: none; }
 		.product-column.top-parent { position: relative; height: 100%; border-right: none; }
 			.product-name { height: 30px; padding: 6px 10px; font-size: 12px; background-color: #F1F1F1; border-bottom: #ccc solid 1px; }
@@ -706,8 +707,10 @@ $body.on("click", function(){
 		return;
 	}
 	$(".record.select-row").removeClass( "select-row" );
+	$(".product-column.select-column").removeClass( "select-column" );
 	var rowId = $record.attr("data-row-id");
-	$body.find(".record[data-row-id='"+rowId+"']").addClass( "select-row" );
+	$body.find(".record[data-row-id='"+rowId+"']").addClass( "select-row", 250 );
+	$this.closest(".product-column").addClass( "select-column", 250 );
 	$this.select();
 	
 }).on("keydown", "input", updateSummary).on("keyup", "input", updateSummary);
