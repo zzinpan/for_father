@@ -34,7 +34,7 @@ input:focus { outline: none; border: #2196F3 solid 1px; padding: 2px 5px 2px 3px
 	.product-group-column { position: relative; display: inline-block; font-size: 0px; border-right: #ccc solid 1px; height: 100%; vertical-align: top; }
 		.product-group-name { position: relative; height: 30px; font-size: 12px; padding: 7px 10px; border-bottom: #ccc solid 1px; background-color: #F1F1F1; text-align: center; }
 		.product-column { position: relative; height: calc( 100% - 30px ); min-width: 50px; text-align: center; display: inline-block; border-right: #ccc solid 1px; }
-		.product-column.select-column { background-color: #E3F2FD; }
+			.select-column { background-color: #E3F2FD !important; }
 		.product-column:last-child { position: relative; height: calc( 100% - 30px ); text-align: center; display: inline-block; border-right: none; }
 		.product-column.top-parent { position: relative; height: 100%; border-right: none; }
 			.product-name { height: 30px; padding: 6px 10px; font-size: 12px; background-color: #F1F1F1; border-bottom: #ccc solid 1px; }
@@ -265,6 +265,7 @@ var $productColumnList = $("#product-column-list"); // 컬롬 목록
 
 var $addInputBtn = $("#add-input-btn"); // 입고 추가 버튼
 var $addOutputBtn = $("#add-output-btn"); // 출고 추가 버튼
+var $delBtn = $("#del-btn"); // 삭제 버튼
 
 var $inputCnt = $("#input-cnt"); // 입고수 표시
 var $outputCnt = $("#output-cnt"); // 출고수 표시
@@ -484,6 +485,23 @@ products.forEach(function( product ){
 	 
 });
 
+// 삭제 버튼 클릭 이벤트
+$delBtn.on("click", function(){
+	
+	if( $delBtn.hasClass( "disable" ) ){
+		return;
+	}
+	
+	if( confirm( "선택한 줄을 삭제하시겠습니까?" ) == false ){
+		return;
+	}
+	
+	$(".record.select-row").remove();
+	$(".select-column").removeClass( "select-column" );
+	updateSummary();
+	$delBtn.addClass("disable");
+	
+});
 
 // 입고 추가 버튼 클릭 이벤트
 $addInputBtn.on("click", function(){
@@ -536,27 +554,8 @@ $addOutputBtn.on("click", function(){
 	
 });
 
-$outputEmployeeColumn.on("click", "input", function( e ){
+function filterEmployeeList( $input ){
 	
-	e.stopPropagation();
-	
-	var $input = $(this);
-	var rect = $input.get( 0 ).getBoundingClientRect();
-	$employeeList.css({
-		left: rect.x + "px",
-		top: rect.y + $input.height() + 8 + "px"
-	});
-
-	$employeeList.data("$input", $input);
-	$employeeList.show();
-	$input.trigger("keyup");
-	
-});
-
-
-$outputEmployeeColumn.on("keyup", "input", function( e ){
-	
-	var $input = $(this);
 	var text = $input.val().toUpperCase();
 	var $employees = $employeeList.find(".employee-item");
 	var beforeVisibleCnt = $employees.filter(":visible").length;
@@ -568,6 +567,33 @@ $outputEmployeeColumn.on("keyup", "input", function( e ){
 			$employee.hide();
 		}
 	}
+	
+}
+
+
+
+$outputEmployeeColumn.on("click", "input", function( e ){
+	e.stopPropagation();
+});
+$outputEmployeeColumn.on("focus", "input", function( e ){
+	
+	var $input = $(this);
+	var rect = $input.get( 0 ).getBoundingClientRect();
+	$employeeList.css({
+		left: rect.x + "px",
+		top: rect.y + $input.height() + 8 + "px"
+	});
+
+	$employeeList.data("$input", $input);
+	$employeeList.show();
+	filterEmployeeList( $input );
+	
+});
+
+
+$outputEmployeeColumn.on("keyup", "input", function(){
+	
+	filterEmployeeList( $(this) );
 	
 });
 
@@ -614,49 +640,53 @@ String.prototype.removeNumberComma = function() {
 
 function updateSummary(){
 	
-	var $this = $(this);
-	var $productCloumn = $this.closest( ".product-column" );
+	var $productColumns = $( ".product-column" );
 	
-	var $beforeTotalSummary = $productCloumn.find(".before-total-summary .record");
-	var beforeTotalSummary = parseFloat( $beforeTotalSummary.text() );
-	
-	var $todayInputSummary = $productCloumn.find(".today-input-summary .record");
-	var $todayInputs = $productCloumn.find(".today-inputs .record input");
-	
-	var todayInputs = 0;
-	for( var i=0; i<$todayInputs.length; ++i ){
+	for( var j=0; j<$productColumns.length; ++j ){
+		var $productColumn = $productColumns.eq( j );
 		
-		var todayInput = parseFloat( $todayInputs.eq( i ).val() );
-		if( isNaN( todayInput ) == true ){
-			todayInput = 0;
-		}
-		todayInputs += todayInput;
-	}
-	$todayInputSummary.text( todayInputs.toString().addNumberComma() );
-	
-	var $todayOutputSummary = $productCloumn.find(".today-output-summary .record");
-	var $todayOutputs = $productCloumn.find(".today-outputs .record input");
-	
-	var todayOutputs = 0;
-	for( var i=0; i<$todayOutputs.length; ++i ){
+		var $beforeTotalSummary = $productColumn.find(".before-total-summary .record");
+		var beforeTotalSummary = parseFloat( $beforeTotalSummary.text() );
 		
-		var todayOutput = parseFloat( $todayOutputs.eq( i ).val() );;
-		if( isNaN( todayOutput ) == true ){
-			todayOutput = 0;
+		var $todayInputSummary = $productColumn.find(".today-input-summary .record");
+		var $todayInputs = $productColumn.find(".today-inputs .record input");
+		
+		var todayInputs = 0;
+		for( var i=0; i<$todayInputs.length; ++i ){
+			
+			var todayInput = parseFloat( $todayInputs.eq( i ).val() );
+			if( isNaN( todayInput ) == true ){
+				todayInput = 0;
+			}
+			todayInputs += todayInput;
 		}
-		todayOutputs += todayOutput;
-	}
-	$todayOutputSummary.text( todayOutputs.toString().addNumberComma() );
-	
-	var $todayTotalSummary = $productCloumn.find(".today-total-summary .record");
-	$todayTotalSummary.text( ( beforeTotalSummary + todayInputs - todayOutputs ).toString().addNumberComma() );
-	var width = $productCloumn.width() - 4;
-	
-	for( var i=0; i<$todayInputs.length; ++i ){
-		$todayInputs.eq( i ).closest(".record").width( width );
-	}
-	for( var i=0; i<$todayOutputs.length; ++i ){
-		$todayOutputs.eq( i ).closest(".record").width( width );
+		$todayInputSummary.text( todayInputs.toString().addNumberComma() );
+		
+		var $todayOutputSummary = $productColumn.find(".today-output-summary .record");
+		var $todayOutputs = $productColumn.find(".today-outputs .record input");
+		
+		var todayOutputs = 0;
+		for( var i=0; i<$todayOutputs.length; ++i ){
+			
+			var todayOutput = parseFloat( $todayOutputs.eq( i ).val() );;
+			if( isNaN( todayOutput ) == true ){
+				todayOutput = 0;
+			}
+			todayOutputs += todayOutput;
+		}
+		$todayOutputSummary.text( todayOutputs.toString().addNumberComma() );
+		
+		var $todayTotalSummary = $productColumn.find(".today-total-summary .record");
+		$todayTotalSummary.text( ( beforeTotalSummary + todayInputs - todayOutputs ).toString().addNumberComma() );
+		var width = $productColumn.width() - 4;
+		
+		for( var i=0; i<$todayInputs.length; ++i ){
+			$todayInputs.eq( i ).closest(".record").width( width );
+		}
+		for( var i=0; i<$todayOutputs.length; ++i ){
+			$todayOutputs.eq( i ).closest(".record").width( width );
+		}
+		
 	}
 	
 }
@@ -707,13 +737,99 @@ $body.on("click", function(){
 		return;
 	}
 	$(".record.select-row").removeClass( "select-row" );
-	$(".product-column.select-column").removeClass( "select-column" );
+	$(".select-column").removeClass( "select-column" );
+	
 	var rowId = $record.attr("data-row-id");
-	$body.find(".record[data-row-id='"+rowId+"']").addClass( "select-row", 250 );
-	$this.closest(".product-column").addClass( "select-column", 250 );
+	$body.find(".record[data-row-id='"+rowId+"']").addClass( "select-row" );
+	
+	var $parent = $this.closest( ".product-column" );
+	if( $parent.length == 0 ){
+		$parent = $("#output-employee-column");
+	}
+	
+	$parent.addClass( "select-column" );
 	$this.select();
 	
-}).on("keydown", "input", updateSummary).on("keyup", "input", updateSummary);
+	$delBtn.removeClass("disable");
+	
+}).on("keydown", "input", function( e ){
+	
+	// 38: up 40: down
+	if( e.keyCode == 38 ){
+		var $this = $(this);
+		var $parent = $this.closest( ".product-column" );
+		if( $parent.length == 0 ){
+			$parent = $("#output-employee-column");
+		}
+		
+		var $inputs = $parent.find( "input" );
+		var index = $inputs.index( $this );
+		if( index == 0 ){
+			return;
+		}
+		e.preventDefault();
+		$inputs.eq( index-1 ).trigger("focus");
+		return;
+	}
+	if( e.keyCode == 40 ){
+		var $this = $(this);
+		var $parent = $this.closest( ".product-column" );
+		if( $parent.length == 0 ){
+			$parent = $("#output-employee-column");
+		}
+		
+		var $inputs = $parent.find( "input" );
+		var index = $inputs.index( $this );
+		if( index == $inputs.length - 1 ){
+			return;
+		}
+		e.preventDefault();
+		$inputs.eq( index+1 ).trigger("focus");
+		return;
+	}
+	
+	// 37: left 39: right
+	if( e.keyCode == 37 ){
+		
+		if( 0 < e.target.selectionStart ){
+			return;
+		}
+		
+		var $this = $(this);
+		var $record = $this.closest( ".record" );
+		var rowId = $record.attr("data-row-id");
+		var $records = $body.find(".record[data-row-id='"+rowId+"']");
+		var index = $records.index( $record );
+		if( index == 0 ){
+			return;
+		}
+		e.preventDefault();
+		$records.eq( index - 1 ).find( "input" ).trigger( "focus" );
+		$employeeList.hide();
+		
+	}
+	
+	if( e.keyCode == 39 ){
+		
+		var $this = $(this);
+		if( e.target.selectionEnd < $this.val().length ){
+			return;
+		}
+		
+		var $record = $this.closest( ".record" );
+		var rowId = $record.attr("data-row-id");
+		var $records = $body.find(".record[data-row-id='"+rowId+"']");
+		var index = $records.index( $record );
+		if( index == $records.length - 1 ){
+			return;
+		}
+		e.preventDefault();
+		$records.eq( index + 1 ).find( "input" ).trigger( "focus" );
+		
+	}
+	
+	
+}).on("keyup", "input", updateSummary);
 
 function updateBodyHeight(){
 	$body.css("height", window.innerHeight + "px");
@@ -729,7 +845,6 @@ $window.on("resize", function(){
 	outRecordDivRect = $outRecordDiv.get(0).getBoundingClientRect();
 }).trigger("resize");
 
-// alert( "출고 추가 시, 직원 검색 추가해야됨. 깃랩처럼 사용자 입력 시, 자동완성 [북부]김성용 선택시, 자동 입력 blur 시, id 자동 맵핑" )
 
 // 저장 전, input의 직원 아이디가 있는지 검증 걸어야됨 ( 사용작 입력의 경우 없을 수 있음 이때는, 조회해서 값넣고, 2개이상이면, 먼가 조치가 필요)
 
